@@ -4,11 +4,10 @@ using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    public class DFA
+    public class DFA : FiniteAutomata<DFA.State>
     {
-        public class State
+        public class State : BaseState
         {
-            public int StateNumber { get; set; }
             public IEnumerable<NFA.State> NfaStates { get; set; }
             public bool Mark { get; set; }
 
@@ -27,15 +26,12 @@ namespace Piglet.Lexer.Construction
             {
                 return string.Format( "{0} {{{1}}}", StateNumber, String.Join( ", ", NfaStates));
             }
-        }
 
-        public IList<State> States { get; set; }
-        public IList<Transition<State>> Transitions { get; set; }
-
-        public DFA()
-        {
-            States = new List<State>();
-            Transitions = new List<Transition<State>>();
+            public override bool AcceptState
+            {
+                get { return NfaStates.Any(f=>f.AcceptState); }
+                set {}  // Do nothing, cannot set
+            }
         }
 
         public static DFA Create(NFA nfa)
@@ -47,7 +43,7 @@ namespace Piglet.Lexer.Construction
             while (true)
             {
                 // Get an unmarked state in dfaStates
-                State t = dfa.States.FirstOrDefault(f => !f.Mark);
+                var t = dfa.States.FirstOrDefault(f => !f.Mark);
                 if (null == t)
                 {
                     // We're done!
@@ -79,17 +75,9 @@ namespace Piglet.Lexer.Construction
                 }
             }
 
-            dfa.SetStateNumbers();
+            dfa.StartState = dfa.States[0];
+            dfa.AssignStateNumbers();
             return dfa;
-        }
-
-        public void SetStateNumbers()
-        {
-            int i = 0;
-            foreach (var state in States)
-            {
-                state.StateNumber = i++;
-            }
         }
     }
 }

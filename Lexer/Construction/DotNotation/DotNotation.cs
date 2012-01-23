@@ -17,7 +17,7 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <param name="automata"></param>
         /// <param name="graphName"></param>
         /// <returns></returns>
-        public static string AsDotNotation(this NFA automata, string graphName = "automata")
+        public static string AsDotNotation<TState>(this FiniteAutomata<TState> automata, string graphName = "automata") where TState : FiniteAutomata<TState>.BaseState
         {
             // Draw the *FA as a directed graph with the state numbers in circles
             // Use a double circle for accepting states
@@ -41,7 +41,6 @@ namespace Piglet.Lexer.Construction.DotNotation
             
             foreach (var transition in automata.Transitions)
             {
-                
                 sb.Append(string.Format("\t{0} -> {1} [label={2}]\n", 
                     transition.From.StateNumber,
                     transition.To.StateNumber,

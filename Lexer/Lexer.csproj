@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Construction\DotNotation\DotNotation.cs" />
+    <Compile Include="Construction\FiniteAutomata.cs" />
     <Compile Include="ILexer.cs" />
     <Compile Include="Configuration\ILexerConfigurator.cs" />
     <Compile Include="Lexer.cs" />

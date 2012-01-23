@@ -19,5 +19,14 @@ namespace TestParser
             Console.WriteLine(dotString);
             Console.WriteLine();
         }
+
+        [TestMethod]
+        public void TestDotForDFA()
+        {
+            var dfa = DFA.Create(NFA.Create(PostFixConverter.ToPostFix("((hej)|(tjo))+hopp")));
+            string dotString = dfa.AsDotNotation();
+            Console.WriteLine(dotString);
+            Console.WriteLine();
+        }
     }
 }

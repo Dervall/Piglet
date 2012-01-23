@@ -5,30 +5,19 @@ using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    public class NFA
+    public class NFA : FiniteAutomata<NFA.State>
     {
         // This represents a state transfer that requires no input. These will never be transferred into the DFA
         public const char Epsilon = (char)0;
 
-        public class State
+        public class State : BaseState
         {
-            public bool AcceptState { get; set; }
-            public int StateNumber { get; set; }
+            public override bool AcceptState { get; set; }
 
             public override string ToString()
             {
                 return string.Format("{0} {1}", StateNumber, AcceptState ? "ACCEPT" : "");
             }
-        }
-
-        public IList<State> States { get; set; }
-        public IList<Transition<State>> Transitions { get; set; }
-        public State StartState { get; set; }
-
-        public NFA()
-        {
-            States = new List<State>();
-            Transitions = new List<Transition<State>>();
         }
 
         public static NFA Create(string postfixRegex)
@@ -202,18 +191,6 @@ namespace Piglet.Lexer.Construction
             }
         }
 
-        public void AssignStateNumbers()
-        {
-            int i = 0;
-            foreach (var state in States)
-            {
-                if (state != StartState)
-                    state.StateNumber = ++i;
-            }
-            // Always use 0 as the start state
-            StartState.StateNumber = 0;
-        }
-
         public IEnumerable<State> Closure(State[] states, ISet<State> visitedStates = null)
         {
             if (visitedStates == null)
@@ -247,7 +224,7 @@ namespace Piglet.Lexer.Construction
         public static NFA Merge(params NFA[] nfas)
         {
             // Create a new NFA, add everything to it.
-            NFA merged = new NFA();
+            var merged = new NFA();
             foreach (var nfa in nfas)
             {
                 merged.AddAll(nfa);

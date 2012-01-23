@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Piglet.Lexer
+namespace Piglet.Lexer.Construction
 {
     public static class PostFixConverter
     {

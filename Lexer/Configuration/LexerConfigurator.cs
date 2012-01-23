@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Piglet.Lexer.Construction;
 
-namespace Piglet.Lexer
+namespace Piglet.Lexer.Configuration
 {
     public class LexerConfigurator<T> : ILexerConfigurator<T>
     {

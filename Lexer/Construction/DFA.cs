@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Piglet.Lexer
+namespace Piglet.Lexer.Construction
 {
     public class DFA
     {

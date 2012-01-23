@@ -1,4 +1,5 @@
 ﻿using System;
+using Piglet.Lexer.Configuration;
 
 namespace Piglet.Lexer
 {

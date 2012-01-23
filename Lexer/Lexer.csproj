@@ -40,12 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILexer.cs" />
+    <Compile Include="Configuration\ILexerConfigurator.cs" />
+    <Compile Include="Lexer.cs" />
+    <Compile Include="Configuration\LexerConfigurator.cs" />
     <Compile Include="LexerFactory.cs" />
-    <Compile Include="DFA.cs" />
-    <Compile Include="NFA.cs" />
-    <Compile Include="PostFixConverter.cs" />
+    <Compile Include="Construction\DFA.cs" />
+    <Compile Include="Construction\NFA.cs" />
+    <Compile Include="Construction\PostFixConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Transition.cs" />
+    <Compile Include="Construction\Transition.cs" />
+    <Compile Include="TransitionTable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

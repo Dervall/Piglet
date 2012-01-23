@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Lexer;
+using Piglet.Lexer.Construction;
 
 namespace TestParser
 {

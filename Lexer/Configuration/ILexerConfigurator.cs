@@ -1,6 +1,6 @@
 using System;
 
-namespace Piglet.Lexer
+namespace Piglet.Lexer.Configuration
 {
     public interface ILexerConfigurator<in T>
     {

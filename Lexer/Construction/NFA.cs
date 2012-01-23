@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Piglet.Lexer
+namespace Piglet.Lexer.Construction
 {
     public class NFA
     {

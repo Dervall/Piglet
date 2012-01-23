@@ -50,6 +50,7 @@
     <Compile Include="TestDotNotation.cs" />
     <Compile Include="TestLexer.cs" />
     <Compile Include="TestPostFixConverter.cs" />
+    <Compile Include="TestRegEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lexer\Lexer.csproj">

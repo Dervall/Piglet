@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{1E23F251-94E1-4504-81E8-2618F5C9FEA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestParser", "TestParser\TestParser.csproj", "{911347A0-30E7-497F-99B9-59DBEEF90A83}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{82E69494-2A01-4E03-95FF-943F0113E8A1}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		Parser.vsmdi = Parser.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexer", "Lexer\Lexer.csproj", "{CAA7C41A-BEF8-4B49-B1FC-234D9FD2A327}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Parser.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E23F251-94E1-4504-81E8-2618F5C9FEA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E23F251-94E1-4504-81E8-2618F5C9FEA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E23F251-94E1-4504-81E8-2618F5C9FEA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E23F251-94E1-4504-81E8-2618F5C9FEA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{911347A0-30E7-497F-99B9-59DBEEF90A83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{911347A0-30E7-497F-99B9-59DBEEF90A83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{911347A0-30E7-497F-99B9-59DBEEF90A83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{911347A0-30E7-497F-99B9-59DBEEF90A83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAA7C41A-BEF8-4B49-B1FC-234D9FD2A327}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAA7C41A-BEF8-4B49-B1FC-234D9FD2A327}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAA7C41A-BEF8-4B49-B1FC-234D9FD2A327}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAA7C41A-BEF8-4B49-B1FC-234D9FD2A327}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

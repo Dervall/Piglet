@@ -221,7 +221,7 @@ namespace Piglet.Lexer.Construction
             }
         }
 
-        public static NFA Merge(params NFA[] nfas)
+        public static NFA Merge(IList<NFA> nfas)
         {
             // Create a new NFA, add everything to it.
             var merged = new NFA();

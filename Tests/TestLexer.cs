@@ -60,7 +60,7 @@ namespace TestParser
             NFA nfa2 = NFA.Create(PostFixConverter.ToPostFix("abb"));
             NFA nfa3 = NFA.Create(PostFixConverter.ToPostFix("a*b+"));
 
-            NFA final = NFA.Merge(nfa, nfa2, nfa3);
+            NFA final = NFA.Merge(new List<NFA> {nfa, nfa2, nfa3});
             DFA finalDFA = DFA.Create(final);
             Console.WriteLine(123);
         }
@@ -77,6 +77,24 @@ namespace TestParser
             lexer.Source = new StringReader("abb");
             Tuple<int, string> tuple = lexer.Next();
             Console.WriteLine("stsd");
+        }
+
+        [TestMethod]
+        public void TestLexerConstructionWithWhitespaceIgnore()
+        {
+            ILexer<string> lexer = LexerFactory<string>.Configure(c =>
+            {
+                c.Token("a+", f => "A+");
+                c.Token("abb", f => "ABB");
+                c.Token("a*b+", f => "A*B+");
+                c.Ignore(" *"); // Bad regexp lol, fix
+            });
+            lexer.Source = new StringReader("    abb   bbbbbbbbb");
+
+            Tuple<int, string> tuple = lexer.Next();
+            Assert.AreEqual("ABB", tuple.Item2);
+            tuple = lexer.Next();
+            Assert.AreEqual("A*B+", tuple.Item2);
         }
 
         [TestMethod]

@@ -10,7 +10,7 @@ namespace Piglet.Lexer
         private readonly short[,] table;
         private readonly Tuple<int, Func<string, T>>[] actions;
 
-        public TransitionTable(DFA dfa, NFA[] nfas, List<Tuple<string, Func<string, T>>> tokens)
+        public TransitionTable(DFA dfa, IList<NFA> nfas, IList<Tuple<string, Func<string, T>>> tokens)
         {
             table = new short[dfa.States.Count(),255];
             
@@ -41,14 +41,25 @@ namespace Piglet.Lexer
                         for (int tokenNumber = 0; tokenNumber < nfas.Count(); ++tokenNumber)
                         {
                             NFA nfa = nfas[tokenNumber];
+                           
                             if (nfa.States.Intersect(state.NfaStates.Where(f=>f.AcceptState)).Any())
                             {
                                 // Match
-                                actions[state.StateNumber] =  new Tuple<int, Func<string, T>>(
-                                    tokenNumber, tokens[tokenNumber].Item2);
+                                // This might be a token that we ignore. This is if the tokenNumber >= number of tokens
+                                // since the ignored tokens are AFTER the normal tokens. If this is so, set the action func to
+                                // -1, NULL to signal that the parsing should restart
+                                if (tokenNumber >= tokens.Count())
+                                {
+                                    actions[state.StateNumber] = new Tuple<int, Func<string, T>>(-1, null);
+                                }
+                                else
+                                {
+                                    actions[state.StateNumber] = new Tuple<int, Func<string, T>>(
+                                        tokenNumber, tokens[tokenNumber].Item2);    
+                                }
                                 break;
                             }
-                        }   
+                        }
                     }
                 }
             }

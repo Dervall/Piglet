@@ -6,6 +6,8 @@ namespace Piglet.Lexer
 {
     public class Lexer<T> : ILexer<T>
     {
+        public TextReader Source { get; set; }
+
         private readonly TransitionTable<T> transitionTable;
         private int state = 0;
 
@@ -43,19 +45,33 @@ namespace Piglet.Lexer
                     Tuple<int, Func<string, T>> action = transitionTable.GetAction(state);
                     if (action != null)
                     {
-                        // Reset states
+                        // Reset state
                         state = 0;
-                        return new Tuple<int, T>(action.Item1, action.Item2 == null ? default(T) : action.Item2(lexeme.ToString()));
+
+                        // If tokennumber is -1 it is an ignored token, like typically whitespace.
+                        // In that case, dont return, continue lexing with the reset parser to get the next token.
+                        if (action.Item1 != -1)
+                        {
+                            return new Tuple<int, T>(action.Item1,
+                                                     action.Item2 == null ? default(T) : action.Item2(lexeme.ToString()));
+                        }
                     }
-                    throw new Exception("Cannot find token. Stuck in state");
+                    else
+                    {
+                        // We get here if there is no action at the state where the lexer cannot continue given the input.
+                        // This is fail.
+                        throw new Exception("Cannot find token. Stuck in state");
+                    }
                 }
-                // Switch states, append character to lexeme.
-                state = nextState;
-                lexeme.Append(c);
-                Source.Read();
+                else
+                {
+                    // Machine has not terminated.
+                    // Switch states, append character to lexeme.
+                    state = nextState;
+                    lexeme.Append(c);
+                    Source.Read();
+                }
             }
         }
-
-        public TextReader Source { get; set; }
     }
 }

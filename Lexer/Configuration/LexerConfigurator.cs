@@ -7,12 +7,17 @@ namespace Piglet.Lexer.Configuration
 {
     public class LexerConfigurator<T> : ILexerConfigurator<T>
     {
-        protected List<Tuple<string, Func<string, T>>> Tokens { get; set; }
+        private readonly List<Tuple<string, Func<string, T>>> tokens;
+        private readonly List<string> ignore;
 
         public ILexer<T> CreateLexer()
         {
             // For each token, create a NFA
-            NFA[] nfas = Tokens.Select(token => NFA.Create(PostFixConverter.ToPostFix(token.Item1))).ToArray();
+            IList<NFA> nfas = tokens.Select(token => NFA.Create(PostFixConverter.ToPostFix(token.Item1))).ToList();
+            foreach (var ignoreExpr in ignore)
+            {
+                nfas.Add(NFA.Create(PostFixConverter.ToPostFix(ignoreExpr)));
+            }
 
             // Create a merged NFA
             NFA mergedNfa = NFA.Merge(nfas);
@@ -21,19 +26,25 @@ namespace Piglet.Lexer.Configuration
             DFA dfa = DFA.Create(mergedNfa);
 
             // Convert the dfa to table form
-            var transitionTable = new TransitionTable<T>(dfa, nfas, Tokens);
+            var transitionTable = new TransitionTable<T>(dfa, nfas, tokens);
 
-            return new Lexer.Lexer<T>(transitionTable);
+            return new Lexer<T>(transitionTable);
         }
 
         public LexerConfigurator()
         {
-            Tokens = new List<Tuple<string, Func<string, T>>>();
+            tokens = new List<Tuple<string, Func<string, T>>>();
+            ignore = new List<string>();
         }
 
         public void Token(string regEx, Func<string, T> action)
         {
-            Tokens.Add(new Tuple<string, Func<string, T>>(regEx, action));
+            tokens.Add(new Tuple<string, Func<string, T>>(regEx, action));
+        }
+
+        public void Ignore(string regEx)
+        {
+            ignore.Add(regEx);
         }
     }
 }

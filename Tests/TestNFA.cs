@@ -23,7 +23,7 @@ namespace TestParser
             NFA nfa = NFA.AcceptRange('a', 'c');
             Assert.AreEqual(2, nfa.States.Count);
             Assert.AreEqual(1, nfa.Transitions.Count);
-            Assert.AreEqual("[a-c]", nfa.Transitions[0].ValidInput);
+            Assert.AreEqual(3, nfa.Transitions[0].ValidInput.Count());
         }
     }
 }

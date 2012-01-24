@@ -19,7 +19,7 @@ namespace Piglet.Lexer.Construction
             public NFA.State[] Move(NFA nfa, char c)
             {
                 // Find transitions going OUT from this state that is valid with an input c
-                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput != null && f.ValidInput.Contains(c)) select e.To).ToArray();
+                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput.Contains(c)) select e.To).ToArray();
             }
 
             public override string ToString()
@@ -79,10 +79,17 @@ namespace Piglet.Lexer.Construction
                             newState = oldState;
                         }
 
-                        // We will only add transitions using single characters for DFAs. No ranges like we
-                        // do in NFAs. So, our DFAs will have lots and lots of edges. That's fine since they will probably be
-                        // condensed into better tables later on.
-                        dfa.Transitions.Add(new Transition<State>(t, new[] { c }, newState));
+                        // See if there already is a transition. In that case, add our character to the list
+                        // of valid values
+                        var transition = dfa.Transitions.SingleOrDefault(f => f.From == t && f.To == newState);
+                        if (transition == null) 
+                        {
+                            // No transition has been found. Create a new one.
+                            transition = new Transition<State>(t, newState);
+                            dfa.Transitions.Add(transition);                     
+                        }
+
+                        transition.ValidInput.Add(c);
                     }
                 }
             }

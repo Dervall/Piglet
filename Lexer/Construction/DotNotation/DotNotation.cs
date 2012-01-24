@@ -60,10 +60,10 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <returns></returns>
         public static string TransitionLabel<T>(this Transition<T> transition )
         {
-            if ( transition.ValidInput == null ) return "ε";
+            if ( !transition.ValidInput.Any()) return "ε";
 
-            if (transition.ValidInput.Length == 1)
-                return transition.ValidInput[0].ToString();
+            if (transition.ValidInput.Count == 1)
+                return transition.ValidInput.First().ToString();
             return string.Join(", ", transition.ValidInput);
         }
     }

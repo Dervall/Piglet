@@ -43,6 +43,11 @@ namespace Piglet.Lexer.Construction
                             {
                                 classNegated = true;
                             }
+                            else
+                            {
+                                // If its not in the first position it is a normal character.
+                                classChars.Add('^');
+                            }
                             break;
                         case '-':
                             if (lastClassChar == '\0' || stringStream.Peek() == ']')

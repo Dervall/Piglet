@@ -74,5 +74,11 @@ namespace TestParser
         {
             CheckMatch("abcd", "[^ABCD]+");
         }
+
+        [TestMethod]
+        public void TestNegateInWrongPosition()
+        {
+            CheckMatch("^", "[x^]");
+        }
     }
 }

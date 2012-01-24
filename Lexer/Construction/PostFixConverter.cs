@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -68,6 +69,18 @@ namespace Piglet.Lexer.Construction
                         break;
 
                     default:
+                        if (inputCharacter == '\\')
+                        {
+                            // Append the escape to the buffer, it will be used by the NFA construction
+                            buffer.Append('\\');
+
+                            // Ignore the escape
+                            if (reader.Peek() == -1)
+                            {
+                                throw new Exception("No character following escape character");
+                            }
+                            inputCharacter = (char) reader.Read();
+                        }
                         if (state.NumAtoms > 1)
                         {
                             --state.NumAtoms;

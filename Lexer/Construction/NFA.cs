@@ -24,35 +24,52 @@ namespace Piglet.Lexer.Construction
         {
             var stack = new Stack<NFA>();
             var stringStream = new StringReader(postfixRegex);
+            var escaped = false;
 
             while (stringStream.Peek() != -1)
             {
                 var c = (char)stringStream.Read();
-                switch (c)
+                if (escaped)
                 {
-                    case '|':
-                        stack.Push(Or(stack.Pop(), stack.Pop()));
-                        break;
+                    switch (c)
+                    {
+                        default:
+                            stack.Push(AcceptSingle(c));
+                            break;
+                    }
+                    escaped = false;
+                }
+                else
+                {
+                    switch (c)
+                    {
+                        case '|':
+                            stack.Push(Or(stack.Pop(), stack.Pop()));
+                            break;
 
-                    case '+':
-                        stack.Push(RepeatOnceOrMore(stack.Pop()));
-                        break;
+                        case '+':
+                            stack.Push(RepeatOnceOrMore(stack.Pop()));
+                            break;
 
-                    case '*':
-                        stack.Push(RepeatZeroOrMore(stack.Pop()));
-                        break;
+                        case '*':
+                            stack.Push(RepeatZeroOrMore(stack.Pop()));
+                            break;
 
-                    case '&':
-                        // & is not commutative, and the stack is reversed.
-                        var second = stack.Pop();
-                        var first = stack.Pop();
-                        stack.Push(And(first, second));
-                        break;
-
-                    default:
-                        // Normal character
-                        stack.Push(AcceptSingle(c));
-                        break;
+                        case '&':
+                            // & is not commutative, and the stack is reversed.
+                            var second = stack.Pop();
+                            var first = stack.Pop();
+                            stack.Push(And(first, second));
+                            break;
+                        case '\\':
+                            // Set escaped state
+                            escaped = true;
+                            break;
+                        default:
+                            // Normal character
+                            stack.Push(AcceptSingle(c));
+                            break;
+                    }
                 }
             }
 

@@ -56,10 +56,12 @@ namespace Piglet.Lexer.Construction
                             {
                                 char from = lastClassChar < c ? lastClassChar : c;
                                 char to = lastClassChar < c ? c : lastClassChar;
-                                for (; from < to; ++from)
+                                for (; from <= to; ++from)
                                 {
                                     classChars.Add(from);
                                 }
+                                // Clear the looking flag, accept characters normally into the class.
+                                lookingForNextInRange = false;
                             } 
                             else
                             {

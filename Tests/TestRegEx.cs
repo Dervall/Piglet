@@ -49,5 +49,11 @@ namespace TestParser
         {
             CheckMatch("abcdePOPP", "[a-eA-Z]+");
         }
+
+        [TestMethod]
+        public void TestAnyCharacter()
+        {
+            CheckMatch("XHXas!!a.A", "X.X.*\\.A");
+        }
     }
 }

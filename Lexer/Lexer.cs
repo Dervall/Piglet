@@ -11,6 +11,10 @@ namespace Piglet.Lexer
         private readonly TransitionTable<T> transitionTable;
         private int state = 0;
 
+        // This is for error reporting purposes
+        private int lineNumber = 1;
+        private StringBuilder currentLine = new StringBuilder();
+
         public Lexer(TransitionTable<T> transitionTable)
         {
             this.transitionTable = transitionTable;
@@ -33,6 +37,12 @@ namespace Piglet.Lexer
                 if (peek == -1)
                 {
                     peek = 0;
+                }
+
+                if (peek == '\n')
+                {
+                    lineNumber++;
+                    currentLine = new StringBuilder();
                 }
 
                 var c = (char)peek;
@@ -60,7 +70,8 @@ namespace Piglet.Lexer
                     {
                         // We get here if there is no action at the state where the lexer cannot continue given the input.
                         // This is fail.
-                        throw new Exception("Cannot find token. Stuck in state");
+                        throw new LexerException(string.Format( "Invalid character '{3}' at {0}:{1}. Line so far {2}", 
+                            lineNumber, currentLine.ToString().Length, currentLine, c));
                     }
                 }
                 else
@@ -69,6 +80,7 @@ namespace Piglet.Lexer
                     // Switch states, append character to lexeme.
                     state = nextState;
                     lexeme.Append(c);
+                    currentLine.Append(c);
                     Source.Read();
                 }
             }

@@ -46,6 +46,7 @@
     <Compile Include="Configuration\ILexerConfigurator.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Configuration\LexerConfigurator.cs" />
+    <Compile Include="LexerException.cs" />
     <Compile Include="LexerFactory.cs" />
     <Compile Include="Construction\DFA.cs" />
     <Compile Include="Construction\NFA.cs" />

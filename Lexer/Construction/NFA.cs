@@ -128,6 +128,9 @@ namespace Piglet.Lexer.Construction
                             // Set escaped state
                             escaped = true;
                             break;
+                        case '.':
+                            stack.Push(AcceptAnything());
+                            break;
                         default:
                             // Normal character
                             stack.Push(AcceptSingle(c));
@@ -148,6 +151,20 @@ namespace Piglet.Lexer.Construction
             var nfa = stack.Pop();
             nfa.AssignStateNumbers();
             return nfa;
+        }
+
+        private static NFA AcceptAnything()
+        {
+            return Accept(AllCharactersExceptNull);
+        }
+
+        protected static IEnumerable<char> AllCharactersExceptNull
+        {
+            get
+            {
+                for (var c = (char)1; c < 256; ++c) 
+                    yield return c;
+            }
         }
 
         private static NFA AcceptClass(IEnumerable<char> classChars)

@@ -67,6 +67,24 @@ namespace Piglet.Lexer.Construction
                             return null;
                         buffer.Append(inputCharacter);
                         break;
+                    case '[':
+                        if (state.NumAtoms > 1)
+                        {
+                            --state.NumAtoms;
+                            buffer.Append('&');
+                        }
+                        // Append to buffer until we find a matching ]
+                        buffer.Append('[');
+                        while (reader.Peek() != ']')
+                        {
+                            if (reader.Peek() == -1)
+                                throw new Exception("Unterminated character class");
+                            buffer.Append((char) reader.Read());
+                        }
+                        buffer.Append(']');
+                        reader.Read();
+                        state.NumAtoms++;
+                        break;
 
                     default:
                         if (state.NumAtoms > 1)

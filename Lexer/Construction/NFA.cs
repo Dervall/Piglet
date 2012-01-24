@@ -25,11 +25,63 @@ namespace Piglet.Lexer.Construction
             var stack = new Stack<NFA>();
             var stringStream = new StringReader(postfixRegex);
             var escaped = false;
+            var inCharacterClass = false;
+            char lastClassChar = '\0';
+            ISet<char> classChars = new HashSet<char>();
+            var lookingForNextInRange = false;
 
             while (stringStream.Peek() != -1)
             {
                 var c = (char)stringStream.Read();
-                if (escaped)
+                if (inCharacterClass)
+                {
+                    switch (c)
+                    {                   
+                        case '-':
+                            if (lastClassChar == '\0' || stringStream.Peek() == ']')
+                            {
+                                // - first or last in string is intepreted as a literal
+                                classChars.Add('-');
+                            } 
+                            else
+                            {
+                                lookingForNextInRange = true;
+                            }
+                            break;
+                        default:
+                            // Anything else, if we are looking for a next in range char,
+                            // add a range. Else add a single character (if its actually the first in a 
+                            // range it wont matter since we use a set.
+                            if (lookingForNextInRange)
+                            {
+                                char from = lastClassChar < c ? lastClassChar : c;
+                                char to = lastClassChar < c ? c : lastClassChar;
+                                for (; from < to; ++from)
+                                {
+                                    classChars.Add(from);
+                                }
+                            } 
+                            else
+                            {
+                                classChars.Add(c);
+                                lastClassChar = c;
+                            }
+                            break;
+                        case ']':
+                            if (!classChars.Any())
+                            {
+                                throw new Exception("Empty character class");
+                            }
+
+                            // Finish character class
+                            stack.Push(AcceptClass(classChars));
+                            classChars = new HashSet<char>();
+                            inCharacterClass = false;
+                            lookingForNextInRange = false;
+                            break;
+                    }
+                }
+                else if (escaped)
                 {
                     switch (c)
                     {
@@ -48,6 +100,10 @@ namespace Piglet.Lexer.Construction
                 {
                     switch (c)
                     {
+                        case '[':
+                            inCharacterClass = true;
+                            break;
+
                         case '|':
                             stack.Push(Or(stack.Pop(), stack.Pop()));
                             break;
@@ -92,6 +148,11 @@ namespace Piglet.Lexer.Construction
             return nfa;
         }
 
+        private static NFA AcceptClass(IEnumerable<char> classChars)
+        {
+            return Accept(classChars);
+        }
+
         private static NFA RepeatOnceOrMore(NFA nfa)
         {
             // Add an epsilon transition from the accept state back to the start state
@@ -127,7 +188,7 @@ namespace Piglet.Lexer.Construction
             return Accept(acceptCharacters);
         }
 
-        private static NFA Accept(char[] acceptCharacters)
+        private static NFA Accept(IEnumerable<char> acceptCharacters)
         {
             // Generate a NFA with a simple path with one state transitioning into an accept state.
             var nfa = new NFA();

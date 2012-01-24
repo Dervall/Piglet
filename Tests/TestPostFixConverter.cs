@@ -25,5 +25,12 @@ namespace TestParser
             string postFix = PostFixConverter.ToPostFix(regEx);
             Assert.AreEqual("ab|*a&b&a*&*ab|&ab|&", postFix);
         }
+
+        [TestMethod]
+        public void TestRangePostFix()
+        {
+            // Postfix should preserve ranges as=is
+            Assert.AreEqual("[a-b][xyz]|", PostFixConverter.ToPostFix("[a-b]|[xyz]"));
+        }
     }
 }

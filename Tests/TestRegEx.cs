@@ -37,5 +37,17 @@ namespace TestParser
         {
             CheckMatch("123", "\\d+");
         }
+
+        [TestMethod]
+        public void TestRange()
+        {
+            CheckMatch("abcde", "[a-e]+");
+        }
+
+        [TestMethod]
+        public void TestMultipleRanges()
+        {
+            CheckMatch("abcdePOPP", "[a-eA-Z]+");
+        }
     }
 }

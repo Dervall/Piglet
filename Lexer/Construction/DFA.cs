@@ -24,6 +24,7 @@ namespace Piglet.Lexer.Construction
 
             public override string ToString()
             {
+                // Purely for debugging purposes
                 return string.Format( "{0} {{{1}}}", StateNumber, String.Join( ", ", NfaStates));
             }
 

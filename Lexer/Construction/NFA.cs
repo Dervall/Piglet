@@ -118,6 +118,10 @@ namespace Piglet.Lexer.Construction
                             stack.Push(RepeatZeroOrMore(stack.Pop()));
                             break;
 
+                        case '?':
+                            stack.Push(RepeatZeroOrOnce(stack.Pop()));
+                            break;
+
                         case '&':
                             // & is not commutative, and the stack is reversed.
                             var second = stack.Pop();
@@ -297,6 +301,14 @@ namespace Piglet.Lexer.Construction
             nfa.States.Add(acceptState);
             oldAcceptState.AcceptState = false;
             nfa.Transitions.Add(new Transition<State>(oldAcceptState, acceptState));
+            return nfa;
+        }
+
+        private static NFA RepeatZeroOrOnce(NFA nfa)
+        {
+            // Easy enough, add an epsilon transition from the start state
+            // to the end state. Done
+            nfa.Transitions.Add(new Transition<State>(nfa.StartState, nfa.States.First(f => f.AcceptState)));
             return nfa;
         }
 

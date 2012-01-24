@@ -17,7 +17,8 @@ namespace Piglet.Lexer
 
             foreach (var state in dfa.States)
             {
-                DFA.State state1 = state;
+                // Store to avoid problems with modified closure
+                DFA.State state1 = state; 
                 foreach (var transition in dfa.Transitions.Where(f => f.From == state1))
                 {
                     // Set the table entry
@@ -25,33 +26,33 @@ namespace Piglet.Lexer
                     {
                         table[new Tuple<int, int>(state.StateNumber, input)] = (short)transition.To.StateNumber;
                     }
+                }
 
-                    // If this is an accepting state, set the action function to be
-                    // the FIRST defined action function if multiple ones match
-                    if (state.NfaStates.Any(f => f.AcceptState))
+                // If this is an accepting state, set the action function to be
+                // the FIRST defined action function if multiple ones match
+                if (state.NfaStates.Any(f => f.AcceptState))
+                {
+                    // Find the lowest ranking NFA which has the accepting state in it
+                    for (int tokenNumber = 0; tokenNumber < nfas.Count(); ++tokenNumber)
                     {
-                        // Find the lowest ranking NFA which has the accepting state in it
-                        for (int tokenNumber = 0; tokenNumber < nfas.Count(); ++tokenNumber)
-                        {
-                            NFA nfa = nfas[tokenNumber];
+                        NFA nfa = nfas[tokenNumber];
 
-                            if (nfa.States.Intersect(state.NfaStates.Where(f => f.AcceptState)).Any())
+                        if (nfa.States.Intersect(state.NfaStates.Where(f => f.AcceptState)).Any())
+                        {
+                            // Match
+                            // This might be a token that we ignore. This is if the tokenNumber >= number of tokens
+                            // since the ignored tokens are AFTER the normal tokens. If this is so, set the action func to
+                            // -1, NULL to signal that the parsing should restart
+                            if (tokenNumber >= tokens.Count())
                             {
-                                // Match
-                                // This might be a token that we ignore. This is if the tokenNumber >= number of tokens
-                                // since the ignored tokens are AFTER the normal tokens. If this is so, set the action func to
-                                // -1, NULL to signal that the parsing should restart
-                                if (tokenNumber >= tokens.Count())
-                                {
-                                    actions[state.StateNumber] = new Tuple<int, Func<string, T>>(-1, null);
-                                }
-                                else
-                                {
-                                    actions[state.StateNumber] = new Tuple<int, Func<string, T>>(
-                                        tokenNumber, tokens[tokenNumber].Item2);
-                                }
-                                break;
+                                actions[state.StateNumber] = new Tuple<int, Func<string, T>>(-1, null);
                             }
+                            else
+                            {
+                                actions[state.StateNumber] = new Tuple<int, Func<string, T>>(
+                                    tokenNumber, tokens[tokenNumber].Item2);
+                            }
+                            break;
                         }
                     }
                 }

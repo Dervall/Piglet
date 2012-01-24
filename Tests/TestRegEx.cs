@@ -55,5 +55,12 @@ namespace TestParser
         {
             CheckMatch("XHXas!!a.A", "X.X.*\\.A");
         }
+
+        [TestMethod]
+        public void TestZeroOrOnce()
+        {
+            CheckMatch("Color", "Colou?r");
+            CheckMatch("Colour", "Colou?r");
+        }
     }
 }

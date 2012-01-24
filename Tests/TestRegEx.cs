@@ -80,5 +80,12 @@ namespace TestParser
         {
             CheckMatch("^", "[x^]");
         }
+
+        [TestMethod]
+        public void SpecialCharactersAreNotThatSpecialInsideAClass()
+        {
+            CheckMatch("+", "[+]");
+            CheckMatch("*", "[*]");
+        }
     }
 }

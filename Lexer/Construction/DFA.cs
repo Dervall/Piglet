@@ -19,7 +19,7 @@ namespace Piglet.Lexer.Construction
             public NFA.State[] Move(NFA nfa, char c)
             {
                 // Find transitions going OUT from this state that requires c
-                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.OnCharacter == c) select e.To).ToArray();
+                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput == c) select e.To).ToArray();
             }
 
             public override string ToString()

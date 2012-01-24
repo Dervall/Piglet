@@ -232,7 +232,7 @@ namespace Piglet.Lexer.Construction
 
             // Find all states reachable by following only epsilon edges.
             State[] closureStates =
-                (from e in Transitions.Where(f => states.Contains(f.From) && f.OnCharacter == Epsilon && !visitedStates.Contains(f.To)) select e.To).ToArray();
+                (from e in Transitions.Where(f => states.Contains(f.From) && f.ValidInput == Epsilon && !visitedStates.Contains(f.To)) select e.To).ToArray();
 
             if (closureStates.Length > 0)
             {

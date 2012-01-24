@@ -31,7 +31,7 @@ namespace Piglet.Lexer
                 foreach (var transition in dfa.Transitions.Where(f => f.From == state1))
                 {
                     // Set the table entry
-                    table[state.StateNumber, transition.OnCharacter] = (short)transition.To.StateNumber;
+                    table[state.StateNumber, transition.ValidInput] = (short)transition.To.StateNumber;
 
                     // If this is an accepting state, set the action function to be
                     // the FIRST defined action function if multiple ones match

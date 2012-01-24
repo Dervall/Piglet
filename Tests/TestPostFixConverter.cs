@@ -12,7 +12,13 @@ namespace TestParser
     public class TestPostFixConverter
     {
 
-        [TestMethodAttribute]
+        [TestMethod]
+        public void TestPreservesEscapes()
+        {
+            Assert.AreEqual("\\p\\e&\\r&+", PostFixConverter.ToPostFix("(\\p\\e\\r)+"));
+        }
+
+        [TestMethod]
         public void TestPostFix()
         {
             string regEx = "((a|b)*aba*)*(a|b)(a|b)";

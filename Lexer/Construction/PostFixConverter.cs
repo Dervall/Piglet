@@ -69,6 +69,11 @@ namespace Piglet.Lexer.Construction
                         break;
 
                     default:
+                        if (state.NumAtoms > 1)
+                        {
+                            --state.NumAtoms;
+                            buffer.Append('&');
+                        }
                         if (inputCharacter == '\\')
                         {
                             // Append the escape to the buffer, it will be used by the NFA construction
@@ -81,11 +86,7 @@ namespace Piglet.Lexer.Construction
                             }
                             inputCharacter = (char) reader.Read();
                         }
-                        if (state.NumAtoms > 1)
-                        {
-                            --state.NumAtoms;
-                            buffer.Append('&');
-                        }
+                        
                         buffer.Append(inputCharacter);
                         state.NumAtoms++;
                         break;

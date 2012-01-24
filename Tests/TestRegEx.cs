@@ -11,17 +11,31 @@ namespace TestParser
     [TestClass]
     public class TestRegEx
     {
-        ILexer<string> CreateLexer(string regEx)
+        private ILexer<string> CreateLexer(string regEx)
         {
             return LexerFactory<string>.Configure(c => c.Token(regEx, f => regEx));
         }
-            
+
+        private void CheckMatch(string input, string regEx)
+        {
+            ILexer<string> lexer = CreateLexer(regEx);
+            lexer.Source = new StringReader(input);
+            Assert.AreEqual(regEx, lexer.Next().Item2);
+        }
+
         [TestMethod]
         public void TestEscapedCharacters()
         {
-            ILexer<string> lexer = CreateLexer("\\++");
-            lexer.Source = new StringReader("++++");
-            Assert.AreEqual("\\++", lexer.Next().Item2);
+            string regEx = "\\++";
+            string input = "++++";
+
+            CheckMatch(input, regEx);
+        }
+
+        [TestMethod]
+        public void TestDigit()
+        {
+            CheckMatch("'\\d+", "123");
         }
     }
 }

@@ -33,6 +33,11 @@ namespace Piglet.Lexer.Construction
                 {
                     switch (c)
                     {
+                        case 'd':
+                            // Shorthand for [0-9]
+                            stack.Push(AcceptRange('0', '9'));   
+                            break;
+                        
                         default:
                             stack.Push(AcceptSingle(c));
                             break;
@@ -85,6 +90,11 @@ namespace Piglet.Lexer.Construction
             var nfa = stack.Pop();
             nfa.AssignStateNumbers();
             return nfa;
+        }
+
+        public static NFA AcceptRange(char start, char end)
+        {
+            throw new NotImplementedException();
         }
 
         private static NFA RepeatOnceOrMore(NFA nfa)

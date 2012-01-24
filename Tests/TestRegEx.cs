@@ -62,5 +62,17 @@ namespace TestParser
             CheckMatch("Color", "Colou?r");
             CheckMatch("Colour", "Colou?r");
         }
+
+        [TestMethod]
+        public void TestEscapedParenthesis()
+        {
+            CheckMatch("(b)", "\\((a|b)\\)");
+        }
+
+        [TestMethod]
+        public void TestNegateCharacterClass()
+        {
+            CheckMatch("abcd", "[^ABCD]+");
+        }
     }
 }

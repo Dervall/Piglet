@@ -29,6 +29,7 @@ namespace Piglet.Lexer.Construction
             char lastClassChar = '\0';
             ISet<char> classChars = new HashSet<char>();
             var lookingForNextInRange = false;
+            var classNegated = false;
 
             while (stringStream.Peek() != -1)
             {
@@ -36,7 +37,13 @@ namespace Piglet.Lexer.Construction
                 if (inCharacterClass)
                 {
                     switch (c)
-                    {                   
+                    {
+                        case '^':
+                            if (lastClassChar == '\0')
+                            {
+                                classNegated = true;
+                            }
+                            break;
                         case '-':
                             if (lastClassChar == '\0' || stringStream.Peek() == ']')
                             {
@@ -76,10 +83,13 @@ namespace Piglet.Lexer.Construction
                             }
 
                             // Finish character class
-                            stack.Push(AcceptClass(classChars));
+                            stack.Push(classNegated
+                                           ? Accept(AllCharactersExceptNull.Except(classChars))
+                                           : Accept(classChars));
                             classChars = new HashSet<char>();
                             inCharacterClass = false;
                             lookingForNextInRange = false;
+                            classNegated = false;
                             break;
                     }
                 }
@@ -169,11 +179,6 @@ namespace Piglet.Lexer.Construction
                 for (var c = (char)1; c < 256; ++c) 
                     yield return c;
             }
-        }
-
-        private static NFA AcceptClass(IEnumerable<char> classChars)
-        {
-            return Accept(classChars);
         }
 
         private static NFA RepeatOnceOrMore(NFA nfa)

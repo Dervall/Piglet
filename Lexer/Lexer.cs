@@ -36,7 +36,7 @@ namespace Piglet.Lexer
                 }
 
                 var c = (char)peek;
-                short nextState = transitionTable[state, c];
+                int nextState = transitionTable[state, c];
                 if (nextState == -1)
                 {
                     // We have reached termination

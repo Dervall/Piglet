@@ -7,22 +7,12 @@ namespace Piglet.Lexer
 {
     public class TransitionTable<T>
     {
-        private readonly short[,] table;
+        private readonly IDictionary<Tuple<int, int>, int> table;
         private readonly Tuple<int, Func<string, T>>[] actions;
 
         public TransitionTable(DFA dfa, IList<NFA> nfas, IList<Tuple<string, Func<string, T>>> tokens)
         {
-            table = new short[dfa.States.Count(),255];
-            
-            // Fill table with illegal action everywhere
-            for (int i = 0; i < dfa.States.Count(); ++i )
-            {
-                for (int j =0; j<255; ++j)
-                {
-                    table[i, j] = -1;
-                }
-            }
-
+            table = new Dictionary<Tuple<int, int>, int>();
             actions = new Tuple<int, Func<string, T>>[dfa.States.Count];
 
             foreach (var state in dfa.States)
@@ -33,9 +23,9 @@ namespace Piglet.Lexer
                     // Set the table entry
                     foreach (var input in transition.ValidInput)
                     {
-                        table[state.StateNumber, input] = (short)transition.To.StateNumber;    
+                        table[new Tuple<int, int>(state.StateNumber, input)] = (short)transition.To.StateNumber;
                     }
-                    
+
                     // If this is an accepting state, set the action function to be
                     // the FIRST defined action function if multiple ones match
                     if (state.NfaStates.Any(f => f.AcceptState))
@@ -44,8 +34,8 @@ namespace Piglet.Lexer
                         for (int tokenNumber = 0; tokenNumber < nfas.Count(); ++tokenNumber)
                         {
                             NFA nfa = nfas[tokenNumber];
-                           
-                            if (nfa.States.Intersect(state.NfaStates.Where(f=>f.AcceptState)).Any())
+
+                            if (nfa.States.Intersect(state.NfaStates.Where(f => f.AcceptState)).Any())
                             {
                                 // Match
                                 // This might be a token that we ignore. This is if the tokenNumber >= number of tokens
@@ -58,7 +48,7 @@ namespace Piglet.Lexer
                                 else
                                 {
                                     actions[state.StateNumber] = new Tuple<int, Func<string, T>>(
-                                        tokenNumber, tokens[tokenNumber].Item2);    
+                                        tokenNumber, tokens[tokenNumber].Item2);
                                 }
                                 break;
                             }
@@ -68,9 +58,15 @@ namespace Piglet.Lexer
             }
         }
 
-        public short this[int state, char c]
+        public int this[int state, char c]
         {
-            get { return table[state, c]; }
+            get
+            {
+                int v;
+                if (table.TryGetValue(new Tuple<int, int>(state, c), out v))
+                    return v;
+                return -1;
+            }
         }
 
         public Tuple<int, Func<string, T>> GetAction(int state)

@@ -18,8 +18,8 @@ namespace Piglet.Lexer.Construction
 
             public NFA.State[] Move(NFA nfa, char c)
             {
-                // Find transitions going OUT from this state that requires c
-                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput == c) select e.To).ToArray();
+                // Find transitions going OUT from this state that is valid with an input c
+                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput != null && f.ValidInput.Contains(c)) select e.To).ToArray();
             }
 
             public override string ToString()
@@ -65,12 +65,24 @@ namespace Piglet.Lexer.Construction
 
                         // See if the new state already exists. If so change the reference to point to 
                         // the already created object, since we will need to add a transition back to the same object
-                        newState = dfa.States.FirstOrDefault(f => f.NfaStates.Except(newState.NfaStates).Count() == 0 &&
-                                                                  newState.NfaStates.Except(f.NfaStates).Count() == 0) ??
-                                   newState;
+                        var oldState = dfa.States.FirstOrDefault(f => f.NfaStates.Except(newState.NfaStates).Count() == 0 &&
+                                                                  newState.NfaStates.Except(f.NfaStates).Count() == 0);
+                        if (oldState == null)
+                        {
+                            dfa.States.Add(newState);
+                        } 
+                        else
+                        {
+                            // New state wasn't that new. We already have one exacly like it in the DFA. Set 
+                            // netstate to oldstate so that the created transition will be correct (still need to
+                            // create a transition)
+                            newState = oldState;
+                        }
 
-                        dfa.States.Add(newState);
-                        dfa.Transitions.Add(new Transition<State>(t, c, newState));
+                        // We will only add transitions using single characters for DFAs. No ranges like we
+                        // do in NFAs. So, our DFAs will have lots and lots of edges. That's fine since they will probably be
+                        // condensed into better tables later on.
+                        dfa.Transitions.Add(new Transition<State>(t, new[] { c }, newState));
                     }
                 }
             }

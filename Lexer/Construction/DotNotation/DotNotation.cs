@@ -60,7 +60,11 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <returns></returns>
         public static string TransitionLabel<T>(this Transition<T> transition )
         {
-            return transition.ValidInput == (char)0 ? "ε" : "" + transition.ValidInput;
+            if ( transition.ValidInput == null ) return "ε";
+
+            if (transition.ValidInput.Length == 1)
+                return transition.ValidInput[0].ToString();
+            return string.Join(", ", transition.ValidInput);
         }
     }
 }

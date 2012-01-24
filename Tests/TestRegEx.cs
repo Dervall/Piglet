@@ -35,7 +35,7 @@ namespace TestParser
         [TestMethod]
         public void TestDigit()
         {
-            CheckMatch("'\\d+", "123");
+            CheckMatch("123", "\\d+");
         }
     }
 }

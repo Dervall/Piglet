@@ -92,20 +92,15 @@ namespace Piglet.Lexer.Construction
             return nfa;
         }
 
-        public static NFA AcceptRange(char start, char end)
-        {
-            throw new NotImplementedException();
-        }
-
         private static NFA RepeatOnceOrMore(NFA nfa)
         {
             // Add an epsilon transition from the accept state back to the start state
             State oldAcceptState = nfa.States.First(f => f.AcceptState);
-            nfa.Transitions.Add(new Transition<State>(oldAcceptState, Epsilon, nfa.StartState));
+            nfa.Transitions.Add(new Transition<State>(oldAcceptState, null, nfa.StartState));
 
             // Add a new accept state, since we cannot have edges exiting the accept state
             var newAcceptState = new State {AcceptState = true};
-            nfa.Transitions.Add(new Transition<State>(oldAcceptState, Epsilon, newAcceptState));
+            nfa.Transitions.Add(new Transition<State>(oldAcceptState, null, newAcceptState));
             nfa.States.Add(newAcceptState);
 
             // Clear the accept flag of the old accept state 
@@ -114,16 +109,35 @@ namespace Piglet.Lexer.Construction
             return nfa;
         }
 
+        public static NFA AcceptRange(char start, char end)
+        {
+            var chars = new char[(end - start) + 1];
+            var i = 0;
+            for (var c = start; c <= end; ++c )
+            {
+                chars[i++] = c;
+            }
+            return Accept(chars);
+        }
+
         public static NFA AcceptSingle(char c)
+        {
+            var acceptCharacters = new[] { c };
+
+            return Accept(acceptCharacters);
+        }
+
+        private static NFA Accept(char[] acceptCharacters)
         {
             // Generate a NFA with a simple path with one state transitioning into an accept state.
             var nfa = new NFA();
             var state = new State();
             nfa.States.Add(state);
 
-            var acceptState = new State { AcceptState = true };
+            var acceptState = new State {AcceptState = true};
             nfa.States.Add(acceptState);
-            nfa.Transitions.Add(new Transition<State>(state, c, acceptState));
+
+            nfa.Transitions.Add(new Transition<State>(state, acceptCharacters, acceptState));
 
             nfa.StartState = state;
 
@@ -166,8 +180,8 @@ namespace Piglet.Lexer.Construction
             nfa.StartState = new State();
             nfa.States.Add(nfa.StartState);
 
-            nfa.Transitions.Add(new Transition<State>(nfa.StartState, Epsilon, a.StartState));
-            nfa.Transitions.Add(new Transition<State>(nfa.StartState, Epsilon, b.StartState));
+            nfa.Transitions.Add(new Transition<State>(nfa.StartState, null, a.StartState));
+            nfa.Transitions.Add(new Transition<State>(nfa.StartState, null, b.StartState));
 
             // Add a new accept state, link all old accept states to the new accept
             // state with an epsilon link and remove the accept flag
@@ -175,7 +189,7 @@ namespace Piglet.Lexer.Construction
             foreach (var oldAcceptState in nfa.States.Where(f => f.AcceptState))
             {
                 oldAcceptState.AcceptState = false;
-                nfa.Transitions.Add(new Transition<State>(oldAcceptState, Epsilon, newAcceptState));
+                nfa.Transitions.Add(new Transition<State>(oldAcceptState, null, newAcceptState));
             }
             nfa.States.Add(newAcceptState);
 
@@ -193,16 +207,16 @@ namespace Piglet.Lexer.Construction
             nfa.StartState = new State();
             nfa.States.Add(nfa.StartState);
             State oldAcceptState = input.States.First(f => f.AcceptState);
-            nfa.Transitions.Add(new Transition<State>(nfa.StartState, Epsilon, oldAcceptState));
+            nfa.Transitions.Add(new Transition<State>(nfa.StartState, null, oldAcceptState));
 
             // Add epsilon link from old accept state of input to start, to allow for repetition
-            nfa.Transitions.Add(new Transition<State>(oldAcceptState, Epsilon, input.StartState));
+            nfa.Transitions.Add(new Transition<State>(oldAcceptState, null, input.StartState));
 
             // Create new accept state, link old accept state to new accept state with epsilon
             var acceptState = new State { AcceptState = true };
             nfa.States.Add(acceptState);
             oldAcceptState.AcceptState = false;
-            nfa.Transitions.Add(new Transition<State>(oldAcceptState, Epsilon, acceptState));
+            nfa.Transitions.Add(new Transition<State>(oldAcceptState, null, acceptState));
             return nfa;
         }
 
@@ -232,7 +246,7 @@ namespace Piglet.Lexer.Construction
 
             // Find all states reachable by following only epsilon edges.
             State[] closureStates =
-                (from e in Transitions.Where(f => states.Contains(f.From) && f.ValidInput == Epsilon && !visitedStates.Contains(f.To)) select e.To).ToArray();
+                (from e in Transitions.Where(f => states.Contains(f.From) && f.ValidInput == null && !visitedStates.Contains(f.To)) select e.To).ToArray();
 
             if (closureStates.Length > 0)
             {
@@ -265,7 +279,7 @@ namespace Piglet.Lexer.Construction
             // Add epsilon transiontions from the start state to all the previous start states
             foreach (var nfa in nfas)
             {
-                merged.Transitions.Add(new Transition<State>(state, Epsilon, nfa.StartState));
+                merged.Transitions.Add(new Transition<State>(state, null, nfa.StartState));
             }
 
             return merged;

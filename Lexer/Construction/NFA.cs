@@ -54,7 +54,7 @@ namespace Piglet.Lexer.Construction
                             {
                                 // - first or last in string is intepreted as a literal
                                 classChars.Add('-');
-                            } 
+                            }
                             else
                             {
                                 lookingForNextInRange = true;
@@ -74,7 +74,7 @@ namespace Piglet.Lexer.Construction
                                 }
                                 // Clear the looking flag, accept characters normally into the class.
                                 lookingForNextInRange = false;
-                            } 
+                            }
                             else
                             {
                                 classChars.Add(c);
@@ -104,12 +104,20 @@ namespace Piglet.Lexer.Construction
                     {
                         case 'd':
                             // Shorthand for [0-9]
-                            stack.Push(AcceptRange('0', '9'));   
+                            stack.Push(AcceptRange('0', '9'));
                             break;
-                        
+
                         case 'D':
                             // Shorthand for [^0-9]
                             stack.Push(Accept(AllCharactersExceptNull.Except(CharRange('0', '9'))));
+                            break;
+
+                        case 's':
+                            stack.Push(Accept(AllWhitespaceCharacters));
+                            break;
+
+                        case 'S':
+                            stack.Push(Accept(AllCharactersExceptNull.Except(AllWhitespaceCharacters)));
                             break;
 
                         default:
@@ -177,6 +185,11 @@ namespace Piglet.Lexer.Construction
             return nfa;
         }
 
+        protected static IEnumerable<char> AllWhitespaceCharacters
+        {
+            get { return new[] { ' ', '\t', '\n', '\r' }; }
+        }
+
         private static NFA AcceptAnything()
         {
             return Accept(AllCharactersExceptNull);
@@ -186,7 +199,7 @@ namespace Piglet.Lexer.Construction
         {
             get
             {
-                for (var c = (char)1; c < 256; ++c) 
+                for (var c = (char)1; c < 256; ++c)
                     yield return c;
             }
         }
@@ -198,7 +211,7 @@ namespace Piglet.Lexer.Construction
             nfa.Transitions.Add(new Transition<State>(oldAcceptState, nfa.StartState));
 
             // Add a new accept state, since we cannot have edges exiting the accept state
-            var newAcceptState = new State {AcceptState = true};
+            var newAcceptState = new State { AcceptState = true };
             nfa.Transitions.Add(new Transition<State>(oldAcceptState, newAcceptState));
             nfa.States.Add(newAcceptState);
 
@@ -239,7 +252,7 @@ namespace Piglet.Lexer.Construction
             var state = new State();
             nfa.States.Add(state);
 
-            var acceptState = new State {AcceptState = true};
+            var acceptState = new State { AcceptState = true };
             nfa.States.Add(acceptState);
 
             nfa.Transitions.Add(new Transition<State>(state, acceptState, acceptCharacters));
@@ -252,7 +265,7 @@ namespace Piglet.Lexer.Construction
         public static NFA And(NFA first, NFA second)
         {
             // Create a new NFA and use the first NFAs start state as the starting point
-            var nfa = new NFA {StartState = first.StartState};
+            var nfa = new NFA { StartState = first.StartState };
 
             // Change all links in to first acceptstate to go to seconds 
             // start state

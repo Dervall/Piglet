@@ -93,5 +93,17 @@ namespace TestParser
         {
             CheckMatch("abcde", "\\D+");
         }
+
+        [TestMethod]
+        public void TestMatchWhitespace()
+        {
+            CheckMatch(" \t\n\r", "\\s+");
+        }
+
+        [TestMethod]
+        public void TestMatchNonWhitespace()
+        {
+            CheckMatch("jfsdhsd", "\\S+");
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Piglet.Lexer.Construction.DotNotation
     {
         /// <summary>
         /// Print the state machine as DOT notation suitable for drawing graphs.
-        /// This is a useful debug functionality
+        /// This is a useful debug functionality!!
         /// 
         /// http://hughesbennett.co.uk/Graphviz copy and paste your text to view graph
         /// 

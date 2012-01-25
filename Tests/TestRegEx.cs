@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Lexer;
 
@@ -26,10 +22,7 @@ namespace TestParser
         [TestMethod]
         public void TestEscapedCharacters()
         {
-            string regEx = "\\++";
-            string input = "++++";
-
-            CheckMatch(input, regEx);
+            CheckMatch("++++", "\\++");
         }
 
         [TestMethod]
@@ -122,6 +115,19 @@ namespace TestParser
         public void TestMatchLiteral()
         {
             CheckMatch("ABC", "ABC");
+        }
+
+        [TestMethod]
+        public void TestEscapedSlash()
+        {
+            CheckMatch("\\\\", "\\\\+");
+        }
+
+        [TestMethod]
+        public void TestBracketInCharacterClass()
+        {
+            // TODO: This is not working.
+            CheckMatch("[][][]", "[][ab]+");
         }
     }
 }

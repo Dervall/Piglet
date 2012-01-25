@@ -138,7 +138,5 @@ namespace TestParser
             DFA dfa = DFA.Create(NFA.Create("ab|c|"));
             Console.WriteLine();
         }
-
-
     }
 }

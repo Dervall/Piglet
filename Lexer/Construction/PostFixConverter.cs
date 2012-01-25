@@ -47,7 +47,7 @@ namespace Piglet.Lexer.Construction
                         state.NumAlternates++;
                         break;
                     case ')':
-                        if (stack.Count() == 0)
+                        if (!stack.Any())
                             return null;
                         if (state.NumAtoms == 0)
                             return null;
@@ -75,10 +75,18 @@ namespace Piglet.Lexer.Construction
                         }
                         // Append to buffer until we find a matching ]
                         buffer.Append('[');
-                        while (reader.Peek() != ']')
+                        int nCharsFound = 0;
+                        while (true)
                         {
+                            if (reader.Peek() == ']')
+                            {
+                                if (nCharsFound != 0)
+                                    break;
+                            }
+
                             if (reader.Peek() == -1)
                                 throw new Exception("Unterminated character class");
+                            nCharsFound++;
                             buffer.Append((char) reader.Read());
                         }
                         buffer.Append(']');

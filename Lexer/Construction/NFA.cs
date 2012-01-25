@@ -17,163 +17,194 @@ namespace Piglet.Lexer.Construction
             }
         }
 
+        private enum LexerState
+        {
+            Normal,
+            BeginCharacterClass,
+            NormalEscaped,
+            InsideCharacterClass,
+            RangeEnd
+        }
+
+        private class CharacterClassState
+        {
+            public CharacterClassState()
+            {
+                ClassChars = new List<char>();
+                LastClassChar = null;
+            }
+
+            public char? LastClassChar { get; set; }
+            public IList<char> ClassChars { get; private set; }
+            public bool Negated { get; set; }
+        }
+
         public static NFA Create(string postfixRegex)
         {
             var stack = new Stack<NFA>();
             var stringStream = new StringReader(postfixRegex);
-            var escaped = false;
-            var inCharacterClass = false;
-            char lastClassChar = '\0';
-            ISet<char> classChars = new HashSet<char>();
-            var lookingForNextInRange = false;
-            var classNegated = false;
+
+            LexerState state = LexerState.Normal;
+            CharacterClassState classState = new CharacterClassState();
 
             while (stringStream.Peek() != -1)
             {
                 var c = (char)stringStream.Read();
-                if (inCharacterClass)
+
+                switch (state)
                 {
-                    switch (c)
-                    {
-                        case '^':
-                            if (lastClassChar == '\0')
-                            {
-                                classNegated = true;
-                            }
-                            else
-                            {
-                                // If its not in the first position it is a normal character.
-                                classChars.Add('^');
-                            }
-                            break;
-                        case '-':
-                            if (lastClassChar == '\0' || stringStream.Peek() == ']')
-                            {
-                                // - first or last in string is intepreted as a literal
-                                classChars.Add('-');
-                            }
-                            else
-                            {
-                                lookingForNextInRange = true;
-                            }
-                            break;
-                        default:
-                            // Anything else, if we are looking for a next in range char,
-                            // add a range. Else add a single character (if its actually the first in a 
-                            // range it wont matter since we use a set.
-                            if (lookingForNextInRange)
-                            {
+                    case LexerState.Normal:
+                        switch (c)
+                        {
+                            case '\\':
+                                state = LexerState.NormalEscaped;
+                                break;
+                            case '[':
+                                state = LexerState.BeginCharacterClass;
+                                classState = new CharacterClassState();
+                                break;
+                            case '|':
+                                stack.Push(Or(stack.Pop(), stack.Pop()));
+                                break;
+                            case '+':
+                                stack.Push(RepeatOnceOrMore(stack.Pop()));
+                                break;
+                            case '*':
+                                stack.Push(RepeatZeroOrMore(stack.Pop()));
+                                break;
+                            case '?':
+                                stack.Push(RepeatZeroOrOnce(stack.Pop()));
+                                break;
+                            case '&':
+                                // & is not commutative, and the stack is reversed.
+                                var second = stack.Pop();
+                                var first = stack.Pop();
+                                stack.Push(And(first, second));
+                                break;
+                            case '.':
+                                stack.Push(AcceptAnything());
+                                break;
+                            default:
+                                // Normal character
+                                stack.Push(AcceptSingle(c));
+                                break;
+                        }
+                        break;
+                    case LexerState.NormalEscaped:
+                        switch (c)
+                        {
+                            case 'd':   // Shorthand for [0-9]
+                                stack.Push(AcceptRange('0', '9'));
+                                break;
+
+                            case 'D':   // Shorthand for [^0-9]
+                                stack.Push(Accept(AllCharactersExceptNull.Except(CharRange('0', '9'))));
+                                break;
+
+                            case 's':
+                                stack.Push(Accept(AllWhitespaceCharacters));
+                                break;
+
+                            case 'S':
+                                stack.Push(Accept(AllCharactersExceptNull.Except(AllWhitespaceCharacters)));
+                                break;
+
+                            case 'w':
+                                stack.Push(Accept(CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'))));
+                                break;
+
+                            case 'W':
+                                stack.Push(Accept(AllCharactersExceptNull.Except(
+                                    CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')))));
+                                break;
+
+                            case '.':
+                            case '*':
+                            case '|':
+                            case '[':
+                            case ']':
+                            case '+':
+                            case '(':
+                            case ')':
+                            case '\\':
+                                stack.Push(AcceptSingle(c));
+                                break;
+
+                            default:
+                                throw new Exception(string.Format("Unknown escaped character '{0}'", c));
+                        }
+                        state = LexerState.Normal;
+                        break;
+
+                    case LexerState.BeginCharacterClass:
+                        switch (c)
+                        {
+                            case '^':
+                                if (classState.Negated)
+                                {
+                                    // If the classstate is ALREADY negated
+                                    // Readd the ^ to the expression
+                                    classState.ClassChars.Add('^');
+                                    state = LexerState.InsideCharacterClass;
+                                }
+                                classState.Negated = true;
+                                break;
+                            case '[':
+                            case ']':
+                            case '-':
+                                // This does not break the character class TODO: I THINK!!!
+                                classState.ClassChars.Add(c);
+                                break;
+                            default:
+                                classState.ClassChars.Add(c);
+                                state = LexerState.InsideCharacterClass;
+                                break;
+                        }
+                        break;
+                    
+                    case LexerState.InsideCharacterClass:
+                        switch (c)
+                        {
+                            case '-':
+                                state = LexerState.RangeEnd;
+                                break;
+                            case '[':
+                                throw new Exception("Opening new character class inside an already open one");
+                            case ']':
+                                // Ending class
+                                stack.Push(classState.Negated
+                                           ? Accept(AllCharactersExceptNull.Except(classState.ClassChars))
+                                           : Accept(classState.ClassChars.Distinct()));
+                                state = LexerState.Normal;
+                                break;
+                            default:
+                                classState.ClassChars.Add(c);
+                                break;
+                        }
+                        break;
+
+                    case LexerState.RangeEnd:
+                        switch (c)
+                        {
+                            case ']':
+                                // We found the - at the position BEFORE the end of the class
+                                // which means we should handle it as a litteral and end the class
+                                stack.Push(classState.Negated
+                                           ? Accept(AllCharactersExceptNull.Except(classState.ClassChars))
+                                           : Accept(classState.ClassChars.Distinct()));
+                                state = LexerState.Normal;
+                                break;
+                            default:
+                                char lastClassChar = classState.ClassChars.Last();
                                 char from = lastClassChar < c ? lastClassChar : c;
                                 char to = lastClassChar < c ? c : lastClassChar;
                                 for (; from <= to; ++from)
                                 {
-                                    classChars.Add(from);
+                                    classState.ClassChars.Add(from);
                                 }
-                                // Clear the looking flag, accept characters normally into the class.
-                                lookingForNextInRange = false;
-                            }
-                            else
-                            {
-                                classChars.Add(c);
-                                lastClassChar = c;
-                            }
-                            break;
-                        case ']':
-                            if (!classChars.Any())
-                            {
-                                throw new Exception("Empty character class");
-                            }
-
-                            // Finish character class
-                            stack.Push(classNegated
-                                           ? Accept(AllCharactersExceptNull.Except(classChars))
-                                           : Accept(classChars));
-                            classChars = new HashSet<char>();
-                            inCharacterClass = false;
-                            lookingForNextInRange = false;
-                            classNegated = false;
-                            break;
-                    }
-                }
-                else if (escaped)
-                {
-                    switch (c)
-                    {
-                        case 'd':
-                            // Shorthand for [0-9]
-                            stack.Push(AcceptRange('0', '9'));
-                            break;
-
-                        case 'D':
-                            // Shorthand for [^0-9]
-                            stack.Push(Accept(AllCharactersExceptNull.Except(CharRange('0', '9'))));
-                            break;
-
-                        case 's':
-                            stack.Push(Accept(AllWhitespaceCharacters));
-                            break;
-
-                        case 'S':
-                            stack.Push(Accept(AllCharactersExceptNull.Except(AllWhitespaceCharacters)));
-                            break;
-
-                        case 'w':
-                            stack.Push(Accept(CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'))));
-                            break;
-
-                        case 'W':
-                            stack.Push(Accept(AllCharactersExceptNull.Except(
-                                CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')))));
-                            break;
-
-                        default:
-                            stack.Push(AcceptSingle(c));
-                            break;
-                    }
-                    escaped = false;
-                }
-                else
-                {
-                    switch (c)
-                    {
-                        case '[':
-                            inCharacterClass = true;
-                            break;
-
-                        case '|':
-                            stack.Push(Or(stack.Pop(), stack.Pop()));
-                            break;
-
-                        case '+':
-                            stack.Push(RepeatOnceOrMore(stack.Pop()));
-                            break;
-
-                        case '*':
-                            stack.Push(RepeatZeroOrMore(stack.Pop()));
-                            break;
-
-                        case '?':
-                            stack.Push(RepeatZeroOrOnce(stack.Pop()));
-                            break;
-
-                        case '&':
-                            // & is not commutative, and the stack is reversed.
-                            var second = stack.Pop();
-                            var first = stack.Pop();
-                            stack.Push(And(first, second));
-                            break;
-                        case '\\':
-                            // Set escaped state
-                            escaped = true;
-                            break;
-                        case '.':
-                            stack.Push(AcceptAnything());
-                            break;
-                        default:
-                            // Normal character
-                            stack.Push(AcceptSingle(c));
-                            break;
-                    }
+                                break;
+                        }
+                        break;
                 }
             }
 

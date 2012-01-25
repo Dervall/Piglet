@@ -105,5 +105,17 @@ namespace TestParser
         {
             CheckMatch("jfsdhsd", "\\S+");
         }
+
+        [TestMethod]
+        public void TestMatchAlphanumeric()
+        {
+            CheckMatch("abcdef90210", "\\w+");
+        }
+
+        [TestMethod]
+        public void TestMatchNonAlphanumeric()
+        {
+            CheckMatch(" \n!@#", "\\W+");
+        }
     }
 }

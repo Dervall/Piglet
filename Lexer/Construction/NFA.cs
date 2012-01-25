@@ -120,6 +120,15 @@ namespace Piglet.Lexer.Construction
                             stack.Push(Accept(AllCharactersExceptNull.Except(AllWhitespaceCharacters)));
                             break;
 
+                        case 'w':
+                            stack.Push(Accept(CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'))));
+                            break;
+
+                        case 'W':
+                            stack.Push(Accept(AllCharactersExceptNull.Except(
+                                CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')))));
+                            break;
+
                         default:
                             stack.Push(AcceptSingle(c));
                             break;
@@ -227,15 +236,12 @@ namespace Piglet.Lexer.Construction
             return Accept(chars);
         }
 
-        private static char[] CharRange(char start, char end)
+        private static IEnumerable<char> CharRange(char start, char end)
         {
-            var chars = new char[(end - start) + 1];
-            var i = 0;
             for (var c = start; c <= end; ++c)
             {
-                chars[i++] = c;
+                yield return c;
             }
-            return chars;
         }
 
         public static NFA AcceptSingle(char c)

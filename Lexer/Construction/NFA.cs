@@ -107,6 +107,11 @@ namespace Piglet.Lexer.Construction
                             stack.Push(AcceptRange('0', '9'));   
                             break;
                         
+                        case 'D':
+                            // Shorthand for [^0-9]
+                            stack.Push(Accept(AllCharactersExceptNull.Except(CharRange('0', '9'))));
+                            break;
+
                         default:
                             stack.Push(AcceptSingle(c));
                             break;
@@ -205,13 +210,19 @@ namespace Piglet.Lexer.Construction
 
         public static NFA AcceptRange(char start, char end)
         {
+            var chars = CharRange(start, end);
+            return Accept(chars);
+        }
+
+        private static char[] CharRange(char start, char end)
+        {
             var chars = new char[(end - start) + 1];
             var i = 0;
-            for (var c = start; c <= end; ++c )
+            for (var c = start; c <= end; ++c)
             {
                 chars[i++] = c;
             }
-            return Accept(chars);
+            return chars;
         }
 
         public static NFA AcceptSingle(char c)

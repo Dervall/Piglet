@@ -87,5 +87,11 @@ namespace TestParser
             CheckMatch("+", "[+]");
             CheckMatch("*", "[*]");
         }
+
+        [TestMethod]
+        public void TestNonDigitEscaped()
+        {
+            CheckMatch("abcde", "\\D+");
+        }
     }
 }

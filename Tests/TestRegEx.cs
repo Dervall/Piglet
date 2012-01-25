@@ -117,5 +117,11 @@ namespace TestParser
         {
             CheckMatch(" \n!@#", "\\W+");
         }
+
+        [TestMethod]
+        public void TestMatchLiteral()
+        {
+            CheckMatch("ABC", "ABC");
+        }
     }
 }

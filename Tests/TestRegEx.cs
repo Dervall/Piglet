@@ -126,8 +126,13 @@ namespace TestParser
         [TestMethod]
         public void TestBracketInCharacterClass()
         {
-            // TODO: This is not working.
             CheckMatch("[][][]", "[][ab]+");
+        }
+
+        [TestMethod]
+        public void TestNumberedRepetition()
+        {
+      //      CheckMatch("coolcoolcool", "(cool){3}");
         }
     }
 }

@@ -87,7 +87,7 @@ namespace TestParser
                 c.Token("a+", f => "A+");
                 c.Token("abb", f => "ABB");
                 c.Token("a*b+", f => "A*B+");
-                c.Ignore(" *"); // Bad regexp lol, fix
+                c.Ignore(" *");
             });
             lexer.Source = new StringReader("    abb   bbbbbbbbb");
 
@@ -95,6 +95,22 @@ namespace TestParser
             Assert.AreEqual("ABB", tuple.Item2);
             tuple = lexer.Next();
             Assert.AreEqual("A*B+", tuple.Item2);
+        }
+
+        [TestMethod]
+        public void TestLexDigits()
+        {
+            ILexer<int> lexer = LexerFactory<int>.Configure(c =>
+            {
+                c.Token("\\d+", int.Parse);
+                c.Ignore(" *");
+            });
+            lexer.Source = new StringReader("    123   42");
+
+            Tuple<int, int> tuple = lexer.Next();
+            Assert.AreEqual(123, tuple.Item2);
+            tuple = lexer.Next();
+            Assert.AreEqual(42, tuple.Item2);
         }
 
         [TestMethod]

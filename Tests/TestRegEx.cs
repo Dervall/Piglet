@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Lexer;
 
@@ -26,10 +22,7 @@ namespace TestParser
         [TestMethod]
         public void TestEscapedCharacters()
         {
-            string regEx = "\\++";
-            string input = "++++";
-
-            CheckMatch(input, regEx);
+            CheckMatch("++++", "\\++");
         }
 
         [TestMethod]
@@ -61,6 +54,85 @@ namespace TestParser
         {
             CheckMatch("Color", "Colou?r");
             CheckMatch("Colour", "Colou?r");
+        }
+
+        [TestMethod]
+        public void TestEscapedParenthesis()
+        {
+            CheckMatch("(b)", "\\((a|b)\\)");
+        }
+
+        [TestMethod]
+        public void TestNegateCharacterClass()
+        {
+            CheckMatch("abcd", "[^ABCD]+");
+        }
+
+        [TestMethod]
+        public void TestNegateInWrongPosition()
+        {
+            CheckMatch("^", "[x^]");
+        }
+
+        [TestMethod]
+        public void SpecialCharactersAreNotThatSpecialInsideAClass()
+        {
+            CheckMatch("+", "[+]");
+            CheckMatch("*", "[*]");
+        }
+
+        [TestMethod]
+        public void TestNonDigitEscaped()
+        {
+            CheckMatch("abcde", "\\D+");
+        }
+
+        [TestMethod]
+        public void TestMatchWhitespace()
+        {
+            CheckMatch(" \t\n\r", "\\s+");
+        }
+
+        [TestMethod]
+        public void TestMatchNonWhitespace()
+        {
+            CheckMatch("jfsdhsd", "\\S+");
+        }
+
+        [TestMethod]
+        public void TestMatchAlphanumeric()
+        {
+            CheckMatch("abcdef90210", "\\w+");
+        }
+
+        [TestMethod]
+        public void TestMatchNonAlphanumeric()
+        {
+            CheckMatch(" \n!@#", "\\W+");
+        }
+
+        [TestMethod]
+        public void TestMatchLiteral()
+        {
+            CheckMatch("ABC", "ABC");
+        }
+
+        [TestMethod]
+        public void TestEscapedSlash()
+        {
+            CheckMatch("\\\\", "\\\\+");
+        }
+
+        [TestMethod]
+        public void TestBracketInCharacterClass()
+        {
+            CheckMatch("[][][]", "[][ab]+");
+        }
+
+        [TestMethod]
+        public void TestNumberedRepetition()
+        {
+      //      CheckMatch("coolcoolcool", "(cool){3}");
         }
     }
 }

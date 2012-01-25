@@ -1,0 +1,7 @@
+Parser.suo
+*.suo
+*.user
+_ReSharper.*
+bin
+obj
+TestResults

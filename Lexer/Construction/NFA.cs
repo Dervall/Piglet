@@ -7,9 +7,6 @@ namespace Piglet.Lexer.Construction
 {
     public class NFA : FiniteAutomata<NFA.State>
     {
-        // This represents a state transfer that requires no input. These will never be transferred into the DFA
-        public const char Epsilon = (char)0;
-
         public class State : BaseState
         {
             public override bool AcceptState { get; set; }

@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
 
-namespace Piglet
+namespace Piglet.Configuration
 {
     public interface INonTerminal<T> : ISymbol<T>
     {

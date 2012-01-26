@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Piglet
+namespace Piglet.Configuration
 {
     public class NonTerminal<T> : Symbol<T>, INonTerminal<T>
     {

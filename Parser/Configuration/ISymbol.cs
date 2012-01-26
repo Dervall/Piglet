@@ -1,4 +1,4 @@
-namespace Piglet
+namespace Piglet.Configuration
 {
     public interface ISymbol<T>
     {

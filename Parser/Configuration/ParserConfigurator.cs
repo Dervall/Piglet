@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Piglet
+namespace Piglet.Configuration
 {
     public class ParserConfigurator<T> : IParserConfigurator<T>
     {

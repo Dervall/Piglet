@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet;
+using Piglet.Configuration;
 
 namespace TestParser
 {

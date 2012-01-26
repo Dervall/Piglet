@@ -1,6 +1,6 @@
 using System;
 
-namespace Piglet
+namespace Piglet.Configuration
 {
     public interface IParserConfigurator<T>
     {

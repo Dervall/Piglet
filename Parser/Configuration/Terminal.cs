@@ -1,6 +1,6 @@
 using System;
 
-namespace Piglet
+namespace Piglet.Configuration
 {
     public class Terminal<T> : Symbol<T>, ITerminal<T>
     {

@@ -1,4 +1,4 @@
-namespace Piglet
+namespace Piglet.Configuration
 {
     public static class ParserConfiguratorFactory
     {

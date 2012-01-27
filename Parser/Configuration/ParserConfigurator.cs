@@ -12,15 +12,19 @@ namespace Piglet.Configuration
 
         private IProductionRule<T> startRule;
         private readonly List<NonTerminal<T>> nonTerminals;
+        private readonly List<Terminal<T>> terminals; 
 
         public ParserConfigurator()
         {
             nonTerminals = new List<NonTerminal<T>>();
+            terminals = new List<Terminal<T>>();
         }
 
         public ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null)
         {
-            return new Terminal<T>(regExp, onParse);
+            var terminal = new Terminal<T>(regExp, onParse);
+            terminals.Add(terminal);
+            return terminal;
         }
 
         public INonTerminal<T> NonTerminal(Action<IProductionConfigurator<T>> productionAction = null)
@@ -67,26 +71,19 @@ namespace Piglet.Configuration
         {
             get { return nonTerminals.SelectMany(nonTerminal => nonTerminal.ProductionRules); }
         }
+
+        public IEnumerable<ISymbol<T>> AllSymbols
+        {
+            get {
+                foreach (var nonTerminal in nonTerminals)
+                {
+                    yield return nonTerminal;
+                }
+                foreach (var terminal in terminals)
+                {
+                    yield return terminal;
+                }
+            }
+        }
     }
-
- /*   public class StartProductionRule<T> : IProductionRule<T>
-    {
-        private readonly NonTerminal<T> startSymbol;
-
-        public StartProductionRule(NonTerminal<T> startSymbol)
-        {
-            this.startSymbol = startSymbol;
-        }
-
-        public ISymbol<T>[] Symbols
-        {
-            get { return new ISymbol<T>[] {startSymbol}; }
-        }
-
-        public ISymbol<T> ResultSymbol
-        {
-            get { return null; }
-        }
-
-    }*/
 }

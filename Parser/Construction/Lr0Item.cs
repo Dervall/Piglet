@@ -26,6 +26,7 @@ namespace Piglet.Construction
             ProductionRule = productionRule;
         }
 
+        
         public override string ToString()
         {
             var sb = new StringBuilder();

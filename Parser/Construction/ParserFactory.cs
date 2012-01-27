@@ -19,22 +19,31 @@ namespace Piglet.Construction
             // be the augmented accept state of the grammar.
             // The closure is all states which are accessible by the dot at the left hand side of the
             // item.
-            var itemSets = new List<List<Lr0Item<T>>> {Closure(new Lr0Item<T>(start, 0), parserConfiguration)};
+            var itemSets = new List<List<Lr0Item<T>>> {Closure(new List<Lr0Item<T>> {new Lr0Item<T>(start, 0) }, parserConfiguration)};
+            
+            // TODO: This method is probably one big stupid performance sink since it iterates WAY to many times over the input
+
+            // Repeat until nothing gets added any more
             while (true)
             {
                 bool anythingAdded = false;
+
                 foreach (var itemSet in itemSets)
                 {
                     foreach (var symbol in parserConfiguration.AllSymbols)
                     {
+                        // Calculate the itemset for by goto for each symbol in the grammar
                         var gotoSet = Goto(itemSet, symbol).ToList();
 
+                        // If there is anything found in the set
                         if (gotoSet.Any())
                         {
+                            // Do a closure on the goto set and see if it's already present in the sets of items that we have
+                            // if that is not the case add it to the item sets and restart the entire thing.
+                            gotoSet = Closure(gotoSet, parserConfiguration);
                             if (!itemSets.Any(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule && 
                                                                                b.DotLocation == a.DotLocation))))
                             {
-
                                 itemSets.Add(gotoSet);
                                 anythingAdded = true;
                                 break;
@@ -60,10 +69,11 @@ namespace Piglet.Construction
                    select new Lr0Item<T>(lr0Item.ProductionRule, lr0Item.DotLocation + 1);
         }
 
-        private static List<Lr0Item<T>> Closure<T>(Lr0Item<T> lr0Item, IParserConfiguration<T> parserConfiguration)
+        private static List<Lr0Item<T>> Closure<T>(IEnumerable<Lr0Item<T>> items, IParserConfiguration<T> parserConfiguration)
         {
-            // The item itself is always in it's own closure set
-            var closure = new List<Lr0Item<T>> { lr0Item };
+            // The items themselves are always in their own closure set
+            var closure = new List<Lr0Item<T>>();
+            closure.AddRange(items);
 
             var added = new HashSet<ISymbol<T>>();
             while (true)

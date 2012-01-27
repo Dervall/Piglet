@@ -22,8 +22,18 @@ namespace Piglet.Configuration
 
         public ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null)
         {
-            var terminal = new Terminal<T>(regExp, onParse);
-            terminals.Add(terminal);
+            Terminal<T> terminal = terminals.SingleOrDefault(f => f.RegExp == regExp);
+            if (terminal != null)
+            {
+                if (terminal.OnParse != onParse)
+                    throw new ParserConfigurationException(
+                        "Redefinition of terminal uses the same regex but different onParse action");
+            }
+            else
+            {
+                terminal = new Terminal<T>(regExp, onParse);
+                terminals.Add(terminal);
+            }
             return terminal;
         }
 
@@ -42,6 +52,30 @@ namespace Piglet.Configuration
 
         public IParser<T> CreateParser()
         {
+            // Before doing anything, make sure all the terminals are registered.
+            // This becomes neccessary since the user can configure the parser using only strings.
+            // Since the nonterminal used for that does not carry a back-reference to the configurator,
+            // we do it this way.
+            foreach (var nonTerminal in nonTerminals)
+            {
+                foreach (var terminal in nonTerminal.ProductionRules.SelectMany( f => f.Symbols).OfType<Terminal<T>>())
+                {
+                    var oldTerminal = terminals.SingleOrDefault(f => f.RegExp == terminal.RegExp);
+                    if (oldTerminal != null)
+                    {
+                        if (oldTerminal.OnParse != terminal.OnParse)
+                        {
+                            throw new ParserConfigurationException(
+                                "Multiply defined terminal has more than one OnParse action");
+                        }
+                    }
+                    else
+                    {
+                        terminals.Add(terminal);
+                    }
+                }
+            }
+
             return ParserFactory.CreateParser(this);
         }
 

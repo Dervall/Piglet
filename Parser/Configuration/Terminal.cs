@@ -16,6 +16,7 @@ namespace Piglet.Configuration
 
             OnParse = onParse;
             RegExp = regExp;
+            DebugName = RegExp;
         }
 
         public override string ToString()

@@ -15,16 +15,12 @@ namespace TestParser
             ITerminal<int> number = configurator.Terminal("d+", int.Parse);
             number.DebugName = "number";
 
-            INonTerminal<int> start = configurator.NonTerminal();
-            start.DebugName = "start";
             INonTerminal<int> term = configurator.NonTerminal();
             term.DebugName = "term";
             INonTerminal<int> expr = configurator.NonTerminal();
             expr.DebugName = "expr";
             INonTerminal<int> factor = configurator.NonTerminal();
             factor.DebugName = "factor";
-
-            start.Productions(p => p.Production(expr, "\n").OnReduce(s => s[0]));
             
             expr.Productions(p => {
                                       p.Production(expr, "+", term).OnReduce(s => s[0] + s[3]);
@@ -43,7 +39,7 @@ namespace TestParser
                                     p.Production("(", expr, ")").OnReduce(s => s[1]);
                                 });
 
-            configurator.OnAccept(start, s => s);
+            configurator.OnAccept(expr, s => s);
 
             IParser<int> parser = configurator.CreateParser();
 

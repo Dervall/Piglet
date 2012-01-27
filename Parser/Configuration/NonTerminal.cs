@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Piglet.Construction;
 
 namespace Piglet.Configuration
 {
@@ -12,6 +13,11 @@ namespace Piglet.Configuration
         {
             productions = new List<NonTerminalProduction>();
             Productions(productionAction);
+        }
+
+        public IEnumerable<IProductionRule<T>> ProductionRules
+        {
+            get { return productions; }
         }
 
         public void Productions(Action<IProductionConfigurator<T>> productionAction)
@@ -27,15 +33,19 @@ namespace Piglet.Configuration
             return string.Format("{0} =>", DebugName);
         }
 
-        private class NonTerminalProduction : IConfigureProductionAction<T>
+        private class NonTerminalProduction : IConfigureProductionAction<T>, IProductionRule<T>
         {
             private Func<T[], T> reduceAction;
             private readonly ISymbol<T>[] symbols;
+            private readonly INonTerminal<T> resultSymbol;
 
             public ISymbol<T>[] Symbols { get { return symbols; } }
+            public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
 
-            public NonTerminalProduction(object[] symbols)
+            public NonTerminalProduction(INonTerminal<T> resultSymbol, object[] symbols)
             {
+                this.resultSymbol = resultSymbol;
+
                 // Move production symbols to the list
                 this.symbols = new ISymbol<T>[symbols.Length];
                 int i = 0;
@@ -75,7 +85,7 @@ namespace Piglet.Configuration
                     throw new ArgumentException("Only string and ISymbol are valid arguments.", "parts");
                 }
 
-                var nonTerminalProduction = new NonTerminalProduction(parts);
+                var nonTerminalProduction = new NonTerminalProduction(nonTerminal, parts);
                 nonTerminal.productions.Add(nonTerminalProduction);
 
                 return nonTerminalProduction;

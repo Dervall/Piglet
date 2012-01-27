@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Piglet.Construction;
 
 namespace Piglet.Configuration
 {
-    public class ParserConfigurator<T> : IParserConfigurator<T>
+    public class ParserConfigurator<T> : IParserConfigurator<T>, IParserConfiguration<T>
     {
-        private INonTerminal<T> startSymbol;
+        private NonTerminal<T> startSymbol;
         private Func<T, T> acceptAction;
+
+        private IProductionRule<T> startRule;
+        private readonly List<NonTerminal<T>> nonTerminals;
 
         public ParserConfigurator()
         {
+            nonTerminals = new List<NonTerminal<T>>();
         }
 
         public ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null)
@@ -19,43 +25,68 @@ namespace Piglet.Configuration
 
         public INonTerminal<T> NonTerminal(Action<IProductionConfigurator<T>> productionAction = null)
         {
-            return new NonTerminal<T>(productionAction);
+            var nonTerminal = new NonTerminal<T>(productionAction);
+            nonTerminals.Add(nonTerminal);
+            return nonTerminal;
         }
 
         public void OnAccept(INonTerminal<T> start, Func<T, T> acceptAction)
         {
-            startSymbol = start;
+            startSymbol = (NonTerminal<T>) start;
             this.acceptAction = acceptAction;
         }
 
         public IParser<T> CreateParser()
         {
-            IList<NonTerminal<T>> nonTerminals = new List<NonTerminal<T>>();
-            IList<Terminal<T>> terminals = new List<Terminal<T>>();
+            return ParserFactory.CreateParser(this);
+        }
 
-            // Gather every symbol in use in the configuration
-            ((NonTerminal<T>) startSymbol).GatherSymbols(nonTerminals, terminals);
+        public IProductionRule<T> Start
+        {
+            get 
+            { 
+                if (startRule == null)
+                {
+                    // No start rule yet? Augment the grammar
+                    // Create the derived start symbol
+                    var augmentedStart = (NonTerminal<T>)NonTerminal();  // Unfortunate cast...
 
-            // Generate the lexer
-            //ILexer<T> lexer = new LexerImpl<T>(terminals, Lexer);
+                    // Use the start symbols debug name with a ' in front to indicate the augmented symbol.
+                    augmentedStart.DebugName = "'" + startSymbol.DebugName;
+                    
+                    // Create a single production 
+                    augmentedStart.Productions(p => p.Production(startSymbol).OnReduce(f => acceptAction(f[0])));
+                    startRule = augmentedStart.ProductionRules.First(); // There's only one production.
 
-
-            // We will now generate the LR(1) states from the production rules.
-           // IEnumerable<LR1State> lr1States = GenerateLr1States() 
-
-            Console.WriteLine("Terminals:");
-            foreach (var terminal in terminals)
-            {
-                Console.WriteLine(terminal.ToString());
+                }
+                return startRule; 
             }
+        }
 
-            Console.WriteLine("NonTerminals");
-            foreach (var nonTerminal in nonTerminals)
-            {
-                Console.WriteLine(nonTerminal.ToString());
-            }
-
-            return null;
+        public IEnumerable<IProductionRule<T>> ProductionRules
+        {
+            get { return nonTerminals.SelectMany(nonTerminal => nonTerminal.ProductionRules); }
         }
     }
+
+ /*   public class StartProductionRule<T> : IProductionRule<T>
+    {
+        private readonly NonTerminal<T> startSymbol;
+
+        public StartProductionRule(NonTerminal<T> startSymbol)
+        {
+            this.startSymbol = startSymbol;
+        }
+
+        public ISymbol<T>[] Symbols
+        {
+            get { return new ISymbol<T>[] {startSymbol}; }
+        }
+
+        public ISymbol<T> ResultSymbol
+        {
+            get { return null; }
+        }
+
+    }*/
 }

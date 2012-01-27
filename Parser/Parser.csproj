@@ -42,16 +42,20 @@
   <ItemGroup>
     <Compile Include="Configuration\IConfigureProductionAction.cs" />
     <Compile Include="Configuration\INonTerminal.cs" />
+    <Compile Include="Configuration\IParserConfiguration.cs" />
     <Compile Include="Configuration\IParserConfigurator.cs" />
     <Compile Include="Configuration\IProductionConfigurator.cs" />
+    <Compile Include="Construction\IProductionRule.cs" />
     <Compile Include="Configuration\ISymbol.cs" />
     <Compile Include="Configuration\ITerminal.cs" />
     <Compile Include="Configuration\NonTerminal.cs" />
     <Compile Include="Configuration\ParserConfigurationException.cs" />
     <Compile Include="Configuration\ParserConfigurator.cs" />
     <Compile Include="Configuration\ParserConfiguratorFactory.cs" />
+    <Compile Include="Construction\ParserFactory.cs" />
     <Compile Include="Configuration\Symbol.cs" />
     <Compile Include="Configuration\Terminal.cs" />
+    <Compile Include="Construction\Lr0Item.cs" />
     <Compile Include="IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

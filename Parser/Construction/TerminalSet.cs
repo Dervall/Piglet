@@ -8,13 +8,13 @@ namespace Piglet.Construction
     {
         private readonly Dictionary<ISymbol<T>, List<Terminal<T>>> dict;
 
-        public TerminalSet(IParserConfiguration<T> parserConfiguration)
+        public TerminalSet(IGrammar<T> grammar)
         {
             dict = new Dictionary<ISymbol<T>, List<Terminal<T>>>();
 
             // Iterate through all the symbols we've got in the grammar
             // and add stuff to the first set
-            foreach (var symbol in parserConfiguration.AllSymbols.OfType<NonTerminal<T>>())
+            foreach (var symbol in grammar.AllSymbols.OfType<NonTerminal<T>>())
             {
                 // Initialize the list
                 dict[symbol] = new List<Terminal<T>>();

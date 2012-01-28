@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Piglet.Construction;
+﻿using System.Collections.Generic;
+using Piglet.Configuration;
 
-namespace Piglet.Configuration
+namespace Piglet.Construction
 {
-    public interface IParserConfiguration<T>
+    public interface IGrammar<T>
     {
         IProductionRule<T> Start { get; }
         IEnumerable<IProductionRule<T>> ProductionRules { get; }

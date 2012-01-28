@@ -9,15 +9,4 @@ namespace Piglet.Configuration
         void OnAccept(INonTerminal<T> start, Func<T, T> acceptAction);
         IParser<T> CreateParser();
     }
-
-    public enum Whitespace
-    {
-        Ignore,
-        Preserve
-    }
-
-    public interface ILexerConfiguration
-    {
-        Whitespace WhitespaceBehaviour { get; set; }
-    }
 }

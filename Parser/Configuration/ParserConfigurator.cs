@@ -5,7 +5,7 @@ using Piglet.Construction;
 
 namespace Piglet.Configuration
 {
-    public class ParserConfigurator<T> : IParserConfigurator<T>, IParserConfiguration<T>
+    public class ParserConfigurator<T> : IParserConfigurator<T>, IGrammar<T>
     {
         private NonTerminal<T> startSymbol;
         private Func<T, T> acceptAction;
@@ -76,7 +76,7 @@ namespace Piglet.Configuration
                 }
             }
 
-            return ParserFactory.CreateParser(this);
+            return new ParserFactory<T>(this).CreateParser();
         }
 
         public IProductionRule<T> Start

@@ -42,7 +42,7 @@
   <ItemGroup>
     <Compile Include="Configuration\IConfigureProductionAction.cs" />
     <Compile Include="Configuration\INonTerminal.cs" />
-    <Compile Include="Configuration\IParserConfiguration.cs" />
+    <Compile Include="Construction\IGrammar.cs" />
     <Compile Include="Configuration\IParserConfigurator.cs" />
     <Compile Include="Configuration\IProductionConfigurator.cs" />
     <Compile Include="Construction\IProductionRule.cs" />

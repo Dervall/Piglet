@@ -6,20 +6,33 @@ using Piglet.Configuration;
 
 namespace Piglet.Construction
 {
-    public static class ParserFactory
+    public class ParserFactory<T>
     {
-        public static IParser<T> CreateParser<T>(IParserConfiguration<T> parserConfiguration)
+        private readonly IGrammar<T> grammar;
+
+        public ParserFactory(IGrammar<T> grammar)
+        {
+            this.grammar = grammar;
+        }
+
+        public IParser<T> CreateParser()
         {
             // First order of business is to create the canonical list of LR0 states.
             // This starts with augmenting the grammar with an accept symbol, then we derive the
             // grammar from that
-            var start = parserConfiguration.Start;
+            var start = grammar.Start;
 
             // So, we are going to calculate the LR0 closure for the start symbol, which should
             // be the augmented accept state of the grammar.
             // The closure is all states which are accessible by the dot at the left hand side of the
             // item.
-            var itemSets = new List<List<Lr0Item<T>>> {Closure(new List<Lr0Item<T>> {new Lr0Item<T>(start, 0) }, parserConfiguration)};
+            var itemSets = new List<List<Lr0Item<T>>>
+                               {
+                                   Closure(new List<Lr0Item<T>>
+                                               {
+                                                   new Lr0Item<T>(start, 0)
+                                               })
+                               };
             
             // TODO: This method is probably one big stupid performance sink since it iterates WAY to many times over the input
 
@@ -30,7 +43,7 @@ namespace Piglet.Construction
 
                 foreach (var itemSet in itemSets)
                 {
-                    foreach (var symbol in parserConfiguration.AllSymbols)
+                    foreach (var symbol in grammar.AllSymbols)
                     {
                         // Calculate the itemset for by goto for each symbol in the grammar
                         var gotoSet = Goto(itemSet, symbol).ToList();
@@ -40,7 +53,7 @@ namespace Piglet.Construction
                         {
                             // Do a closure on the goto set and see if it's already present in the sets of items that we have
                             // if that is not the case add it to the item sets and restart the entire thing.
-                            gotoSet = Closure(gotoSet, parserConfiguration);
+                            gotoSet = Closure(gotoSet);
                             if (!itemSets.Any(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule && 
                                                                                b.DotLocation == a.DotLocation))))
                             {
@@ -58,21 +71,21 @@ namespace Piglet.Construction
             }
 
             // Get the first and follow sets for all nonterminal symbols
-            var first = CalculateFirst(parserConfiguration);
-            var follow = CalculateFollow(parserConfiguration, first);
+            var first = CalculateFirst();
+            var follow = CalculateFollow(first);
 
             return null;
         }
 
-        private static TerminalSet<T> CalculateFollow<T>(IParserConfiguration<T> parserConfiguration, TerminalSet<T> first)
+        private TerminalSet<T> CalculateFollow(TerminalSet<T> first)
         {
-            var follow = new TerminalSet<T>(parserConfiguration);
+            var follow = new TerminalSet<T>(grammar);
             return follow;
         }
 
-        private static TerminalSet<T> CalculateFirst<T>(IParserConfiguration<T> parserConfiguration)
+        private TerminalSet<T> CalculateFirst()
         {
-            var first = new TerminalSet<T>(parserConfiguration);
+            var first = new TerminalSet<T>(grammar);
 
             // Algorithm is that if a nonterminal has a production that starts with a 
             // terminal, we add that to the first set. If it starts with a nonterminal, we add
@@ -83,7 +96,7 @@ namespace Piglet.Construction
             {
                 addedThings = false;
                 
-                foreach (var symbol in parserConfiguration.AllSymbols.OfType<NonTerminal<T>>())
+                foreach (var symbol in grammar.AllSymbols.OfType<NonTerminal<T>>())
                 {
                     foreach (var productionRule in symbol.ProductionRules)
                     {
@@ -128,7 +141,7 @@ namespace Piglet.Construction
             return first;
         }
 
-        private static IEnumerable<Lr0Item<T>> Goto<T>(IEnumerable<Lr0Item<T>> closures, ISymbol<T> symbol)
+        private IEnumerable<Lr0Item<T>> Goto(IEnumerable<Lr0Item<T>> closures, ISymbol<T> symbol)
         {
             // Every place there is a symbol to the right of the dot that matches the symbol we are looking for
             // add a new Lr0 item that has the dot moved one step to the right.
@@ -137,7 +150,7 @@ namespace Piglet.Construction
                    select new Lr0Item<T>(lr0Item.ProductionRule, lr0Item.DotLocation + 1);
         }
 
-        private static List<Lr0Item<T>> Closure<T>(IEnumerable<Lr0Item<T>> items, IParserConfiguration<T> parserConfiguration)
+        private List<Lr0Item<T>> Closure(IEnumerable<Lr0Item<T>> items)
         {
             // The items themselves are always in their own closure set
             var closure = new List<Lr0Item<T>>();
@@ -155,7 +168,7 @@ namespace Piglet.Construction
                         // Create new Lr0 items from all rules where the resulting symbol of the production rule
                         // matches the symbol that was to the right of the dot.
                         toAdd.AddRange(
-                            parserConfiguration.ProductionRules.Where(f => f.ResultSymbol == symbolRightOfDot).Select(
+                            grammar.ProductionRules.Where(f => f.ResultSymbol == symbolRightOfDot).Select(
                                 f => new Lr0Item<T>(f, 0)));
                         added.Add(symbolRightOfDot);
                     }

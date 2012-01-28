@@ -28,47 +28,6 @@ namespace Piglet.Configuration
             }
         }
 
-        public override string ToString()
-        {
-            return string.Format("{0} =>", DebugName);
-        }
-
-        private class NonTerminalProduction : IConfigureProductionAction<T>, IProductionRule<T>
-        {
-            private Func<T[], T> reduceAction;
-            private readonly ISymbol<T>[] symbols;
-            private readonly INonTerminal<T> resultSymbol;
-
-            public ISymbol<T>[] Symbols { get { return symbols; } }
-            public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
-
-            public NonTerminalProduction(INonTerminal<T> resultSymbol, object[] symbols)
-            {
-                this.resultSymbol = resultSymbol;
-
-                // Move production symbols to the list
-                this.symbols = new ISymbol<T>[symbols.Length];
-                int i = 0;
-                foreach (var part in symbols)
-                {
-                    if (part is string)
-                    {
-                        this.symbols[i] = new Terminal<T>((string) part, null);
-                    }
-                    else
-                    {
-                        this.symbols[i] = (ISymbol<T>)symbols[i];
-                    }
-                    ++i;
-                }
-            }
-
-            public void OnReduce(Func<T[], T> action)
-            {
-                reduceAction = action;
-            }
-        }
-
         private class NonTerminalProductionConfigurator : IProductionConfigurator<T>
         {
             private readonly NonTerminal<T> nonTerminal;
@@ -92,47 +51,45 @@ namespace Piglet.Configuration
             }
         }
 
-        public void GatherSymbols(IList<NonTerminal<T>> nonTerminals, IList<Terminal<T>> terminals)
+        private class NonTerminalProduction : IConfigureProductionAction<T>, IProductionRule<T>
         {
-            if (!nonTerminals.Contains(this))
-            {
-                nonTerminals.Add(this);
-            }
+            private Func<T[], T> reduceAction;
+            private readonly ISymbol<T>[] symbols;
+            private readonly INonTerminal<T> resultSymbol;
 
-            foreach (var production in productions)
+            public ISymbol<T>[] Symbols { get { return symbols; } }
+            public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
+
+            public NonTerminalProduction(INonTerminal<T> resultSymbol, object[] symbols)
             {
-                foreach (var symbol in production.Symbols)
+                this.resultSymbol = resultSymbol;
+
+                // Move production symbols to the list
+                this.symbols = new ISymbol<T>[symbols.Length];
+                int i = 0;
+                foreach (var part in symbols)
                 {
-                    if (symbol is NonTerminal<T>)
+                    if (part is string)
                     {
-                        if (!nonTerminals.Contains(symbol))
-                        {
-                            ((NonTerminal<T>)symbol).GatherSymbols(nonTerminals, terminals);
-                        }
-                    } 
+                        this.symbols[i] = new Terminal<T>((string)part, null);
+                    }
                     else
                     {
-                        var terminal = (Terminal<T>)symbol;
-                        if (terminals.Any(f => f.RegExp == terminal.RegExp))
-                        {
-                            if (terminals.Any(f => f.OnParse != terminal.OnParse))
-                            {
-                                // There's a terminal which has been defined earlier with a different OnParse
-                                // This is illegal!
-                                throw new ParserConfigurationException(
-                                    string.Format(
-                                        "Two terminal symbols using the RegExp {0} but using different OnParse actions",
-                                        terminal.RegExp));
-
-                            }
-                        }
-                        else
-                        {
-                            terminals.Add(terminal);
-                        }
+                        this.symbols[i] = (ISymbol<T>)symbols[i];
                     }
+                    ++i;
                 }
             }
+
+            public void OnReduce(Func<T[], T> action)
+            {
+                reduceAction = action;
+            }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} =>", DebugName);
         }
     }
 }

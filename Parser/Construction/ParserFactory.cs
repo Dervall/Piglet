@@ -191,15 +191,17 @@ namespace Piglet.Construction
                             table.Action[i, grammar.EndOfInputTerminal.TokenNumber] = SLRParseTable<T>.Accept();
                         }
                     }
+                }
 
-                    // Fill the goto table with the state IDs of all states that have been originally
-                    // produced by the GOTO operation from this state
-                    foreach (var gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet))
-                    {
-                        table.Goto[i, gotoTransition.OnSymbol.TokenNumber] = itemSets.IndexOf(gotoTransition.To);
-                    }
+                // Fill the goto table with the state IDs of all states that have been originally
+                // produced by the GOTO operation from this state
+                foreach (var gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet && f.OnSymbol is NonTerminal<T>))
+                {
+                    table.Goto[i, gotoTransition.OnSymbol.TokenNumber] = itemSets.IndexOf(gotoTransition.To);
                 }
             }
+
+            string debugTable = table.ToDebugString(grammar, itemSets.Count());
 
             return null;
         }

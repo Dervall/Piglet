@@ -1,19 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet;
-using Piglet.Configuration;
 using Piglet.Lexer;
+using Piglet.Parser;
+using Piglet.Parser.Configuration;
 
 namespace TestParser
 {
     [TestClass]
-    public class UnitTest1
+    public class ParserIntegrationTest
     {
         [TestMethod]
         public void TestACalculator()
         {
             var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
 
-            ITerminal<int> number = configurator.Terminal("d+", int.Parse);
+            ITerminal<int> number = configurator.Terminal("\\d+", int.Parse);
             number.DebugName = "number";
 
             INonTerminal<int> term = configurator.NonTerminal();
@@ -24,32 +26,32 @@ namespace TestParser
             factor.DebugName = "factor";
             
             expr.Productions(p => {
-                                      p.Production(expr, "+", term).OnReduce(s => s[0] + s[3]);
+                                      p.Production(expr, "\\+", term).OnReduce(s => s[0] + s[2]);
                                       p.Production(term).OnReduce(s => s[0]);
                                   });
 
             term.Productions(p =>
                                  {
-                                     p.Production(term, "*", factor).OnReduce(s => s[0] * s[2]);
+                                     p.Production(term, "\\*", factor).OnReduce(s => s[0] * s[2]);
                                      p.Production(factor).OnReduce(s => s[0]);
                                  });
 
             factor.Productions(p =>
                                 {
                                     p.Production(number).OnReduce(s => s[0]);
-                                    p.Production("(", expr, ")").OnReduce(s => s[1]);
+                                    p.Production("\\(", expr, "\\)").OnReduce(s => s[1]);
                                 });
 
+//            configurator.AutoEscapeLiterals = true;
             configurator.OnAccept(expr, s => s);
             configurator.AugmentGrammar();
 
-         //   ILexer<int> lexer = configurator.CreateLexer();
+            ILexer<int> lexer = configurator.CreateLexer();
             IParser<int> parser = configurator.CreateParser();
+            lexer.Source = new StringReader("7+8*2");
+            int result = parser.Parse(lexer);
 
-            // This is what will actually RUN once we get this stuff up to par
-
-   //         int result = parser.Parse("7+8*2\n");
- //           Assert.AreEqual(23, result);
+            Assert.AreEqual(23, result);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Piglet.Configuration
+﻿namespace Piglet.Parser.Configuration
 {
     public class Symbol<T> : ISymbol<T>
     {

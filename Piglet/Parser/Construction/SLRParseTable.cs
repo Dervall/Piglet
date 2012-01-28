@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Piglet.Configuration;
+using Piglet.Parser.Configuration;
 
-namespace Piglet.Construction
+namespace Piglet.Parser.Construction
 {
     public class SLRParseTable<T>
     {
@@ -66,8 +66,7 @@ namespace Piglet.Construction
         public static int Shift(int stateToChangeTo)
         {
             // Shift is positive integers
-            // Add 1 to state
-            return stateToChangeTo + 1;
+            return stateToChangeTo;
         }
 
         public ISparseParseTable Action

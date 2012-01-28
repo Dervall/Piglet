@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Piglet.Configuration;
+﻿using System.Text;
+using Piglet.Parser.Configuration;
 
-namespace Piglet.Construction
+namespace Piglet.Parser.Construction
 {
     public class Lr0Item<T>
     {

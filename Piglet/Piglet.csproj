@@ -75,6 +75,7 @@
     <Compile Include="Parser\Construction\TerminalSet.cs" />
     <Compile Include="Parser\IParser.cs" />
     <Compile Include="Parser\LRParser.cs" />
+    <Compile Include="Parser\ParseException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

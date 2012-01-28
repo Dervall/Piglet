@@ -28,13 +28,14 @@ namespace Piglet.Lexer.Configuration
             // Convert the dfa to table form
             var transitionTable = new TransitionTable<T>(dfa, nfas, tokens);
 
-            return new Lexer<T>(transitionTable);
+            return new Lexer<T>(transitionTable, EndOfInputTokenNumber);
         }
 
         public LexerConfigurator()
         {
             tokens = new List<Tuple<string, Func<string, T>>>();
             ignore = new List<string>();
+            EndOfInputTokenNumber = -1;
         }
 
         public void Token(string regEx, Func<string, T> action)
@@ -46,5 +47,7 @@ namespace Piglet.Lexer.Configuration
         {
             ignore.Add(regEx);
         }
+
+        public int EndOfInputTokenNumber { get; set; }
     }
 }

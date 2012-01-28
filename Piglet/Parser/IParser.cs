@@ -1,7 +1,9 @@
-namespace Piglet
+using Piglet.Lexer;
+
+namespace Piglet.Parser
 {
-    public interface IParser<out T>
+    public interface IParser<T>
     {
-        T Parse();
+        T Parse(ILexer<T> lexer);
     }
 }

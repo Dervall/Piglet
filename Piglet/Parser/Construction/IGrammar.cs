@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Piglet.Configuration;
+using Piglet.Parser.Configuration;
 
-namespace Piglet.Construction
+namespace Piglet.Parser.Construction
 {
     public interface IGrammar<T>
     {

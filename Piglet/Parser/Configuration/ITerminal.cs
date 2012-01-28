@@ -1,6 +1,6 @@
 using System;
 
-namespace Piglet.Configuration
+namespace Piglet.Parser.Configuration
 {
     public interface ITerminal<T> : ISymbol<T>
     {

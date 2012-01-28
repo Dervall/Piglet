@@ -1,6 +1,7 @@
 using System;
+using Piglet.Lexer;
 
-namespace Piglet.Configuration
+namespace Piglet.Parser.Configuration
 {
     public interface IParserConfigurator<T>
     {
@@ -9,6 +10,6 @@ namespace Piglet.Configuration
         void OnAccept(INonTerminal<T> start, Func<T, T> acceptAction);
         IParser<T> CreateParser();
         void AugmentGrammar();
-//        ILexer<int> CreateLexer();
+        ILexer<T> CreateLexer();
     }
 }

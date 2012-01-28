@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Piglet.Construction;
+using Piglet.Lexer;
+using Piglet.Parser.Construction;
 
-namespace Piglet.Configuration
+namespace Piglet.Parser.Configuration
 {
     public class ParserConfigurator<T> : IParserConfigurator<T>, IGrammar<T>
     {
@@ -66,10 +67,6 @@ namespace Piglet.Configuration
             augmentedStart.Productions(p => p.Production(startSymbol).OnReduce(f => acceptAction(f[0])));
             startRule = augmentedStart.ProductionRules.First(); // There's only one production.
 
-            // Add the end of input symbol
-            var eoi = Terminal(null, s => default(T));
-            eoi.DebugName = "$";
-
             // Make sure all the terminals are registered.
             // This becomes neccessary since the user can configure the parser using only strings.
             // Since the nonterminal used for that does not carry a back-reference to the configurator,
@@ -94,15 +91,33 @@ namespace Piglet.Configuration
                 }
             }
 
-            // Assign all tokens in the grammar token numbers first!
+            // Add the end of input symbol
+            var eoi = Terminal(null, s => default(T));
+            eoi.DebugName = "$";
+
+            // Assign all tokens in the grammar token numbers!
             AssignTokenNumbers();
 
             // This class is now a valid implementation of IGrammar, ready to use.
         }
 
+        public ILexer<T> CreateLexer()
+        {
+            if (startRule == null)
+            {
+                // User has forgotten to augment the grammar. Lets help him out and do it
+                // for him
+                AugmentGrammar();
+            }
+
+            // User wants a default lexer, great. Use the lexer from grammar factory
+            // to fix him up
+            return LexerFactory<T>.ConfigureFromGrammar(this);
+        }
+
         public IParser<T> CreateParser()
         {
-            if (startRule != null)
+            if (startRule == null)
             {
                 // User has forgotten to augment the grammar. Lets help him out and do it
                 // for him

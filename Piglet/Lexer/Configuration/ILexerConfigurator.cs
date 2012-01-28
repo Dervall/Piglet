@@ -6,5 +6,6 @@ namespace Piglet.Lexer.Configuration
     {
         void Token(string regEx, Func<string, T> action );
         void Ignore(string regEx);
+        int EndOfInputTokenNumber { get; set; }
     }
 }

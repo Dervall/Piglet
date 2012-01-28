@@ -54,7 +54,7 @@
     <Compile Include="TestRegEx.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Parser\Piglet.csproj">
+    <ProjectReference Include="..\Piglet\Piglet.csproj">
       <Project>{1E23F251-94E1-4504-81E8-2618F5C9FEA3}</Project>
       <Name>Piglet</Name>
     </ProjectReference>

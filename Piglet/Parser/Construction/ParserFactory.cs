@@ -1,10 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Piglet.Configuration;
+using Piglet.Parser.Configuration;
 
-namespace Piglet.Construction
+namespace Piglet.Parser.Construction
 {
     public class ParserFactory<T>
     {
@@ -85,23 +84,20 @@ namespace Piglet.Construction
                                 anythingAdded = true;
                                 break;
                             }
-                            else
+                            // Already found the set, add a transition if it already isn't there
+                            var nt = new GotoSetTransition
+                                         {
+                                             From = itemSet,
+                                             OnSymbol = symbol,
+                                             To = oldGotoSet
+                                         };
+                            if (!gotoSetTransitions.Any(a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
                             {
-                                // Already found the set, add a transition if it already isn't there
-                                var nt = new GotoSetTransition
-                                                        {
-                                                            From = itemSet,
-                                                            OnSymbol = symbol,
-                                                            To = oldGotoSet
-                                                        };
-                                if (!gotoSetTransitions.Any(a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
-                                {
-                                    gotoSetTransitions.Add(nt);
+                                gotoSetTransitions.Add(nt);
 
-                                    // TODO: Not sure if should set anything added to true. Better set it
-                                    // TODO: Only thing that can happen is that this function is EVEN slower than it already is
-                                    anythingAdded = true;
-                                }
+                                // TODO: Not sure if should set anything added to true. Better set it
+                                // TODO: Only thing that can happen is that this function is EVEN slower than it already is
+                                anythingAdded = true;
                             }
                         }
                     }
@@ -114,7 +110,7 @@ namespace Piglet.Construction
 
             SLRParseTable<T> parseTable = CreateSLRParseTable(itemSets, follow, gotoSetTransitions);
 
-            return null;
+            return new LRParser<T>(parseTable);
         }
 
         private SLRParseTable<T> CreateSLRParseTable(List<List<Lr0Item<T>>> itemSets, TerminalSet<T> follow, List<GotoSetTransition> gotoSetTransitions)
@@ -198,12 +194,15 @@ namespace Piglet.Construction
                 }
             }
 
+            // Move the reduction rules to the table. No need for the impromptu dictionary
+            // anymore.
+            table.ReductionRules = reductionRules.Select( f=> f.Item2 ).ToArray();
+
+            // Useful point to look at the table, since after this point the grammar is pretty much destroyed.
             string debugTable = table.ToDebugString(grammar, itemSets.Count());
 
-            return null;
+            return table;
         }
-
-        
 
         private TerminalSet<T> CalculateFollow(TerminalSet<T> first)
         {
@@ -299,12 +298,12 @@ namespace Piglet.Construction
                                 // TODO: if it is nullable, it should add Epsilon to the first
                                 // TODO: and continue with the next one. We are going to assume nullable
                                 // TODO: is false and go on
-                                var nullable = false;
+                             /*   var nullable = false;
                                 if (nullable)
                                 {
                                     throw new NotImplementedException("Nullable production rules doesn't work yet");
                                 }
-                                else
+                                else*/
                                 {
                                     foreach (var f in first[nonTerminal])
                                     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Piglet.Construction
+namespace Piglet.Parser.Construction
 {
     public class ReductionRule<T>
     {

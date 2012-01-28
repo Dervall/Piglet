@@ -1,7 +1,7 @@
 using System;
-using Piglet.Configuration;
+using Piglet.Parser.Configuration;
 
-namespace Piglet.Construction
+namespace Piglet.Parser.Construction
 {
     public interface IProductionRule<T>
     {

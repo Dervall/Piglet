@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piglet", "Parser\Piglet.csproj", "{1E23F251-94E1-4504-81E8-2618F5C9FEA3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piglet", "Piglet\Piglet.csproj", "{1E23F251-94E1-4504-81E8-2618F5C9FEA3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{82E69494-2A01-4E03-95FF-943F0113E8A1}"
 	ProjectSection(SolutionItems) = preProject
 		Local.testsettings = Local.testsettings
-		Parser.vsmdi = Parser.vsmdi
+		Piglet.vsmdi = Piglet.vsmdi
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Parser.vsmdi
+		CategoryFile = Piglet.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

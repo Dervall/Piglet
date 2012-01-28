@@ -1,4 +1,4 @@
-namespace Piglet.Construction
+namespace Piglet.Parser.Construction
 {
     public interface ISparseParseTable
     {

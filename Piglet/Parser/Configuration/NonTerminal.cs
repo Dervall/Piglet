@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Piglet.Construction;
+using Piglet.Parser.Construction;
 
-namespace Piglet.Configuration
+namespace Piglet.Parser.Configuration
 {
     public class NonTerminal<T> : Symbol<T>, INonTerminal<T>
     {

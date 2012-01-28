@@ -80,6 +80,59 @@ namespace Piglet.Construction
         private TerminalSet<T> CalculateFollow(TerminalSet<T> first)
         {
             var follow = new TerminalSet<T>(grammar);
+
+            // As per the dragon book, add end-of-input token to 
+            // follow on the start symbol
+            follow.Add(grammar.AcceptSymbol, grammar.EndOfInputTerminal);
+
+            // TODO: This doesn't support epsilon rules yet
+            bool addedThings;
+            do
+            {
+                addedThings = false;
+                foreach (var productionRule in grammar.ProductionRules)
+                {
+                    for (int n = 0; n < productionRule.Symbols.Length; ++n)
+                    {
+                        // Skip all terminals
+                        if (productionRule.Symbols[n] is NonTerminal<T>)
+                        {
+                            var currentSymbol = (NonTerminal<T>) productionRule.Symbols[n];
+                            var nextSymbol = n == productionRule.Symbols.Length - 1
+                                                 ? null
+                                                 : productionRule.Symbols[n + 1];
+                            if (nextSymbol == null)
+                            {
+                                // Add everything in FOLLOW(production.ResultSymbol) since we were at the end
+                                // of the production
+                                // TODO: This is also a valid action if there is an Epsilon production of nextsymbol
+                                foreach (var terminal in follow[(NonTerminal<T>)productionRule.ResultSymbol])
+                                {
+                                    addedThings |= follow.Add(currentSymbol, terminal);
+                                }
+                            }
+
+                            if (nextSymbol != null)
+                            {
+                                // It's not at the end, if the next symbol is a terminal, just add it
+                                if (nextSymbol is Terminal<T>)
+                                {
+                                    addedThings |= follow.Add(currentSymbol, (Terminal<T>) nextSymbol);
+                                }
+                                else
+                                {
+                                    // Add everthing in FIRST(nextSymbol)
+                                    foreach (var terminal in first[(NonTerminal<T>)nextSymbol])
+                                    {
+                                        addedThings |= follow.Add(currentSymbol, terminal);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } while (addedThings);
+
             return follow;
         }
 

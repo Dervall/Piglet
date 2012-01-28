@@ -52,7 +52,22 @@ namespace Piglet.Configuration
 
         public IParser<T> CreateParser()
         {
-            // Before doing anything, make sure all the terminals are registered.
+            // First we need to augment the grammar with a start rule and a new start symbol
+            // Create the derived start symbol
+            var augmentedStart = (NonTerminal<T>)NonTerminal();  // Unfortunate cast...
+
+            // Use the start symbols debug name with a ' in front to indicate the augmented symbol.
+            augmentedStart.DebugName = "'" + startSymbol.DebugName;
+
+            // Create a single production 
+            augmentedStart.Productions(p => p.Production(startSymbol).OnReduce(f => acceptAction(f[0])));
+            startRule = augmentedStart.ProductionRules.First(); // There's only one production.
+
+            // Add the end of input symbol
+            var eoi = Terminal(null, s => default(T));
+            eoi.DebugName = "$";
+
+            // Make sure all the terminals are registered.
             // This becomes neccessary since the user can configure the parser using only strings.
             // Since the nonterminal used for that does not carry a back-reference to the configurator,
             // we do it this way.
@@ -76,6 +91,9 @@ namespace Piglet.Configuration
                 }
             }
 
+            // This class is now a valid implementation of IGrammar, ready to use. Create a new parserfactory
+            // and pass this into it, for use.
+
             return new ParserFactory<T>(this).CreateParser();
         }
 
@@ -83,20 +101,6 @@ namespace Piglet.Configuration
         {
             get 
             { 
-                if (startRule == null)
-                {
-                    // No start rule yet? Augment the grammar
-                    // Create the derived start symbol
-                    var augmentedStart = (NonTerminal<T>)NonTerminal();  // Unfortunate cast...
-
-                    // Use the start symbols debug name with a ' in front to indicate the augmented symbol.
-                    augmentedStart.DebugName = "'" + startSymbol.DebugName;
-                    
-                    // Create a single production 
-                    augmentedStart.Productions(p => p.Production(startSymbol).OnReduce(f => acceptAction(f[0])));
-                    startRule = augmentedStart.ProductionRules.First(); // There's only one production.
-
-                }
                 return startRule; 
             }
         }
@@ -118,6 +122,16 @@ namespace Piglet.Configuration
                     yield return terminal;
                 }
             }
+        }
+
+        public NonTerminal<T> AcceptSymbol
+        {
+            get { return (NonTerminal<T>)Start.ResultSymbol; }
+        }
+
+        public Terminal<T> EndOfInputTerminal
+        {
+            get { return terminals.Single(f => f.RegExp == null); }
         }
     }
 }

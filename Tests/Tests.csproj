@@ -54,13 +54,9 @@
     <Compile Include="TestRegEx.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lexer\Lexer.csproj">
-      <Project>{CAA7C41A-BEF8-4B49-B1FC-234D9FD2A327}</Project>
-      <Name>Lexer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Parser\Parser.csproj">
+    <ProjectReference Include="..\Parser\Piglet.csproj">
       <Project>{1E23F251-94E1-4504-81E8-2618F5C9FEA3}</Project>
-      <Name>Parser</Name>
+      <Name>Piglet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

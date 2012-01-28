@@ -15,6 +15,13 @@ namespace Piglet.Construction
             this.grammar = grammar;
         }
 
+        private class GotoSetTransition
+        {
+            public List<Lr0Item<T>> From { get; set; }
+            public List<Lr0Item<T>> To { get; set; }
+            public ISymbol<T> OnSymbol { get; set; }
+        }
+
         public IParser<T> CreateParser()
         {
             // First order of business is to create the canonical list of LR0 states.
@@ -37,6 +44,7 @@ namespace Piglet.Construction
                                                    new Lr0Item<T>(start, 0)
                                                })
                                };
+            var gotoSetTransitions = new List<GotoSetTransition>();
             
             // TODO: This method is probably one big stupid performance sink since it iterates WAY to many times over the input
 
@@ -58,12 +66,42 @@ namespace Piglet.Construction
                             // Do a closure on the goto set and see if it's already present in the sets of items that we have
                             // if that is not the case add it to the item sets and restart the entire thing.
                             gotoSet = Closure(gotoSet);
-                            if (!itemSets.Any(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule && 
-                                                                               b.DotLocation == a.DotLocation))))
+                            var oldGotoSet = itemSets.FirstOrDefault(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule &&
+                                                                                b.DotLocation == a.DotLocation)));
+
+                            if (oldGotoSet == null)
                             {
+                                // Add goto set to itemsets
                                 itemSets.Add(gotoSet);
+
+                                // Add a transition
+                                gotoSetTransitions.Add(new GotoSetTransition
+                                                           {
+                                                               From = itemSet,
+                                                               OnSymbol = symbol,
+                                                               To = gotoSet
+                                                           });
+
                                 anythingAdded = true;
                                 break;
+                            }
+                            else
+                            {
+                                // Already found the set, add a transition if it already isn't there
+                                var nt = new GotoSetTransition
+                                                        {
+                                                            From = itemSet,
+                                                            OnSymbol = symbol,
+                                                            To = oldGotoSet
+                                                        };
+                                if (!gotoSetTransitions.Any(a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
+                                {
+                                    gotoSetTransitions.Add(nt);
+
+                                    // TODO: Not sure if should set anything added to true. Better set it
+                                    // TODO: Only thing that can happen is that this function is EVEN slower than it already is
+                                    anythingAdded = true;
+                                }
                             }
                         }
                     }
@@ -74,7 +112,105 @@ namespace Piglet.Construction
                     break;
             }
 
+            SLRParseTable<T> parseTable = CreateSLRParseTable(itemSets, follow, gotoSetTransitions);
+
             return null;
+        }
+
+        private SLRParseTable<T> CreateSLRParseTable(List<List<Lr0Item<T>>> itemSets, TerminalSet<T> follow, List<GotoSetTransition> gotoSetTransitions)
+        {
+            var table = new SLRParseTable<T>();
+
+            // Assign all tokens in the grammar token numbers first!
+            AssignTokenNumbers();
+
+            // Holds the generated reduction rules, which we'll feed the table at the end of this method
+            // the second part at least, the other is for indexing them while making the table.
+            var reductionRules = new List<Tuple<IProductionRule<T>, ReductionRule<T>>>();
+
+            for (int i = 0; i < itemSets.Count(); ++i )
+            {
+                var itemSet = itemSets[i];
+                foreach (var lr0Item in itemSet)
+                {
+                    // Fill the action table first
+
+                    // If the next symbol in the LR0 item is a terminal (symbol
+                    // found after the dot, add a SHIFT j IF GOTO(lr0Item, nextSymbol) == j
+                    if (lr0Item.SymbolRightOfDot != null)
+                    {
+                        if (lr0Item.SymbolRightOfDot is Terminal<T>)
+                        {
+                            // Look for a transition in the gotoSetTransitions
+                            // there should always be one.
+                            var transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr0Item.SymbolRightOfDot);
+                            int transitionIndex = itemSets.IndexOf(transition.To);
+                            int tokenNumber = ((Terminal<T>) lr0Item.SymbolRightOfDot).TokenNumber;
+                            table.Action[i, tokenNumber] = SLRParseTable<T>.Shift(transitionIndex);
+                        }
+                    }
+                    else
+                    {
+                        // The dot is at the end. Add reduce action to the parse table for
+                        // all FOLLOW for the resulting symbol
+                        // Do NOT do this if the resulting symbol is the start symbol
+                        if (lr0Item.ProductionRule.ResultSymbol != grammar.AcceptSymbol)
+                        {
+                            int numReductionRules = reductionRules.Count();
+                            int reductionRule = 0;
+                            for (; reductionRule < numReductionRules; ++reductionRule)
+                            {
+                                if (reductionRules[reductionRule].Item1 == lr0Item.ProductionRule)
+                                {
+                                    // Found it, it's already created
+                                    break;
+                                }
+                            }
+
+                            if (numReductionRules == reductionRule)
+                            {
+                                // Need to create a new reduction rule
+                                reductionRules.Add(new Tuple<IProductionRule<T>, ReductionRule<T>>(lr0Item.ProductionRule,
+                                    new ReductionRule<T>
+                                    {
+                                        NumTokensToPop = lr0Item.ProductionRule.Symbols.Count(),
+                                        OnReduce = lr0Item.ProductionRule.ReduceAction,
+                                        TokenToPush = lr0Item.ProductionRule.ResultSymbol.TokenNumber
+                                    }));
+                            }
+
+                            foreach (var followTerminal in follow[(NonTerminal<T>) lr0Item.ProductionRule.ResultSymbol])
+                            {
+                                table.Action[i, followTerminal.TokenNumber] = SLRParseTable<T>.Reduce(reductionRule);
+                            } 
+                        }
+                        else
+                        {
+                            // This production rule has the start symbol with the dot at the rightmost end in it, add ACCEPT to action
+                            // for end of input character.
+                            table.Action[i, grammar.EndOfInputTerminal.TokenNumber] = SLRParseTable<T>.Accept();
+                        }
+                    }
+
+                    // Fill the goto table with the state IDs of all states that have been originally
+                    // produced by the GOTO operation from this state
+                    foreach (var gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet))
+                    {
+                        table.Goto[i, gotoTransition.OnSymbol.TokenNumber] = itemSets.IndexOf(gotoTransition.To);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private void AssignTokenNumbers()
+        {
+            int t = 0;
+            foreach (var symbol in grammar.AllSymbols)
+            {
+                symbol.TokenNumber = t++;
+            }
         }
 
         private TerminalSet<T> CalculateFollow(TerminalSet<T> first)

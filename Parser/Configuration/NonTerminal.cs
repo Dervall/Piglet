@@ -59,6 +59,7 @@ namespace Piglet.Configuration
 
             public ISymbol<T>[] Symbols { get { return symbols; } }
             public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
+            public Func<T[], T> ReduceAction { get { return reduceAction; } } 
 
             public NonTerminalProduction(INonTerminal<T> resultSymbol, object[] symbols)
             {

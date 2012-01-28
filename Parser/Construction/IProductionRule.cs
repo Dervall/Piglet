@@ -1,3 +1,4 @@
+using System;
 using Piglet.Configuration;
 
 namespace Piglet.Construction
@@ -6,5 +7,6 @@ namespace Piglet.Construction
     {
         ISymbol<T>[] Symbols { get; }
         ISymbol<T> ResultSymbol { get; }
+        Func<T[], T> ReduceAction { get; } 
     }
 }

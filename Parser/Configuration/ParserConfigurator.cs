@@ -113,13 +113,14 @@ namespace Piglet.Configuration
         public IEnumerable<ISymbol<T>> AllSymbols
         {
             get {
-                foreach (var nonTerminal in nonTerminals)
-                {
-                    yield return nonTerminal;
-                }
                 foreach (var terminal in terminals)
                 {
                     yield return terminal;
+                }
+ 
+                foreach (var nonTerminal in nonTerminals)
+                {
+                    yield return nonTerminal;
                 }
             }
         }

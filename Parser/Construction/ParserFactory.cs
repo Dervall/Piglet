@@ -57,7 +57,94 @@ namespace Piglet.Construction
                     break;
             }
 
+            // Get the first and follow sets for all nonterminal symbols
+            var first = CalculateFirst(parserConfiguration);
+            var follow = CalculateFollow(parserConfiguration, first);
+
             return null;
+        }
+
+        private static Dictionary<ISymbol<T>, List<Terminal<T>>> CalculateFollow<T>(IParserConfiguration<T> parserConfiguration, Dictionary<ISymbol<T>, List<Terminal<T>>> first)
+        {
+            return null;
+            //       throw new NotImplementedException();
+        }
+
+        private static Dictionary<ISymbol<T>, List<Terminal<T>>> CalculateFirst<T>(IParserConfiguration<T> parserConfiguration)
+        {
+            // Create a dictionary to hold the data
+            var first = new Dictionary<ISymbol<T>, List<Terminal<T>>>();
+
+            // Iterate through all the symbols we've got in the grammar
+            // and add stuff to the first set
+            foreach (var symbol in parserConfiguration.AllSymbols.OfType<NonTerminal<T>>())
+            {
+                // Initialize the list
+                first[symbol] = new List<Terminal<T>>();
+            }
+
+            // Algorithm is that if a nonterminal has a production that starts with a 
+            // terminal, we add that to the first set. If it starts with a nonterminal, we add
+            // that nonterminals firsts to the known firsts of our nonterminal.
+            // TODO: There is probably performance benefits to optimizing this.
+            bool addedThings;
+            do
+            {
+                addedThings = false;
+                
+                foreach (var symbol in parserConfiguration.AllSymbols.OfType<NonTerminal<T>>())
+                {
+                    var knownFirsts = first[symbol];
+                    foreach (var productionRule in symbol.ProductionRules)
+                    {
+                        foreach (var productionSymbol in productionRule.Symbols)
+                        {
+                            // Terminals are trivial, just add them
+                            if (productionSymbol is Terminal<T>)
+                            {
+                                var terminal = (Terminal<T>) productionSymbol;
+                                if (!knownFirsts.Contains(terminal))
+                                {
+                                    knownFirsts.Add(terminal);
+                                    addedThings = true;
+                                }
+                                // This production rule is done now
+                                break;
+                            }
+
+                            if (productionSymbol is NonTerminal<T>)
+                            {
+                                var nonTerminal = (NonTerminal<T>) productionSymbol;
+                                // TODO: The check for nullable should be here...
+                                // TODO: if it is nullable, it should add Epsilon to the first
+                                // TODO: and continue with the next one. We are going to assume nullable
+                                // TODO: is false and go on
+                                var nullable = false;
+                                if (nullable)
+                                {
+                                    throw new NotImplementedException("Nullable production rules doesn't work yet");
+                                }
+                                else
+                                {
+                                    var nonTerminalKnownFirsts = first[nonTerminal];
+                                    nonTerminalKnownFirsts.ForEach(f => 
+                                                                       { 
+                                                                           if (!knownFirsts.Contains(f))
+                                                                           {
+                                                                               knownFirsts.Add(f);
+                                                                               addedThings = true;
+                                                                           }
+                                                                       });
+                                    // Jump out since the other symbols are not in the first set
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } while (addedThings); 
+
+            return first;
         }
 
         private static IEnumerable<Lr0Item<T>> Goto<T>(IEnumerable<Lr0Item<T>> closures, ISymbol<T> symbol)

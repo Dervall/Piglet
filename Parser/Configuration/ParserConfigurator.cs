@@ -50,8 +50,11 @@ namespace Piglet.Configuration
             this.acceptAction = acceptAction;
         }
 
-        public IParser<T> CreateParser()
+        public void AugmentGrammar()
         {
+            if (startRule != null)
+                throw new ParserConfigurationException("You can only augment a grammar once!");
+
             // First we need to augment the grammar with a start rule and a new start symbol
             // Create the derived start symbol
             var augmentedStart = (NonTerminal<T>)NonTerminal();  // Unfortunate cast...
@@ -73,7 +76,7 @@ namespace Piglet.Configuration
             // we do it this way.
             foreach (var nonTerminal in nonTerminals)
             {
-                foreach (var terminal in nonTerminal.ProductionRules.SelectMany( f => f.Symbols).OfType<Terminal<T>>())
+                foreach (var terminal in nonTerminal.ProductionRules.SelectMany(f => f.Symbols).OfType<Terminal<T>>())
                 {
                     var oldTerminal = terminals.SingleOrDefault(f => f.RegExp == terminal.RegExp);
                     if (oldTerminal != null)
@@ -91,9 +94,23 @@ namespace Piglet.Configuration
                 }
             }
 
-            // This class is now a valid implementation of IGrammar, ready to use. Create a new parserfactory
-            // and pass this into it, for use.
+            // Assign all tokens in the grammar token numbers first!
+            AssignTokenNumbers();
 
+            // This class is now a valid implementation of IGrammar, ready to use.
+        }
+
+        public IParser<T> CreateParser()
+        {
+            if (startRule != null)
+            {
+                // User has forgotten to augment the grammar. Lets help him out and do it
+                // for him
+                AugmentGrammar();
+            }
+
+            // Create a new parserfactory
+            // and pass this into it, for use.
             return new ParserFactory<T>(this).CreateParser();
         }
 
@@ -133,6 +150,15 @@ namespace Piglet.Configuration
         public Terminal<T> EndOfInputTerminal
         {
             get { return terminals.Single(f => f.RegExp == null); }
+        }
+
+        private void AssignTokenNumbers()
+        {
+            int t = 0;
+            foreach (var symbol in AllSymbols)
+            {
+                symbol.TokenNumber = t++;
+            }
         }
     }
 }

@@ -121,9 +121,6 @@ namespace Piglet.Construction
         {
             var table = new SLRParseTable<T>();
 
-            // Assign all tokens in the grammar token numbers first!
-            AssignTokenNumbers();
-
             // Holds the generated reduction rules, which we'll feed the table at the end of this method
             // the second part at least, the other is for indexing them while making the table.
             var reductionRules = new List<Tuple<IProductionRule<T>, ReductionRule<T>>>();
@@ -206,14 +203,7 @@ namespace Piglet.Construction
             return null;
         }
 
-        private void AssignTokenNumbers()
-        {
-            int t = 0;
-            foreach (var symbol in grammar.AllSymbols)
-            {
-                symbol.TokenNumber = t++;
-            }
-        }
+        
 
         private TerminalSet<T> CalculateFollow(TerminalSet<T> first)
         {

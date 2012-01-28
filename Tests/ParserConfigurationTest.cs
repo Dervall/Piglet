@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet;
 using Piglet.Configuration;
+using Piglet.Lexer;
 
 namespace TestParser
 {
@@ -40,7 +41,9 @@ namespace TestParser
                                 });
 
             configurator.OnAccept(expr, s => s);
+            configurator.AugmentGrammar();
 
+         //   ILexer<int> lexer = configurator.CreateLexer();
             IParser<int> parser = configurator.CreateParser();
 
             // This is what will actually RUN once we get this stuff up to par

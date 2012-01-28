@@ -61,6 +61,7 @@
     <Compile Include="Construction\SLRParseTable.cs" />
     <Compile Include="Construction\TerminalSet.cs" />
     <Compile Include="IParser.cs" />
+    <Compile Include="LRParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

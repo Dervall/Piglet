@@ -56,6 +56,7 @@
     <Compile Include="Configuration\Symbol.cs" />
     <Compile Include="Configuration\Terminal.cs" />
     <Compile Include="Construction\Lr0Item.cs" />
+    <Compile Include="Construction\TerminalSet.cs" />
     <Compile Include="IParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -64,24 +64,15 @@ namespace Piglet.Construction
             return null;
         }
 
-        private static Dictionary<ISymbol<T>, List<Terminal<T>>> CalculateFollow<T>(IParserConfiguration<T> parserConfiguration, Dictionary<ISymbol<T>, List<Terminal<T>>> first)
+        private static TerminalSet<T> CalculateFollow<T>(IParserConfiguration<T> parserConfiguration, TerminalSet<T> first)
         {
-            return null;
-            //       throw new NotImplementedException();
+            var follow = new TerminalSet<T>(parserConfiguration);
+            return follow;
         }
 
-        private static Dictionary<ISymbol<T>, List<Terminal<T>>> CalculateFirst<T>(IParserConfiguration<T> parserConfiguration)
+        private static TerminalSet<T> CalculateFirst<T>(IParserConfiguration<T> parserConfiguration)
         {
-            // Create a dictionary to hold the data
-            var first = new Dictionary<ISymbol<T>, List<Terminal<T>>>();
-
-            // Iterate through all the symbols we've got in the grammar
-            // and add stuff to the first set
-            foreach (var symbol in parserConfiguration.AllSymbols.OfType<NonTerminal<T>>())
-            {
-                // Initialize the list
-                first[symbol] = new List<Terminal<T>>();
-            }
+            var first = new TerminalSet<T>(parserConfiguration);
 
             // Algorithm is that if a nonterminal has a production that starts with a 
             // terminal, we add that to the first set. If it starts with a nonterminal, we add
@@ -94,7 +85,6 @@ namespace Piglet.Construction
                 
                 foreach (var symbol in parserConfiguration.AllSymbols.OfType<NonTerminal<T>>())
                 {
-                    var knownFirsts = first[symbol];
                     foreach (var productionRule in symbol.ProductionRules)
                     {
                         foreach (var productionSymbol in productionRule.Symbols)
@@ -102,12 +92,8 @@ namespace Piglet.Construction
                             // Terminals are trivial, just add them
                             if (productionSymbol is Terminal<T>)
                             {
-                                var terminal = (Terminal<T>) productionSymbol;
-                                if (!knownFirsts.Contains(terminal))
-                                {
-                                    knownFirsts.Add(terminal);
-                                    addedThings = true;
-                                }
+                                addedThings |= first.Add(symbol, (Terminal<T>) productionSymbol);
+                                
                                 // This production rule is done now
                                 break;
                             }
@@ -126,15 +112,10 @@ namespace Piglet.Construction
                                 }
                                 else
                                 {
-                                    var nonTerminalKnownFirsts = first[nonTerminal];
-                                    nonTerminalKnownFirsts.ForEach(f => 
-                                                                       { 
-                                                                           if (!knownFirsts.Contains(f))
-                                                                           {
-                                                                               knownFirsts.Add(f);
-                                                                               addedThings = true;
-                                                                           }
-                                                                       });
+                                    foreach (var f in first[nonTerminal])
+                                    {
+                                        addedThings |= first.Add(symbol, f);
+                                    }
                                     // Jump out since the other symbols are not in the first set
                                     break;
                                 }
@@ -189,3 +170,4 @@ namespace Piglet.Construction
         }
     }
 }
+

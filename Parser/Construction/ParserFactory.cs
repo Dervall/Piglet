@@ -22,6 +22,10 @@ namespace Piglet.Construction
             // grammar from that
             var start = grammar.Start;
 
+            // Get the first and follow sets for all nonterminal symbols
+            var first = CalculateFirst();
+            var follow = CalculateFollow(first);
+
             // So, we are going to calculate the LR0 closure for the start symbol, which should
             // be the augmented accept state of the grammar.
             // The closure is all states which are accessible by the dot at the left hand side of the
@@ -69,10 +73,6 @@ namespace Piglet.Construction
                 if (!anythingAdded)
                     break;
             }
-
-            // Get the first and follow sets for all nonterminal symbols
-            var first = CalculateFirst();
-            var follow = CalculateFollow(first);
 
             return null;
         }

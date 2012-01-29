@@ -45,12 +45,6 @@ namespace Piglet.Lexer
                     peek = 0;
                 }
 
-                if (peek == '\n')
-                {
-                    lineNumber++;
-                    currentLine = new StringBuilder();
-                }
-
                 var c = (char)peek;
                 int nextState = transitionTable[state, c];
                 if (nextState == -1)
@@ -89,17 +83,28 @@ namespace Piglet.Lexer
                                     LineContents = currentLine.ToString(), 
                                     LineNumber = lineNumber
                                 };
-
+                        
                         throw lexerException;
                     }
                 }
                 else
                 {
+                    // Peek is still last char. If we are going to be switching lines
+                    // add to the line number and clear the current line buffer
+                    if (c == '\n')
+                    {
+                        lineNumber++;
+                        currentLine = new StringBuilder();
+                    } 
+                    else
+                    {
+                        currentLine.Append(c);
+                    }
+
                     // Machine has not terminated.
                     // Switch states, append character to lexeme.
                     state = nextState;
                     lexeme.Append(c);
-                    currentLine.Append(c);
                     Source.Read();
                 }
             }

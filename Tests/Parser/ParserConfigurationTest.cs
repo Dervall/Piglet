@@ -211,5 +211,24 @@ namespace Piglet.Tests.Parser
                 // sillyness doesn't run on forever.
             }
         }
+
+        [TestMethod]
+        public void TestNonTerminalFollow()
+        {
+            // This grammar will require the parser factory to perform an aggregated FOLLOW
+            // which it doesn't do if there aren't two nonteminals in a row
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
+            var a = configurator.NonTerminal();
+            var b = configurator.NonTerminal();
+            var c = configurator.NonTerminal();
+            var d = configurator.NonTerminal();
+            a.Productions(p => p.Production(a, b, c, d));
+            b.Productions(p => p.Production("b"));
+            c.Productions(p => p.Production(b));
+            d.Productions(p => p.Production("d"));
+            configurator.SetStartSymbol(a);
+            configurator.CreateParser();
+            // Just make sure this doesn't crash for now
+        }
     }
 }

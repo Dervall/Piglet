@@ -118,6 +118,14 @@ namespace Piglet.Lexer.Construction
                                     CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')))));
                                 break;
 
+                            case 'n':
+                                stack.Push(Accept(new [] { '\n' }));
+                                break;
+
+                            case 'r':
+                                stack.Push(Accept(new[] { '\r' }));
+                                break;
+
                             case '.':
                             case '*':
                             case '|':

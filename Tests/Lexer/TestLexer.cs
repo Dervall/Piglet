@@ -80,6 +80,30 @@ namespace Piglet.Tests.Lexer
         }
 
         [TestMethod]
+        public void TestLexErrorOnThirdLine()
+        {
+            ILexer<string> lexer = LexerFactory<string>.Configure(c =>
+                {
+                    c.Token("a+", s => s);
+                    c.Ignore("( |\\n)+");
+                });
+            lexer.SetSource("aaa         aa  \n   aaa    aa\n   error \n   aaaa");
+            try
+            {
+                for (int i = 0; i < 10; ++i)
+                {
+                    lexer.Next();
+                }
+                Assert.Fail();
+            }
+            catch (LexerException e)
+            {
+                Assert.AreEqual(3, e.LineNumber);
+                Assert.AreEqual("   ", e.LineContents);
+            }
+        }
+
+        [TestMethod]
         public void TestCreateDFA()
         {
             NFA nfa = NFA.Create("ab|*c&d&");

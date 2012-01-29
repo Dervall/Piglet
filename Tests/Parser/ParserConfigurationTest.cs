@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Lexer;
 using Piglet.Parser;
@@ -89,7 +90,7 @@ namespace Piglet.Tests.Parser
             }
             catch (ShiftReduceConflictException<string> e)
             {
-                Assert.AreEqual(ident, e.ReduceSymbol);
+                Assert.AreEqual(ifStatement, e.ReduceSymbol);
                 Assert.AreEqual("else", e.ShiftSymbol.DebugName);
             }
         }
@@ -108,6 +109,107 @@ namespace Piglet.Tests.Parser
             configurator.SetStartSymbol(nonTerminal);
 
             configurator.CreateParser();
+        }
+
+        [TestMethod]
+        public void TestReduceReduceConflict()
+        {
+            // Represents the grammar
+            //
+            // x := t | y
+            // t := "A"
+            // y := "A"
+            //
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<object>();
+            var t = configurator.NonTerminal();
+            t.DebugName = "T";
+            t.Productions(p => p.Production("A"));
+            var y = configurator.NonTerminal();
+            y.DebugName = "Y";
+            y.Productions(p => p.Production("A"));
+            var x = configurator.NonTerminal();
+            x.DebugName = "X";
+            x.Productions(p =>
+                              {
+                                  p.Production(t);
+                                  p.Production(y);
+                              });
+
+            configurator.SetStartSymbol(x);
+
+            try
+            {
+                configurator.CreateParser();
+                Assert.Fail();
+            }
+            catch (ReduceReduceConflictException<object> e)
+            {
+                Assert.AreEqual(y, e.NewReduceSymbol);
+                Assert.AreEqual(t, e.PreviousReduceSymbol);
+            }
+        }
+
+        [TestMethod]
+        public void TestRetardedCyclicGrammar()
+        {
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<byte>();
+            var t = configurator.NonTerminal();
+            t.Productions(f => f.Production(t));
+            configurator.SetStartSymbol(t);
+
+            try
+            {
+                configurator.CreateParser();
+                Assert.Fail();
+            }
+            catch (ShiftReduceConflictException<byte>)
+            {
+                // There is no real need to check this exception. It says something
+                // about wanting to shift the augmented start symbol. We are cool that this
+                // sillyness doesn't run on forever.
+            }
+        }
+
+        [TestMethod]
+        public void TestShiftReduceConflictWithAccept()
+        {
+            // For certain grammars you can produce this stuff. It is not a real world case
+            // but the exception should still be helpful
+
+            // Here's how this retarded grammar looks
+            // a := a | b | c
+            // b := "b" 
+            // c := "c"
+            //
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
+            var a = configurator.NonTerminal();
+            a.DebugName = "a";
+            var b = configurator.NonTerminal();
+            b.DebugName = "b";
+            var c = configurator.NonTerminal();
+            c.DebugName = "c";
+            a.Productions(p =>
+            {
+                p.Production(a);
+                p.Production(b);
+                p.Production(c);
+            });
+            b.Productions(p => p.Production("b"));
+            c.Productions(p => p.Production("c"));
+
+            configurator.SetStartSymbol(a);
+
+            try
+            {
+                var parser = (LRParser<int>)configurator.CreateParser();
+                Assert.Fail();
+            }
+            catch (ShiftReduceConflictException<int>)
+            {
+                // There is no real need to check this exception. It says something
+                // about wanting to reduce on the $. We are cool that this
+                // sillyness doesn't run on forever.
+            }
         }
     }
 }

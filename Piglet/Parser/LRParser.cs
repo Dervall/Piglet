@@ -17,6 +17,11 @@ namespace Piglet.Parser
             parseStack = new Stack<int>();
         }
 
+        /// <summary>
+        /// This is accessible for test and debug reasons
+        /// </summary>
+        internal IParseTable<T> Table { get { return parseTable; } }
+
         public T Parse(ILexer<T> lexer)
         {
             // If this parser has been used before, clear the stacks

@@ -150,8 +150,7 @@ namespace Piglet.Parser.Construction
                                 // Grammar is ambiguous. Since we have the full grammar at hand and the state table hasn't we
                                 // can augment this exception for the benefit of the user.
                                 e.ShiftSymbol = lr0Item.SymbolRightOfDot;
-                                e.ReduceSymbol = grammar.AllSymbols.First(f => f.TokenNumber == -(1 + e.PreviousValue));
-
+                                e.ReduceSymbol = reductionRules[-(1 + e.PreviousValue)].Item1.ResultSymbol;
                                 throw;
                             }
                         }
@@ -195,8 +194,7 @@ namespace Piglet.Parser.Construction
                                 catch (ReduceReduceConflictException<T> e)
                                 {
                                     // Augment exception with correct symbols for the poor user
-                                    e.PreviousReduceSymbol =
-                                        grammar.AllSymbols.First(f => f.TokenNumber == -(1 + e.PreviousValue));
+                                    e.PreviousReduceSymbol = reductionRules[ -(1 + e.PreviousValue)].Item1.ResultSymbol;
                                     e.NewReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
                                     throw;
                                 }
@@ -205,8 +203,9 @@ namespace Piglet.Parser.Construction
                                     // We know we're the cause of the reduce part
                                     e.ReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
                                     // The old value is the shift
-                                    e.ShiftSymbol = grammar.AllSymbols.First(f => f.TokenNumber == e.PreviousValue);
-                                    
+                                    e.ShiftSymbol = e.PreviousValue == int.MaxValue 
+                                        ? grammar.AcceptSymbol // Conflicting with the accept symbol
+                                        : grammar.AllSymbols.First(f => f.TokenNumber == e.PreviousValue);
                                     throw;
                                 }
                             } 

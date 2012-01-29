@@ -139,7 +139,21 @@ namespace Piglet.Parser.Construction
                             var transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr0Item.SymbolRightOfDot);
                             int transitionIndex = itemSets.IndexOf(transition.To);
                             int tokenNumber = ((Terminal<T>) lr0Item.SymbolRightOfDot).TokenNumber;
-                            table.Action[i, tokenNumber] = SLRParseTable<T>.Shift(transitionIndex);
+                            try
+                            {
+                                table.Action[i, tokenNumber] = SLRParseTable<T>.Shift(transitionIndex);
+                            } 
+                            catch (ShiftReduceConflictException<T> e)
+                            {
+                                // Since we wanted to shift, it will not be reduce reduce exceptions at this point
+
+                                // Grammar is ambiguous. Since we have the full grammar at hand and the state table hasn't we
+                                // can augment this exception for the benefit of the user.
+                                e.ShiftSymbol = lr0Item.SymbolRightOfDot;
+                                e.ReduceSymbol = grammar.AllSymbols.First(f => f.TokenNumber == -(1 + e.PreviousValue));
+
+                                throw;
+                            }
                         }
                     }
                     else
@@ -174,7 +188,27 @@ namespace Piglet.Parser.Construction
 
                             foreach (var followTerminal in follow[(NonTerminal<T>) lr0Item.ProductionRule.ResultSymbol])
                             {
-                                table.Action[i, followTerminal.TokenNumber] = SLRParseTable<T>.Reduce(reductionRule);
+                                try
+                                {
+                                    table.Action[i, followTerminal.TokenNumber] = SLRParseTable<T>.Reduce(reductionRule);
+                                }
+                                catch (ReduceReduceConflictException<T> e)
+                                {
+                                    // Augment exception with correct symbols for the poor user
+                                    e.PreviousReduceSymbol =
+                                        grammar.AllSymbols.First(f => f.TokenNumber == -(1 + e.PreviousValue));
+                                    e.NewReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
+                                    throw;
+                                }
+                                catch (ShiftReduceConflictException<T> e)
+                                {
+                                    // We know we're the cause of the reduce part
+                                    e.ReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
+                                    // The old value is the shift
+                                    e.ShiftSymbol = grammar.AllSymbols.First(f => f.TokenNumber == e.PreviousValue);
+                                    
+                                    throw;
+                                }
                             } 
                         }
                         else
@@ -199,7 +233,7 @@ namespace Piglet.Parser.Construction
             table.ReductionRules = reductionRules.Select( f=> f.Item2 ).ToArray();
 
             // Useful point to look at the table, since after this point the grammar is pretty much destroyed.
-            string debugTable = table.ToDebugString(grammar, itemSets.Count());
+           // string debugTable = table.ToDebugString(grammar, itemSets.Count());
 
             return table;
         }

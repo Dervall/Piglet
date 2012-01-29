@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Piglet.Parser.Configuration;
 
 namespace Piglet.Parser.Construction
 {
-    public class SLRParseTable<T>
+    public class SLRParseTable<T> : IParseTable<T>
     {
-        private readonly ISparseParseTable actionTable;
-        private readonly ISparseParseTable gotoTable;
+        private readonly ITable2D actionTable;
+        private readonly ITable2D gotoTable;
 
         public SLRParseTable()
         {
@@ -17,7 +14,7 @@ namespace Piglet.Parser.Construction
             gotoTable = new SparseDictionaryTable();
         }
 
-        private class SparseDictionaryTable : ISparseParseTable
+        private class SparseDictionaryTable : ITable2D
         {
             private readonly IDictionary<int, IDictionary<int, int>> table;
 
@@ -49,8 +46,28 @@ namespace Piglet.Parser.Construction
                             // TODO: Specify what sort of exception this is
                             // TODO: based on whatever was in the table and what 
                             // TODO: we tried to put in it.
-                            if (table[stateNumber][tokenNumber] != value)
-                                throw new Exception("State table conflict.");
+                            int oldValue = table[stateNumber][tokenNumber];
+                            if (oldValue != value)
+                            {
+                                try
+                                {
+                                    if (oldValue < 0 && value < 0)
+                                    {
+                                        // Both values are reduce. Throw a reduce reduce conflict
+                                        throw new ReduceReduceConflictException<T>("Grammar contains a reduce reduce conflict");
+                                    }
+                                    throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict");
+                                }
+                                catch (AmbiguousGrammarException ex)
+                                {
+                                    // Fill in more information on the error and rethrow the error
+                                    ex.StateNumber = stateNumber;
+                                    ex.TokenNumber = tokenNumber;
+                                    ex.PreviousValue = oldValue;
+                                    ex.NewValue = value;
+                                    throw;
+                                }
+                            }
                             return;
                         }
                     }
@@ -69,12 +86,12 @@ namespace Piglet.Parser.Construction
             return stateToChangeTo;
         }
 
-        public ISparseParseTable Action
+        public ITable2D Action
         {
             get { return actionTable; }
         }
 
-        public ISparseParseTable Goto
+        public ITable2D Goto
         {
             get { return gotoTable; }
         }
@@ -91,52 +108,6 @@ namespace Piglet.Parser.Construction
         public static int Accept()
         {
             return int.MaxValue; // Max means accept
-        }
-
-        public string ToDebugString(IGrammar<T> grammar, int numStates)
-        {
-            int numTokens = grammar.AllSymbols.Count();
-            int numTerminals = grammar.AllSymbols.OfType<Terminal<T>>().Count();
-
-            var formatString = new StringBuilder("{0,8}|");
-            for (int i = 0; i < numTokens; ++i)
-            {
-                if (i == numTerminals)
-                    formatString.Append("|"); // Extra bar to separate actions and gotos
-                formatString.Append("|{" + (i + 1) + ",8}");
-            }
-            formatString.Append("|\n");
-            string format = formatString.ToString();
-            var sb = new StringBuilder();
-            sb.Append(string.Format(format, new[] { "STATE" }.Concat(grammar.AllSymbols.Select(f => f.DebugName)).ToArray<object>()));
-            for (int i = 0; i < numStates; ++i)
-            {
-                object[] formatParams = new[] {i.ToString()}.Concat(grammar.AllSymbols.OfType<Terminal<T>>().Select(f =>
-                    {
-                        var actionValue = actionTable[i, f.TokenNumber];
-                        if (actionValue == int.MaxValue)
-                        {
-                            return "acc";
-                        }
-
-                        if (actionValue == int.MinValue)
-                        {
-                            return "";
-                        }
-
-                        if (actionValue < 0)
-                        {
-                            return "r" + -(actionValue + 1);
-                        }
-
-                        return "s" + actionValue;
-                    }).Concat(grammar.AllSymbols.OfType<NonTerminal<T>>().Select(f => Goto[i, f.TokenNumber] ==
-                                                                                      int.MinValue
-                                                                                          ? ""
-                                                                                          : Goto[i, f.TokenNumber].ToString()))).ToArray<object>();
-                sb.Append(string.Format(format, formatParams));
-            }
-            return sb.ToString();
         }
     }
 }

@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{911347A0-30E7-497F-99B9-59DBEEF90A83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piglet.Tests", "Tests\Piglet.Tests.csproj", "{911347A0-30E7-497F-99B9-59DBEEF90A83}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution

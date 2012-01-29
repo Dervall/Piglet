@@ -42,10 +42,10 @@ namespace Piglet.Lexer
                             // Match
                             // This might be a token that we ignore. This is if the tokenNumber >= number of tokens
                             // since the ignored tokens are AFTER the normal tokens. If this is so, set the action func to
-                            // -1, NULL to signal that the parsing should restart
+                            // int.MinValue, NULL to signal that the parsing should restart without reporting errors
                             if (tokenNumber >= tokens.Count())
                             {
-                                actions[state.StateNumber] = new Tuple<int, Func<string, T>>(-1, null);
+                                actions[state.StateNumber] = new Tuple<int, Func<string, T>>(int.MinValue, null);
                             }
                             else
                             {

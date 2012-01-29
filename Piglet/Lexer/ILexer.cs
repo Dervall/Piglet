@@ -6,6 +6,7 @@ namespace Piglet.Lexer
     public interface ILexer<T>
     {
         Tuple<int, T> Next();
-        TextReader Source { get; set; }
+        void SetSource(TextReader reader);
+        void SetSource(string source);
     }
 }

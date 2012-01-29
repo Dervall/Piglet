@@ -9,9 +9,6 @@ namespace Piglet.Parser.Configuration
     public class ParserConfigurator<T> : IParserConfigurator<T>, IGrammar<T>
     {
         private NonTerminal<T> startSymbol;
-        private Func<T, T> acceptAction;
-
-        private IProductionRule<T> startRule;
         private readonly List<NonTerminal<T>> nonTerminals;
         private readonly List<Terminal<T>> terminals; 
 
@@ -26,7 +23,7 @@ namespace Piglet.Parser.Configuration
             Terminal<T> terminal = terminals.SingleOrDefault(f => f.RegExp == regExp);
             if (terminal != null)
             {
-                if (terminal.OnParse != onParse)
+                if (terminal.OnParse != (onParse??Terminal<T>.DefaultFunc))
                     throw new ParserConfigurationException(
                         "Redefinition of terminal uses the same regex but different onParse action");
             }
@@ -40,21 +37,22 @@ namespace Piglet.Parser.Configuration
 
         public INonTerminal<T> NonTerminal(Action<IProductionConfigurator<T>> productionAction = null)
         {
-            var nonTerminal = new NonTerminal<T>(productionAction);
+            var nonTerminal = new NonTerminal<T>(this, productionAction);
             nonTerminals.Add(nonTerminal);
             return nonTerminal;
         }
 
-        public void OnAccept(INonTerminal<T> start, Func<T, T> acceptAction)
+        public void SetStartSymbol(INonTerminal<T> start)
         {
             startSymbol = (NonTerminal<T>) start;
-            this.acceptAction = acceptAction;
         }
 
         public void AugmentGrammar()
         {
-            if (startRule != null)
+            if (Start != null)
                 throw new ParserConfigurationException("You can only augment a grammar once!");
+            if (startSymbol == null)
+                throw new ParserConfigurationException("StartSymbol must be specified");
 
             // First we need to augment the grammar with a start rule and a new start symbol
             // Create the derived start symbol
@@ -64,8 +62,8 @@ namespace Piglet.Parser.Configuration
             augmentedStart.DebugName = "'" + startSymbol.DebugName;
 
             // Create a single production 
-            augmentedStart.Productions(p => p.Production(startSymbol).OnReduce(f => acceptAction(f[0])));
-            startRule = augmentedStart.ProductionRules.First(); // There's only one production.
+            augmentedStart.Productions(p => p.Production(startSymbol)); // This production is never reduced, parser accepts when its about to reduce. No reduce action.
+            Start = augmentedStart.ProductionRules.First(); // There's only one production.
 
             // Make sure all the terminals are registered.
             // This becomes neccessary since the user can configure the parser using only strings.
@@ -103,7 +101,7 @@ namespace Piglet.Parser.Configuration
 
         public ILexer<T> CreateLexer()
         {
-            if (startRule == null)
+            if (Start == null)
             {
                 // User has forgotten to augment the grammar. Lets help him out and do it
                 // for him
@@ -117,7 +115,7 @@ namespace Piglet.Parser.Configuration
 
         public IParser<T> CreateParser()
         {
-            if (startRule == null)
+            if (Start == null)
             {
                 // User has forgotten to augment the grammar. Lets help him out and do it
                 // for him
@@ -129,13 +127,7 @@ namespace Piglet.Parser.Configuration
             return new ParserFactory<T>(this).CreateParser();
         }
 
-        public IProductionRule<T> Start
-        {
-            get 
-            { 
-                return startRule; 
-            }
-        }
+        public IProductionRule<T> Start { get; private set; }
 
         public IEnumerable<IProductionRule<T>> ProductionRules
         {
@@ -144,7 +136,8 @@ namespace Piglet.Parser.Configuration
 
         public IEnumerable<ISymbol<T>> AllSymbols
         {
-            get {
+            get
+            {
                 foreach (var terminal in terminals)
                 {
                     yield return terminal;

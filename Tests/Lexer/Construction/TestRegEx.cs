@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Lexer;
 
-namespace TestParser
+namespace Piglet.Tests.Lexer.Construction
 {
     [TestClass]
     public class TestRegEx
@@ -15,7 +15,7 @@ namespace TestParser
         private void CheckMatch(string input, string regEx)
         {
             ILexer<string> lexer = CreateLexer(regEx);
-            lexer.Source = new StringReader(input);
+            lexer.SetSource(new StringReader(input));
             Assert.AreEqual(regEx, lexer.Next().Item2);
         }
 
@@ -132,6 +132,7 @@ namespace TestParser
         [TestMethod]
         public void TestNumberedRepetition()
         {
+            // TODO: Make this work
       //      CheckMatch("coolcoolcool", "(cool){3}");
         }
     }

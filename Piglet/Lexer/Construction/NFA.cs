@@ -45,7 +45,7 @@ namespace Piglet.Lexer.Construction
             var stringStream = new StringReader(postfixRegex);
 
             LexerState state = LexerState.Normal;
-            CharacterClassState classState = new CharacterClassState();
+            var classState = new CharacterClassState();
 
             while (stringStream.Peek() != -1)
             {

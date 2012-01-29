@@ -6,11 +6,11 @@ namespace Piglet.Parser
 {
     public class LRParser<T> : IParser<T>
     {
-        private readonly SLRParseTable<T> parseTable;
+        private readonly IParseTable<T> parseTable;
         private readonly Stack<T> valueStack;
         private readonly Stack<int> parseStack;
 
-        public LRParser(SLRParseTable<T> parseTable)
+        public LRParser(IParseTable<T> parseTable)
         {
             this.parseTable = parseTable;
             valueStack = new Stack<T>();
@@ -37,7 +37,6 @@ namespace Piglet.Parser
                     if (action == int.MaxValue)
                     {
                         // Accept!
-                        // TODO: Unsure if accept function has run...
                         return valueStack.Pop();
                     }
 

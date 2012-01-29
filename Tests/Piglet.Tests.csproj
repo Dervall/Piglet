@@ -9,8 +9,8 @@
     <ProjectGuid>{911347A0-30E7-497F-99B9-59DBEEF90A83}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestParser</RootNamespace>
-    <AssemblyName>TestParser</AssemblyName>
+    <RootNamespace>Piglet.Tests</RootNamespace>
+    <AssemblyName>Piglet.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -45,13 +45,13 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ParserConfigurationTest.cs" />
+    <Compile Include="Parser\ParserConfigurationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestDotNotation.cs" />
-    <Compile Include="TestLexer.cs" />
-    <Compile Include="TestNFA.cs" />
-    <Compile Include="TestPostFixConverter.cs" />
-    <Compile Include="TestRegEx.cs" />
+    <Compile Include="Lexer\Construction\DotNotation\TestDotNotation.cs" />
+    <Compile Include="Lexer\TestLexer.cs" />
+    <Compile Include="Lexer\Construction\TestNFA.cs" />
+    <Compile Include="Lexer\Construction\TestPostFixConverter.cs" />
+    <Compile Include="Lexer\Construction\TestRegEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Piglet\Piglet.csproj">
@@ -59,6 +59,7 @@
       <Name>Piglet</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,11 +6,11 @@ namespace Piglet.Lexer
 {
     public class Lexer<T> : ILexer<T>
     {
-        public TextReader Source { get; set; }
+        private TextReader Source { get; set; }
 
         private readonly TransitionTable<T> transitionTable;
         private readonly int endOfInputTokenNumber;
-        private int state = 0;
+        private int state;
         
 
         // This is for error reporting purposes
@@ -25,6 +25,9 @@ namespace Piglet.Lexer
 
         public Tuple<int, T> Next()
         {
+            // Reset state
+            state = 0;
+
             var lexeme = new StringBuilder();
 
             while(true)
@@ -55,16 +58,22 @@ namespace Piglet.Lexer
                     // We have reached termination
                     // Two possibilities, current state accepts, if so return token ID
                     // else there is an error
-                    Tuple<int, Func<string, T>> action = transitionTable.GetAction(state);
+                    var action = transitionTable.GetAction(state);
                     if (action != null)
                     {
-                        // Reset state
-                        state = 0;
-
-                        // If tokennumber is -1 it is an ignored token, like typically whitespace.
+                        // If tokennumber is int.MinValue it is an ignored token, like typically whitespace.
                         // In that case, dont return, continue lexing with the reset parser to get the next token.
-                        if (action.Item1 != -1)
+                        if (action.Item1 == int.MinValue)
                         {
+                            // Reset state
+                            state = 0;
+                            
+                            // Clear lexeme
+                            lexeme = new StringBuilder();
+                        }
+                        else
+                        {
+                            // Token completed. Return it
                             return new Tuple<int, T>(action.Item1,
                                                      action.Item2 == null ? default(T) : action.Item2(lexeme.ToString()));
                         }
@@ -73,8 +82,15 @@ namespace Piglet.Lexer
                     {
                         // We get here if there is no action at the state where the lexer cannot continue given the input.
                         // This is fail.
-                        throw new LexerException(string.Format( "Invalid character '{3}' at {0}:{1}. Line so far {2}", 
-                            lineNumber, currentLine.ToString().Length, currentLine, c));
+                        var lexerException =
+                            new LexerException(string.Format("Invalid character '{0}'",
+                                                             c == '\0' ? "NULL" : c.ToString()))
+                                {
+                                    LineContents = currentLine.ToString(), 
+                                    LineNumber = lineNumber
+                                };
+
+                        throw lexerException;
                     }
                 }
                 else
@@ -87,6 +103,16 @@ namespace Piglet.Lexer
                     Source.Read();
                 }
             }
+        }
+
+        public void SetSource(TextReader reader)
+        {
+            Source = reader;
+        }
+
+        public void SetSource(string source)
+        {
+            Source = new StringReader(source);
         }
     }
 }

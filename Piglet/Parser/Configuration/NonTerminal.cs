@@ -7,10 +7,12 @@ namespace Piglet.Parser.Configuration
 {
     public class NonTerminal<T> : Symbol<T>, INonTerminal<T>
     {
+        private readonly IParserConfigurator<T> configurator;
         private readonly IList<NonTerminalProduction> productions;
 
-        public NonTerminal(Action<IProductionConfigurator<T>> productionAction)
+        public NonTerminal(IParserConfigurator<T> configurator, Action<IProductionConfigurator<T>> productionAction)
         {
+            this.configurator = configurator;
             productions = new List<NonTerminalProduction>();
             Productions(productionAction);
         }
@@ -24,16 +26,18 @@ namespace Piglet.Parser.Configuration
         {
             if (productionAction != null)
             {
-                productionAction(new NonTerminalProductionConfigurator(this));
+                productionAction(new NonTerminalProductionConfigurator(configurator, this));
             }
         }
 
         private class NonTerminalProductionConfigurator : IProductionConfigurator<T>
         {
+            private readonly IParserConfigurator<T> configurator;
             private readonly NonTerminal<T> nonTerminal;
 
-            public NonTerminalProductionConfigurator(NonTerminal<T> nonTerminal)
+            public NonTerminalProductionConfigurator(IParserConfigurator<T> configurator, NonTerminal<T> nonTerminal)
             {
+                this.configurator = configurator;
                 this.nonTerminal = nonTerminal;
             }
 
@@ -44,7 +48,7 @@ namespace Piglet.Parser.Configuration
                     throw new ArgumentException("Only string and ISymbol are valid arguments.", "parts");
                 }
 
-                var nonTerminalProduction = new NonTerminalProduction(nonTerminal, parts);
+                var nonTerminalProduction = new NonTerminalProduction(configurator, nonTerminal, parts);
                 nonTerminal.productions.Add(nonTerminalProduction);
 
                 return nonTerminalProduction;
@@ -61,7 +65,7 @@ namespace Piglet.Parser.Configuration
             public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
             public Func<T[], T> ReduceAction { get { return reduceAction; } } 
 
-            public NonTerminalProduction(INonTerminal<T> resultSymbol, object[] symbols)
+            public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object[] symbols)
             {
                 this.resultSymbol = resultSymbol;
 
@@ -72,7 +76,7 @@ namespace Piglet.Parser.Configuration
                 {
                     if (part is string)
                     {
-                        this.symbols[i] = new Terminal<T>((string)part, null);
+                        this.symbols[i] = configurator.Terminal((string)part, null);
                     }
                     else
                     {

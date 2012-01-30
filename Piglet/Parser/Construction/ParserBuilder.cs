@@ -5,23 +5,23 @@ using Piglet.Parser.Configuration;
 
 namespace Piglet.Parser.Construction
 {
-    public class ParserFactory<T>
+    internal class ParserBuilder<T>
     {
         private readonly IGrammar<T> grammar;
 
-        public ParserFactory(IGrammar<T> grammar)
+        public ParserBuilder(IGrammar<T> grammar)
         {
             this.grammar = grammar;
         }
 
-        private class GotoSetTransition
+        private sealed class GotoSetTransition
         {
             public List<Lr0Item<T>> From { get; set; }
             public List<Lr0Item<T>> To { get; set; }
             public ISymbol<T> OnSymbol { get; set; }
         }
 
-        public IParser<T> CreateParser()
+        internal IParser<T> CreateParser()
         {
             // First order of business is to create the canonical list of LR0 states.
             // This starts with augmenting the grammar with an accept symbol, then we derive the

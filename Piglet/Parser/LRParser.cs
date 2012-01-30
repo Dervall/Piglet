@@ -4,13 +4,13 @@ using Piglet.Parser.Construction;
 
 namespace Piglet.Parser
 {
-    public class LRParser<T> : IParser<T>
+    internal class LRParser<T> : IParser<T>
     {
         private readonly IParseTable<T> parseTable;
         private readonly Stack<T> valueStack;
         private readonly Stack<int> parseStack;
 
-        public LRParser(IParseTable<T> parseTable)
+        internal LRParser(IParseTable<T> parseTable)
         {
             this.parseTable = parseTable;
             valueStack = new Stack<T>();

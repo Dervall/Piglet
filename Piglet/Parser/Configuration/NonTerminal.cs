@@ -5,7 +5,7 @@ using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
 {
-    public class NonTerminal<T> : Symbol<T>, INonTerminal<T>
+    internal class NonTerminal<T> : Symbol<T>, INonTerminal<T>
     {
         private readonly IParserConfigurator<T> configurator;
         private readonly IList<NonTerminalProduction> productions;

@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 
 namespace Piglet.Parser.Construction
 {
-    public class SLRParseTable<T> : IParseTable<T>
+    internal class SLRParseTable<T> : IParseTable<T>
     {
         private readonly ITable2D actionTable;
         private readonly ITable2D gotoTable;
@@ -43,9 +42,7 @@ namespace Piglet.Parser.Construction
                     {
                         if (table[stateNumber].ContainsKey(tokenNumber))
                         {
-                            // TODO: Specify what sort of exception this is
-                            // TODO: based on whatever was in the table and what 
-                            // TODO: we tried to put in it.
+                            // This is an error condition, find out what sort of exception it is
                             int oldValue = table[stateNumber][tokenNumber];
                             if (oldValue != value)
                             {
@@ -80,12 +77,6 @@ namespace Piglet.Parser.Construction
             }
         }
 
-        public static int Shift(int stateToChangeTo)
-        {
-            // Shift is positive integers
-            return stateToChangeTo;
-        }
-
         public ITable2D Action
         {
             get { return actionTable; }
@@ -98,6 +89,12 @@ namespace Piglet.Parser.Construction
 
         public ReductionRule<T>[] ReductionRules { get; set; }
 
+        public static int Shift(int stateToChangeTo)
+        {
+            // Shift is positive integers
+            return stateToChangeTo;
+        }
+        
         public static int Reduce(int reductionRule)
         {
             // Reduce is negative integers

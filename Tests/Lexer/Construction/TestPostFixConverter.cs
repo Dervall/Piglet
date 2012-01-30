@@ -1,12 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Piglet.Lexer;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Lexer.Construction;
 
-namespace TestParser
+namespace Piglet.Tests.Lexer.Construction
 {
     [TestClass]
     public class TestPostFixConverter

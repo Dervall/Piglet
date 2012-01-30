@@ -2,7 +2,7 @@ using System;
 
 namespace Piglet.Parser.Configuration
 {
-    public class Terminal<T> : Symbol<T>, ITerminal<T>
+    internal class Terminal<T> : Symbol<T>, ITerminal<T>
     {
         public static readonly Func<string, T> DefaultFunc = f => default(T);
         public string RegExp { get; private set; }

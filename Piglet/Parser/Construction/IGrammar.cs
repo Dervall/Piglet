@@ -3,7 +3,7 @@ using Piglet.Parser.Configuration;
 
 namespace Piglet.Parser.Construction
 {
-    public interface IGrammar<T>
+    internal interface IGrammar<T>
     {
         IProductionRule<T> Start { get; }
         IEnumerable<IProductionRule<T>> ProductionRules { get; }

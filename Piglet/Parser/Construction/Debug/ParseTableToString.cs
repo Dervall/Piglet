@@ -4,9 +4,9 @@ using Piglet.Parser.Configuration;
 
 namespace Piglet.Parser.Construction.Debug
 {
-    public static class ParseTableToString
+    internal static class ParseTableToString
     {
-        public static string ToDebugString<T>(this IParseTable<T> table, IGrammar<T> grammar)
+        internal static string ToDebugString<T>(this IParseTable<T> table, IGrammar<T> grammar)
         {
             int numTokens = grammar.AllSymbols.Count();
             int numTerminals = grammar.AllSymbols.OfType<Terminal<T>>().Count();

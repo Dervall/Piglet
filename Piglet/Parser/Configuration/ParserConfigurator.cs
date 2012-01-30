@@ -6,7 +6,7 @@ using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
 {
-    public class ParserConfigurator<T> : IParserConfigurator<T>, IGrammar<T>
+    internal class ParserConfigurator<T> : IParserConfigurator<T>, IGrammar<T>
     {
         private NonTerminal<T> startSymbol;
         private readonly List<NonTerminal<T>> nonTerminals;
@@ -124,7 +124,7 @@ namespace Piglet.Parser.Configuration
 
             // Create a new parserfactory
             // and pass this into it, for use.
-            return new ParserFactory<T>(this).CreateParser();
+            return new ParserBuilder<T>(this).CreateParser();
         }
 
         public IProductionRule<T> Start { get; private set; }

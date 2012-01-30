@@ -3,10 +3,10 @@ using Piglet.Parser.Configuration;
 
 namespace Piglet.Parser.Construction
 {
-    public class Lr0Item<T>
+    internal class Lr0Item<T>
     {
-        public IProductionRule<T> ProductionRule { get; set; } 
-        public int DotLocation { get; set; }
+        public IProductionRule<T> ProductionRule { get; private set; } 
+        public int DotLocation { get; private set; }
 
         public ISymbol<T> SymbolRightOfDot
         {

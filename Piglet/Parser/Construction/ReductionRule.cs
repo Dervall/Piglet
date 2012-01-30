@@ -2,7 +2,7 @@ using System;
 
 namespace Piglet.Parser.Construction
 {
-    public class ReductionRule<T>
+    internal class ReductionRule<T>
     {
         public int NumTokensToPop { get; set; }
         public int TokenToPush { get; set; }

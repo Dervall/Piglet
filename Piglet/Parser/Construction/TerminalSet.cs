@@ -4,7 +4,7 @@ using Piglet.Parser.Configuration;
 
 namespace Piglet.Parser.Construction
 {
-    public class TerminalSet<T>
+    internal class TerminalSet<T>
     {
         private readonly Dictionary<ISymbol<T>, List<Terminal<T>>> dict;
 

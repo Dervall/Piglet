@@ -69,7 +69,7 @@
     <Compile Include="Parser\Configuration\ParserConfigurator.cs" />
     <Compile Include="Parser\Configuration\ParserConfiguratorFactory.cs" />
     <Compile Include="Parser\Construction\ITable2D.cs" />
-    <Compile Include="Parser\Construction\ParserFactory.cs" />
+    <Compile Include="Parser\Construction\ParserBuilder.cs" />
     <Compile Include="Parser\Configuration\Symbol.cs" />
     <Compile Include="Parser\Configuration\Terminal.cs" />
     <Compile Include="Parser\Construction\Lr0Item.cs" />

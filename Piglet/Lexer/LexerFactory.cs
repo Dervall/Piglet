@@ -16,7 +16,7 @@ namespace Piglet.Lexer
             return lexerConfigurator.CreateLexer();
         }
 
-        public static ILexer<T> ConfigureFromGrammar(IGrammar<T> grammar)
+        internal static ILexer<T> ConfigureFromGrammar(IGrammar<T> grammar)
         {
             // This works because the grammar tokens will recieve the same token number
             // since they are assigned to this list in just the same way. AND BECAUSE the

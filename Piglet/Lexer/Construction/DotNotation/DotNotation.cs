@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 
 namespace Piglet.Lexer.Construction.DotNotation
 {
-    public static class DotNotation
+    internal static class DotNotation
     {
         /// <summary>
         /// Print the state machine as DOT notation suitable for drawing graphs.

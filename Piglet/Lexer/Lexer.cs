@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Piglet.Lexer
 {
-    public class Lexer<T> : ILexer<T>
+    internal class Lexer<T> : ILexer<T>
     {
         private TextReader Source { get; set; }
 

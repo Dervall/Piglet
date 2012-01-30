@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    public class DFA : FiniteAutomata<DFA.State>
+    internal class DFA : FiniteAutomata<DFA.State>
     {
         public class State : BaseState
         {

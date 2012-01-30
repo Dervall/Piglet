@@ -2,7 +2,7 @@
 
 namespace Piglet.Lexer.Construction
 {
-    public abstract class FiniteAutomata<TState> where TState : FiniteAutomata<TState>.BaseState
+    internal abstract class FiniteAutomata<TState> where TState : FiniteAutomata<TState>.BaseState
     {
         public abstract class BaseState
         {

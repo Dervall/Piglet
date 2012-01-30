@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Piglet.Lexer.Construction
 {
-    public static class PostFixConverter
+    internal static class PostFixConverter
     {
         private struct ScopeState
         {

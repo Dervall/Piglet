@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    public class NFA : FiniteAutomata<NFA.State>
+    internal class NFA : FiniteAutomata<NFA.State>
     {
-        public class State : BaseState
+        internal class State : BaseState
         {
             public override bool AcceptState { get; set; }
 

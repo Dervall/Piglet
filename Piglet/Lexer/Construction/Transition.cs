@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    public class Transition<TState>
+    internal class Transition<TState>
     {
         public TState From { get; set; }
         public TState To { get; set; }

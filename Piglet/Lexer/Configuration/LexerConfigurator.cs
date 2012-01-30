@@ -5,7 +5,7 @@ using Piglet.Lexer.Construction;
 
 namespace Piglet.Lexer.Configuration
 {
-    public class LexerConfigurator<T> : ILexerConfigurator<T>
+    internal class LexerConfigurator<T> : ILexerConfigurator<T>
     {
         private readonly List<Tuple<string, Func<string, T>>> tokens;
         private readonly List<string> ignore;

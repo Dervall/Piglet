@@ -5,7 +5,7 @@ using Piglet.Lexer.Construction;
 
 namespace Piglet.Lexer
 {
-    public class TransitionTable<T>
+    internal class TransitionTable<T>
     {
         private readonly IDictionary<Tuple<int, int>, int> table;
         private readonly Tuple<int, Func<string, T>>[] actions;

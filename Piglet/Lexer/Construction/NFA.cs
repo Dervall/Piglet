@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -159,7 +158,7 @@ namespace Piglet.Lexer.Construction
                                 break;
 
                             default:
-                                throw new Exception(string.Format("Unknown escaped character '{0}'", c));
+                                throw new LexerConstructionException(string.Format("Unknown escaped character '{0}'", c));
                         }
                         state = LexerState.Normal;
                         break;
@@ -197,7 +196,7 @@ namespace Piglet.Lexer.Construction
                                 state = LexerState.RangeEnd;
                                 break;
                             case '[':
-                                throw new Exception("Opening new character class inside an already open one");
+                                throw new LexerConstructionException("Opening new character class inside an already open one");
                             case ']':
                                 // Ending class
                                 stack.Push(classState.Negated
@@ -292,7 +291,7 @@ namespace Piglet.Lexer.Construction
             // is malformed.
             if (stack.Count() != 1)
             {
-                throw new Exception("Malformed postfix regexp expression");
+                throw new LexerConstructionException("Malformed postfix regexp expression");
             }
 
             // Pop it from the stack, and assign each state a number, primarily for debugging purposes,

@@ -23,7 +23,8 @@ namespace Piglet.Lexer.Construction
             BeginCharacterClass,
             NormalEscaped,
             InsideCharacterClass,
-            RangeEnd
+            RangeEnd,
+            NumberedRepetition
         }
 
         private class CharacterClassState
@@ -31,12 +32,25 @@ namespace Piglet.Lexer.Construction
             public CharacterClassState()
             {
                 ClassChars = new List<char>();
-                LastClassChar = null;
             }
 
-            public char? LastClassChar { get; set; }
             public IList<char> ClassChars { get; private set; }
             public bool Negated { get; set; }
+        }
+
+        private class NumberedRepetitionState
+        {
+            public NumberedRepetitionState()
+            {
+                MinRepetitions = -1;
+                MaxRepetitions = -1;
+                Chars = new List<char>();
+            }
+
+            public int MaxRepetitions { get; set; }
+            public int MinRepetitions { get; set; }
+            public List<char> Chars { get; private set; }
+            public int CurrentPart { get; set; }
         }
 
         public static NFA Create(string postfixRegex)
@@ -46,6 +60,8 @@ namespace Piglet.Lexer.Construction
 
             LexerState state = LexerState.Normal;
             var classState = new CharacterClassState();
+            var numberedRepetitionState = new NumberedRepetitionState();
+
 
             while (stringStream.Peek() != -1)
             {
@@ -62,6 +78,10 @@ namespace Piglet.Lexer.Construction
                             case '[':
                                 state = LexerState.BeginCharacterClass;
                                 classState = new CharacterClassState();
+                                break;
+                            case '{':
+                                state = LexerState.NumberedRepetition;
+                                numberedRepetitionState = new NumberedRepetitionState();
                                 break;
                             case '|':
                                 stack.Push(Or(stack.Pop(), stack.Pop()));
@@ -211,6 +231,58 @@ namespace Piglet.Lexer.Construction
                                     classState.ClassChars.Add(from);
                                 }
                                 break;
+                        }
+                        break;
+                    case LexerState.NumberedRepetition:
+                        switch (c)
+                        {
+                            case '0':   // Is it really OK to start with a 0. It is now.
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                                numberedRepetitionState.Chars.Add(c);
+                                break;
+                            case '}':
+                            case ':':
+                                // Parse whatever is in Chars
+                                int reps;
+                                if (!int.TryParse(new string(numberedRepetitionState.Chars.ToArray()), out reps ))
+                                {
+                                    throw new LexerConstructionException("Numbered repetition operator contains operand that is not a number");
+                                }
+                                numberedRepetitionState.Chars.Clear();
+
+                                // Set the right value
+                                if (numberedRepetitionState.CurrentPart == 0)
+                                {
+                                    numberedRepetitionState.MinRepetitions = reps;
+                                }
+                                else
+                                {
+                                    numberedRepetitionState.MaxRepetitions = reps;
+                                }
+
+                                if (c == ':')
+                                {
+                                    ++numberedRepetitionState.CurrentPart;
+                                    if (numberedRepetitionState.CurrentPart > 1)
+                                        throw new LexerConstructionException("More than one : in numbered repetition.");
+                                }
+                                else
+                                {
+                                    stack.Push(NumberedRepeat(stack.Pop(), numberedRepetitionState.MinRepetitions, numberedRepetitionState.MaxRepetitions));
+                                    state = LexerState.Normal;
+                                }
+                                break;
+                            default:
+                                throw new LexerConstructionException(
+                                    string.Format("Illegal character {0} in numbered repetition", c));
                         }
                         break;
                 }
@@ -386,6 +458,62 @@ namespace Piglet.Lexer.Construction
             // to the end state. Done
             nfa.Transitions.Add(new Transition<State>(nfa.StartState, nfa.States.First(f => f.AcceptState)));
             return nfa;
+        }
+
+        private static NFA NumberedRepeat(NFA nfa, int minRepetitions, int maxRepetitions)
+        {
+            if (maxRepetitions < minRepetitions)
+            {
+                maxRepetitions = minRepetitions;
+            }
+
+            // Copy the NFA max repetitions times, link them together.
+            NFA output = nfa.Copy();
+            var epsilonLinkStates = new Stack<State>();
+            for (int i = 1; i < maxRepetitions; ++i)
+            {
+                NFA newNfa = nfa.Copy();
+                if (i >= minRepetitions)
+                {
+                    epsilonLinkStates.Push(newNfa.StartState);
+                }
+                output = And(output, newNfa);
+            }
+
+            // Add epsilon transitions from accept to beginning states of NFAs in the chain
+            var acceptState = output.States.Single(f => f.AcceptState);
+            while (epsilonLinkStates.Any())
+            {
+                output.Transitions.Add(new Transition<State>(epsilonLinkStates.Pop(),
+                                                             acceptState));
+            }
+
+            return output;
+        }
+
+        private NFA Copy()
+        {
+            var newNFA = new NFA();
+            var stateMap = new Dictionary<State, State>();
+
+            foreach (var state in States)
+            {
+                var newState = new State {AcceptState = state.AcceptState, StateNumber = state.StateNumber};
+                stateMap.Add(state, newState);
+                newNFA.States.Add(newState);
+            }
+
+            foreach (var transition in Transitions)
+            {
+                // Hard copy the valid input
+                var newTransition = new Transition<State>(stateMap[transition.From], stateMap[transition.To], 
+                    transition.ValidInput == null ? null : transition.ValidInput.ToArray());
+                newNFA.Transitions.Add(newTransition);
+            }
+
+            newNFA.StartState = stateMap[StartState];
+
+            return newNFA;
         }
 
         private void AddAll(NFA nfa)

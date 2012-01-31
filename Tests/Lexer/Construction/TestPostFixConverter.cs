@@ -27,5 +27,11 @@ namespace Piglet.Tests.Lexer.Construction
             // Postfix should preserve ranges as=is
             Assert.AreEqual("[a-b][xyz]|", PostFixConverter.ToPostFix("[a-b]|[xyz]"));
         }
+
+        [TestMethod]
+        public void TestNumberedRepetition()
+        {
+            Assert.AreEqual("[a-c]{3}[b-f]{8}|", PostFixConverter.ToPostFix("[a-c]{3}|[b-f]{8}"));
+        }
     }
 }

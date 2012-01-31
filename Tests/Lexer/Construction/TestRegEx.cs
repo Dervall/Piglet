@@ -132,8 +132,15 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestNumberedRepetition()
         {
-            // TODO: Make this work
-      //      CheckMatch("coolcoolcool", "(cool){3}");
+            CheckMatch("coolcoolcool", "(cool){3}");
+        }
+
+        [TestMethod]
+        public void TestNumberedRepetitionWithMaxValue()
+        {
+            CheckMatch("coolcoolcoolcoolcool", "(cool){3:5}");
+            CheckMatch("coolcoolcoolcool", "(cool){3:5}");
+            CheckMatch("coolcoolcool", "(cool){3:5}");
         }
     }
 }

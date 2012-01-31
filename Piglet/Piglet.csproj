@@ -45,6 +45,7 @@
     <Compile Include="Lexer\Construction\DFA.cs" />
     <Compile Include="Lexer\Construction\DotNotation\DotNotation.cs" />
     <Compile Include="Lexer\Construction\FiniteAutomata.cs" />
+    <Compile Include="Lexer\Construction\LexerConstructionException.cs" />
     <Compile Include="Lexer\Construction\NFA.cs" />
     <Compile Include="Lexer\Construction\PostFixConverter.cs" />
     <Compile Include="Lexer\Construction\Transition.cs" />

@@ -17,7 +17,7 @@ namespace Piglet.Lexer.Construction
         public static string ToPostFix(string regExp)
         {
             var state = new ScopeState();
-            
+
             var buffer = new StringBuilder();
             var reader = new StringReader(regExp);
 
@@ -28,7 +28,7 @@ namespace Piglet.Lexer.Construction
                 switch (inputCharacter)
                 {
                     case '(':
-                        if (state.NumAtoms> 1)
+                        if (state.NumAtoms > 1)
                         {
                             --state.NumAtoms;
                             buffer.Append('&');
@@ -67,6 +67,23 @@ namespace Piglet.Lexer.Construction
                             return null;
                         buffer.Append(inputCharacter);
                         break;
+
+                    case '{':
+                        if (state.NumAtoms == 0)
+                            throw new Exception("No characters preceeding numbered repetition operator");
+                        buffer.Append(inputCharacter);
+                        while (true)
+                        {
+                            if (reader.Peek() == -1)
+                                throw new Exception("Unterminated numbered repetition operator");
+                            inputCharacter = (char) reader.Read();
+                            buffer.Append(inputCharacter);
+
+                            if (inputCharacter == '}')
+                                break;
+                        }
+                        break;
+
                     case '[':
                         if (state.NumAtoms > 1)
                         {
@@ -87,7 +104,7 @@ namespace Piglet.Lexer.Construction
                             if (reader.Peek() == -1)
                                 throw new Exception("Unterminated character class");
                             nCharsFound++;
-                            buffer.Append((char) reader.Read());
+                            buffer.Append((char)reader.Read());
                         }
                         buffer.Append(']');
                         reader.Read();
@@ -110,9 +127,9 @@ namespace Piglet.Lexer.Construction
                             {
                                 throw new Exception("No character following escape character");
                             }
-                            inputCharacter = (char) reader.Read();
+                            inputCharacter = (char)reader.Read();
                         }
-                        
+
                         buffer.Append(inputCharacter);
                         state.NumAtoms++;
                         break;

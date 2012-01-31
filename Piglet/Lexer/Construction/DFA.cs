@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Piglet.Lexer.Construction.DotNotation;
 
 namespace Piglet.Lexer.Construction
 {
@@ -97,6 +98,7 @@ namespace Piglet.Lexer.Construction
 
             dfa.StartState = dfa.States[0];
             dfa.AssignStateNumbers();
+
             return dfa;
         }
     }

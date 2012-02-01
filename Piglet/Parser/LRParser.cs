@@ -82,7 +82,8 @@ namespace Piglet.Parser
                     {
                         onReduceParams[i] = valueStack.Pop();
                     }
-                    valueStack.Push(reductionRule.OnReduce(onReduceParams));
+                    var reduceFunc = reductionRule.OnReduce;
+                    valueStack.Push(reduceFunc == null ? default(T) : reduceFunc(onReduceParams));
                 }
             }
         }

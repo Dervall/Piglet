@@ -230,5 +230,74 @@ namespace Piglet.Tests.Parser
             configurator.CreateParser();
             // Just make sure this doesn't crash for now
         }
+
+        [TestMethod]
+        public void TestGrammarWithEpsilonTransitions()
+        {
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
+            var func = configurator.NonTerminal();
+            var paramList = configurator.NonTerminal();
+            var optionalParamList = configurator.NonTerminal();
+
+            func.Productions(p => p.Production("func", "\\(", optionalParamList, "\\)"));
+            paramList.Productions(p =>
+                                      {
+                                          p.Production(paramList, ",", "ident");
+                                          p.Production("ident");
+                                      });
+
+            optionalParamList.Productions(p =>
+                                              {
+                                                  p.Production(paramList);
+                                                  p.Production();
+                                              });
+
+            configurator.SetStartSymbol(func);
+            
+            var lexer = configurator.CreateLexer();
+            var parser = configurator.CreateParser();
+            lexer.SetSource("func(ident,ident,ident,ident)");
+            parser.Parse(lexer);
+            lexer.SetSource("func()");
+            parser.Parse(lexer);
+
+        }
+
+        [TestMethod]
+        public void TestDeepEpsilonChain()
+        {
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
+
+            var a = configurator.NonTerminal();
+            var b = configurator.NonTerminal();
+            var c = configurator.NonTerminal();
+            var d = configurator.NonTerminal();
+            var e = configurator.NonTerminal();
+
+            a.Productions(p => p.Production("a", b));
+            b.Productions(p =>
+                {
+                    p.Production(c);
+                    p.Production();
+
+                });
+            c.Productions(p => p.Production("d",d));
+            d.Productions(p =>
+                {
+                    p.Production(e);
+                    p.Production();
+                });
+            e.Productions(p => p.Production("e"));
+
+            configurator.SetStartSymbol(a);
+            var lexer = configurator.CreateLexer();
+            var parser = configurator.CreateParser();
+            lexer.SetSource("ade");
+            parser.Parse(lexer);
+            lexer.SetSource("a");
+            parser.Parse(lexer);
+            lexer.SetSource("ad");
+            parser.Parse(lexer);
+        }
     }
 }

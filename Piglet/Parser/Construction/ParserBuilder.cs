@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Piglet.Parser.Configuration;
+using Piglet.Parser.Construction.Debug;
 
 namespace Piglet.Parser.Construction
 {
@@ -109,7 +110,7 @@ namespace Piglet.Parser.Construction
             }
 
             SLRParseTable<T> parseTable = CreateSLRParseTable(itemSets, follow, gotoSetTransitions);
-
+            
             return new LRParser<T>(parseTable);
         }
 
@@ -245,7 +246,6 @@ namespace Piglet.Parser.Construction
             // follow on the start symbol
             follow.Add(grammar.AcceptSymbol, grammar.EndOfInputTerminal);
 
-            // TODO: This doesn't support epsilon rules yet
             bool addedThings;
             do
             {
@@ -265,7 +265,6 @@ namespace Piglet.Parser.Construction
                             {
                                 // Add everything in FOLLOW(production.ResultSymbol) since we were at the end
                                 // of the production
-                                // TODO: This is also a valid action if there is an Epsilon production of nextsymbol
                                 foreach (var terminal in follow[(NonTerminal<T>)productionRule.ResultSymbol])
                                 {
                                     addedThings |= follow.Add(currentSymbol, terminal);

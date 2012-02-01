@@ -206,7 +206,7 @@ namespace Piglet.Parser.Construction
                                     // The old value is the shift
                                     e.ShiftSymbol = e.PreviousValue == int.MaxValue 
                                         ? grammar.AcceptSymbol // Conflicting with the accept symbol
-                                        : grammar.AllSymbols.First(f => f.TokenNumber == e.PreviousValue);
+                                        : grammar.AllSymbols.FirstOrDefault(f => f.TokenNumber == e.PreviousValue);
                                     throw;
                                 }
                             } 

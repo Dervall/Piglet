@@ -299,5 +299,40 @@ namespace Piglet.Tests.Parser
             lexer.SetSource("ad");
             parser.Parse(lexer);
         }
+
+        [TestMethod]
+        public void TestNonSLRGrammar()
+        {
+            // 1. S’ ::= S     4. L ::= * R
+            // 2. S ::= L = R  5. L ::= id
+            // 3. S ::= R      6. R ::= L
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
+            var S = configurator.NonTerminal();
+            var L = configurator.NonTerminal();
+            var R = configurator.NonTerminal();
+
+            S.Productions(p =>
+                              {
+                                  p.Production(L, "=", R);
+                                  p.Production(R);
+                              });
+
+            L.Productions(p =>
+                              {
+                                  p.Production("\\*", R);
+                                  p.Production("id");
+                              });
+
+            R.Productions(p=>
+                              {
+                                  p.Production(L);
+                              });
+
+            configurator.SetStartSymbol(S);
+
+            // TODO: This case is interesting because it will work once LALR parsing is operational.
+      //      configurator.CreateParser();
+
+        }
     }
 }

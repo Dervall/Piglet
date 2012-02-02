@@ -265,6 +265,7 @@ namespace Piglet.Parser.Construction
                             {
                                 // Add everything in FOLLOW(production.ResultSymbol) since we were at the end
                                 // of the production
+                                // TODO: This is also a valid action if there is an Epsilon production of nextsymbol
                                 foreach (var terminal in follow[(NonTerminal<T>)productionRule.ResultSymbol])
                                 {
                                     addedThings |= follow.Add(currentSymbol, terminal);
@@ -285,6 +286,7 @@ namespace Piglet.Parser.Construction
                                     {
                                         addedThings |= follow.Add(currentSymbol, terminal);
                                     }
+                                    // TODO: Should there not be a break here?!? cant continue looping that would be bad
                                 }
                             }
                         }

@@ -59,7 +59,7 @@ namespace Piglet.Parser
                 {
                     if (action == int.MinValue)
                     {
-                        throw new ParseException("Illegal token");
+                        throw new ParseException(string.Format("Illegal token {0}", input.Item1));
                     }
 
                     // Get the right reduction rule to apply

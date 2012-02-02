@@ -26,11 +26,12 @@ namespace Piglet.Tests.Parser
             expr.DebugName = "expr";
             INonTerminal<int> factor = configurator.NonTerminal();
             factor.DebugName = "factor";
-            
-            expr.Productions(p => {
-                                      p.Production(expr, "\\+", term).OnReduce(s => s[0] + s[2]);
-                                      p.Production(term).OnReduce(s => s[0]);
-                                  });
+
+            expr.Productions(p =>
+            {
+                p.Production(expr, "\\+", term).OnReduce(s => s[0] + s[2]);
+                p.Production(term).OnReduce(s => s[0]);
+            });
 
             term.Productions(p =>
                                  {
@@ -253,7 +254,7 @@ namespace Piglet.Tests.Parser
                                               });
 
             configurator.SetStartSymbol(func);
-            
+
             var lexer = configurator.CreateLexer();
             var parser = configurator.CreateParser();
             lexer.SetSource("func(ident,ident,ident,ident)");
@@ -281,7 +282,7 @@ namespace Piglet.Tests.Parser
                     p.Production();
 
                 });
-            c.Productions(p => p.Production("d",d));
+            c.Productions(p => p.Production("d", d));
             d.Productions(p =>
                 {
                     p.Production(e);
@@ -323,7 +324,7 @@ namespace Piglet.Tests.Parser
                                   p.Production("id");
                               });
 
-            R.Productions(p=>
+            R.Productions(p =>
                               {
                                   p.Production(L);
                               });
@@ -331,8 +332,54 @@ namespace Piglet.Tests.Parser
             configurator.SetStartSymbol(S);
 
             // TODO: This case is interesting because it will work once LALR parsing is operational.
-      //      configurator.CreateParser();
+            //      configurator.CreateParser();
 
+        }
+
+        [TestMethod]
+        public void TestMultipleEpsilonParametersInARow()
+        {
+            var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
+            var a = configurator.NonTerminal();
+            var b = configurator.NonTerminal();
+            var c = configurator.NonTerminal();
+            var d = configurator.NonTerminal();
+
+            a.Productions(p => p.Production("a", b, c, d, "a"));
+            b.Productions(p =>
+                              {
+                                  p.Production("b");
+                                  p.Production();
+                              });
+
+            c.Productions(p =>
+                            {
+                                p.Production("c");
+                                p.Production();
+                            });
+            d.Productions(p =>
+                              {
+                                  p.Production("d");
+                                  p.Production();
+                              });
+
+            configurator.SetStartSymbol(a);
+            var lexer = configurator.CreateLexer();
+            var parser = configurator.CreateParser();
+            lexer.SetSource("aa");
+            parser.Parse(lexer);
+            lexer.SetSource("aba");
+            parser.Parse(lexer);
+            lexer.SetSource("abca");
+            parser.Parse(lexer);
+            lexer.SetSource("abcda");
+            parser.Parse(lexer);
+            lexer.SetSource("aca");
+            parser.Parse(lexer);
+            lexer.SetSource("ada");
+            parser.Parse(lexer);
+            lexer.SetSource("abda");
+            parser.Parse(lexer);
         }
     }
 }

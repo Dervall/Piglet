@@ -30,8 +30,9 @@ namespace Piglet.Parser.Construction
             var start = grammar.Start;
 
             // Get the first and follow sets for all nonterminal symbols
-            var first = CalculateFirst();
-            var follow = CalculateFollow(first);
+            var nullable = CalculateNullable();
+            var first = CalculateFirst(nullable);
+            var follow = CalculateFollow(first, nullable);
 
             // So, we are going to calculate the LR0 closure for the start symbol, which should
             // be the augmented accept state of the grammar.
@@ -45,7 +46,7 @@ namespace Piglet.Parser.Construction
                                                })
                                };
             var gotoSetTransitions = new List<GotoSetTransition>();
-            
+
             // TODO: This method is probably one big stupid performance sink since it iterates WAY to many times over the input
 
             // Repeat until nothing gets added any more
@@ -110,8 +111,59 @@ namespace Piglet.Parser.Construction
             }
 
             SLRParseTable<T> parseTable = CreateSLRParseTable(itemSets, follow, gotoSetTransitions);
-            
+
             return new LRParser<T>(parseTable);
+        }
+
+        private ISet<NonTerminal<T>> CalculateNullable()
+        {
+            // TODO: This is a naïve implementation that keeps iterating until the set becomes stable
+            // TODO: This could probably be optimized.
+
+            // A nullable symbol is a symbol that may consist of only epsilon transitions
+            var nullable = new HashSet<NonTerminal<T>>();
+
+            bool nullableSetChanged;
+
+            do
+            {
+                nullableSetChanged = false;
+                foreach (var nonTerminal in grammar.AllSymbols.OfType<NonTerminal<T>>())
+                {
+                    // No need to reevaluate things we know to be nullable.
+                    if (nullable.Contains(nonTerminal))
+                        continue;
+
+                    foreach (var production in nonTerminal.ProductionRules)
+                    {
+                        // If this production is nullable, add the nonterminal to the set.
+
+                        // Iterate over symbols. If we find a terminal it is never nullable
+                        // if we find a nonterminal continue iterating only if this terminal itself is not nullable.
+                        // By this rule, empty production rules will always return nullable true
+                        bool symbolIsNullable = true;
+
+                        foreach (var symbol in production.Symbols)
+                        {
+                            if (symbol is Terminal<T> || !nullable.Contains((NonTerminal<T>)symbol))
+                            {
+                                symbolIsNullable = false;
+                                break;
+                            }
+                        }
+                        if (symbolIsNullable)
+                        {
+                            if (!nullable.Contains(nonTerminal))
+                            {
+                                nullable.Add(nonTerminal);
+                                nullableSetChanged = true;
+                            }
+                        }
+                    }
+                }
+            } while (nullableSetChanged);
+
+            return nullable;
         }
 
         private SLRParseTable<T> CreateSLRParseTable(List<List<Lr0Item<T>>> itemSets, TerminalSet<T> follow, List<GotoSetTransition> gotoSetTransitions)
@@ -122,7 +174,7 @@ namespace Piglet.Parser.Construction
             // the second part at least, the other is for indexing them while making the table.
             var reductionRules = new List<Tuple<IProductionRule<T>, ReductionRule<T>>>();
 
-            for (int i = 0; i < itemSets.Count(); ++i )
+            for (int i = 0; i < itemSets.Count(); ++i)
             {
                 var itemSet = itemSets[i];
                 foreach (var lr0Item in itemSet)
@@ -139,11 +191,11 @@ namespace Piglet.Parser.Construction
                             // there should always be one.
                             var transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr0Item.SymbolRightOfDot);
                             int transitionIndex = itemSets.IndexOf(transition.To);
-                            int tokenNumber = ((Terminal<T>) lr0Item.SymbolRightOfDot).TokenNumber;
+                            int tokenNumber = ((Terminal<T>)lr0Item.SymbolRightOfDot).TokenNumber;
                             try
                             {
                                 table.Action[i, tokenNumber] = SLRParseTable<T>.Shift(transitionIndex);
-                            } 
+                            }
                             catch (ShiftReduceConflictException<T> e)
                             {
                                 // Since we wanted to shift, it will not be reduce reduce exceptions at this point
@@ -186,7 +238,7 @@ namespace Piglet.Parser.Construction
                                     }));
                             }
 
-                            foreach (var followTerminal in follow[(NonTerminal<T>) lr0Item.ProductionRule.ResultSymbol])
+                            foreach (var followTerminal in follow[(NonTerminal<T>)lr0Item.ProductionRule.ResultSymbol])
                             {
                                 try
                                 {
@@ -195,7 +247,7 @@ namespace Piglet.Parser.Construction
                                 catch (ReduceReduceConflictException<T> e)
                                 {
                                     // Augment exception with correct symbols for the poor user
-                                    e.PreviousReduceSymbol = reductionRules[ -(1 + e.PreviousValue)].Item1.ResultSymbol;
+                                    e.PreviousReduceSymbol = reductionRules[-(1 + e.PreviousValue)].Item1.ResultSymbol;
                                     e.NewReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
                                     throw;
                                 }
@@ -204,12 +256,12 @@ namespace Piglet.Parser.Construction
                                     // We know we're the cause of the reduce part
                                     e.ReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
                                     // The old value is the shift
-                                    e.ShiftSymbol = e.PreviousValue == int.MaxValue 
+                                    e.ShiftSymbol = e.PreviousValue == int.MaxValue
                                         ? grammar.AcceptSymbol // Conflicting with the accept symbol
                                         : grammar.AllSymbols.FirstOrDefault(f => f.TokenNumber == e.PreviousValue);
                                     throw;
                                 }
-                            } 
+                            }
                         }
                         else
                         {
@@ -230,15 +282,15 @@ namespace Piglet.Parser.Construction
 
             // Move the reduction rules to the table. No need for the impromptu dictionary
             // anymore.
-            table.ReductionRules = reductionRules.Select( f=> f.Item2 ).ToArray();
+            table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
 
             // Useful point to look at the table, since after this point the grammar is pretty much destroyed.
-           // string debugTable = table.ToDebugString(grammar, itemSets.Count());
+            // string debugTable = table.ToDebugString(grammar, itemSets.Count());
 
             return table;
         }
 
-        private TerminalSet<T> CalculateFollow(TerminalSet<T> first)
+        private TerminalSet<T> CalculateFollow(TerminalSet<T> first, ISet<NonTerminal<T>> nullable)
         {
             var follow = new TerminalSet<T>(grammar);
 
@@ -257,7 +309,7 @@ namespace Piglet.Parser.Construction
                         // Skip all terminals
                         if (productionRule.Symbols[n] is NonTerminal<T>)
                         {
-                            var currentSymbol = (NonTerminal<T>) productionRule.Symbols[n];
+                            var currentSymbol = (NonTerminal<T>)productionRule.Symbols[n];
                             var nextSymbol = n == productionRule.Symbols.Length - 1
                                                  ? null
                                                  : productionRule.Symbols[n + 1];
@@ -277,7 +329,7 @@ namespace Piglet.Parser.Construction
                                 // It's not at the end, if the next symbol is a terminal, just add it
                                 if (nextSymbol is Terminal<T>)
                                 {
-                                    addedThings |= follow.Add(currentSymbol, (Terminal<T>) nextSymbol);
+                                    addedThings |= follow.Add(currentSymbol, (Terminal<T>)nextSymbol);
                                 }
                                 else
                                 {
@@ -286,7 +338,8 @@ namespace Piglet.Parser.Construction
                                     {
                                         addedThings |= follow.Add(currentSymbol, terminal);
                                     }
-                                    // TODO: Should there not be a break here?!? cant continue looping that would be bad
+
+                                    break;
                                 }
                             }
                         }
@@ -297,7 +350,7 @@ namespace Piglet.Parser.Construction
             return follow;
         }
 
-        private TerminalSet<T> CalculateFirst()
+        private TerminalSet<T> CalculateFirst(ISet<NonTerminal<T>> nullable)
         {
             var first = new TerminalSet<T>(grammar);
 
@@ -309,7 +362,7 @@ namespace Piglet.Parser.Construction
             do
             {
                 addedThings = false;
-                
+
                 foreach (var symbol in grammar.AllSymbols.OfType<NonTerminal<T>>())
                 {
                     foreach (var productionRule in symbol.ProductionRules)
@@ -319,38 +372,38 @@ namespace Piglet.Parser.Construction
                             // Terminals are trivial, just add them
                             if (productionSymbol is Terminal<T>)
                             {
-                                addedThings |= first.Add(symbol, (Terminal<T>) productionSymbol);
-                                
+                                addedThings |= first.Add(symbol, (Terminal<T>)productionSymbol);
+
                                 // This production rule is done now
                                 break;
                             }
 
                             if (productionSymbol is NonTerminal<T>)
                             {
-                                var nonTerminal = (NonTerminal<T>) productionSymbol;
-                                // TODO: The check for nullable should be here...
-                                // TODO: if it is nullable, it should add Epsilon to the first
-                                // TODO: and continue with the next one. We are going to assume nullable
-                                // TODO: is false and go on
-                             /*   var nullable = false;
-                                if (nullable)
+                                var nonTerminal = (NonTerminal<T>)productionSymbol;
+                                // If it is nullable, it should add Epsilon to the first
+                                // and continue with the next one.
+                                if (nullable.Contains(nonTerminal))
                                 {
-                                    throw new NotImplementedException("Nullable production rules doesn't work yet");
+                                    // Add epsilon dummy symbol to first
+                                    addedThings |= first.Add(symbol, Terminal<T>.Epsilon);
+
+                                    // Not breaking will cause it to continue with the next symbol in the production rule.
                                 }
-                                else*/
+                                else
                                 {
                                     foreach (var f in first[nonTerminal])
                                     {
                                         addedThings |= first.Add(symbol, f);
                                     }
-                                    // Jump out since the other symbols are not in the first set
+                                    // Jump out since we've found a non nullable symbol
                                     break;
                                 }
                             }
                         }
                     }
                 }
-            } while (addedThings); 
+            } while (addedThings);
 
             return first;
         }

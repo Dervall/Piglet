@@ -74,11 +74,6 @@ namespace Piglet.Parser.Configuration
 
         public void AugmentGrammar()
         {
-            if (Start != null)
-                throw new ParserConfigurationException("You can only augment a grammar once!");
-            if (startSymbol == null)
-                throw new ParserConfigurationException("StartSymbol must be specified");
-
             // First we need to augment the grammar with a start rule and a new start symbol
             // Create the derived start symbol
             var augmentedStart = (NonTerminal<T>)NonTerminal();  // Unfortunate cast...
@@ -126,13 +121,6 @@ namespace Piglet.Parser.Configuration
 
         public ILexer<T> CreateLexer()
         {
-            if (Start == null)
-            {
-                // User has forgotten to augment the grammar. Lets help him out and do it
-                // for him
-                AugmentGrammar();
-            }
-
             // User wants a default lexer, great. Use the lexer from grammar factory
             // to fix him up
             return LexerFactory<T>.ConfigureFromGrammar(this);

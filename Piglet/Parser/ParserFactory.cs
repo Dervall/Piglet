@@ -9,7 +9,8 @@ namespace Piglet.Parser
         {
             var parserConfigurator = new ParserConfigurator<T>();
             configureAction(parserConfigurator);
-            
+            parserConfigurator.AugmentGrammar();
+
             var parser = parserConfigurator.CreateParser();
 
             // If our lexer settings says that we are supposed to create a lexer, do so now and assign

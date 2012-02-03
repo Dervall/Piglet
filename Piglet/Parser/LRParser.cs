@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using Piglet.Lexer;
 using Piglet.Parser.Construction;
 
@@ -21,8 +22,9 @@ namespace Piglet.Parser
         /// This is accessible for test and debug reasons
         /// </summary>
         internal IParseTable<T> Table { get { return parseTable; } }
+        public ILexer<T> Lexer { get; set; }
 
-        public T Parse(ILexer<T> lexer)
+        private T Parse()
         {
             // If this parser has been used before, clear the stacks
             valueStack.Clear();
@@ -31,7 +33,7 @@ namespace Piglet.Parser
             // Push default state onto the parse stack. Default state is always 0
             parseStack.Push(0);
 
-            var input = lexer.Next();
+            var input = Lexer.Next();
 
             while (true)
             {
@@ -53,7 +55,7 @@ namespace Piglet.Parser
                     valueStack.Push(input.Item2);
 
                     // Lex next token
-                    input = lexer.Next();
+                    input = Lexer.Next();
                 }
                 else
                 {
@@ -86,6 +88,20 @@ namespace Piglet.Parser
                     valueStack.Push(reduceFunc == null ? default(T) : reduceFunc(onReduceParams));
                 }
             }
+        }
+
+        
+
+        public T Parse(string input)
+        {
+            Lexer.SetSource(input);
+            return Parse();
+        }
+
+        public T Parse(StringReader input)
+        {
+            Lexer.SetSource(input);
+            return Parse();
         }
     }
 }

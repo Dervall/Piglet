@@ -1,9 +1,13 @@
+using System.IO;
 using Piglet.Lexer;
 
 namespace Piglet.Parser
 {
     public interface IParser<T>
     {
-        T Parse(ILexer<T> lexer);
+        ILexer<T> Lexer { get; set; }
+        
+        T Parse(string input);
+        T Parse(StringReader input);
     }
 }

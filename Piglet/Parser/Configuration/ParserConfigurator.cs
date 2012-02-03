@@ -10,12 +10,26 @@ namespace Piglet.Parser.Configuration
     {
         private NonTerminal<T> startSymbol;
         private readonly List<NonTerminal<T>> nonTerminals;
-        private readonly List<Terminal<T>> terminals; 
+        private readonly List<Terminal<T>> terminals;
+        private readonly ILexerSettings lexerSettings;
 
         public ParserConfigurator()
         {
             nonTerminals = new List<NonTerminal<T>>();
             terminals = new List<Terminal<T>>();
+            lexerSettings = new LexerSettingsImpl();
+        
+            // Set some default settings
+            LexerSettings.CreateLexer = true;
+            LexerSettings.EscapeLiterals = false;
+            LexerSettings.Ignore = new string[] {};
+        }
+
+        private class LexerSettingsImpl : ILexerSettings
+        {
+            public bool CreateLexer { get; set; }
+            public bool EscapeLiterals { get; set; }
+            public string[] Ignore { get; set; }
         }
 
         public ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null)
@@ -39,7 +53,18 @@ namespace Piglet.Parser.Configuration
         {
             var nonTerminal = new NonTerminal<T>(this, productionAction);
             nonTerminals.Add(nonTerminal);
+            
+            if (startSymbol == null)
+            {
+                // First symbol to be created is the start symbol
+                SetStartSymbol(nonTerminal);
+            }
             return nonTerminal;
+        }
+
+        public ILexerSettings LexerSettings
+        {
+            get { return lexerSettings; }
         }
 
         public void SetStartSymbol(INonTerminal<T> start)

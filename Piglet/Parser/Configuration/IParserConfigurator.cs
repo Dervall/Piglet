@@ -7,9 +7,14 @@ namespace Piglet.Parser.Configuration
     {
         ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null);
         INonTerminal<T> NonTerminal(Action<IProductionConfigurator<T>> productionAction = null);
-        void SetStartSymbol(INonTerminal<T> start);
-        IParser<T> CreateParser();
-        void AugmentGrammar();
-        ILexer<T> CreateLexer();
+
+        ILexerSettings LexerSettings { get; }
+    }
+
+    public interface ILexerSettings
+    {
+        bool CreateLexer { get; set; }
+        bool EscapeLiterals { get; set; }
+        string[] Ignore { get; set; }
     }
 }

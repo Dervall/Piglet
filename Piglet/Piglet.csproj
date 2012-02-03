@@ -68,7 +68,7 @@
     <Compile Include="Parser\Configuration\NonTerminal.cs" />
     <Compile Include="Parser\Configuration\ParserConfigurationException.cs" />
     <Compile Include="Parser\Configuration\ParserConfigurator.cs" />
-    <Compile Include="Parser\Configuration\ParserConfiguratorFactory.cs" />
+    <Compile Include="Parser\ParserFactory.cs" />
     <Compile Include="Parser\Construction\ITable2D.cs" />
     <Compile Include="Parser\Construction\ParserBuilder.cs" />
     <Compile Include="Parser\Configuration\Symbol.cs" />

@@ -153,11 +153,7 @@ namespace Piglet.Parser.Construction
                         }
                         if (symbolIsNullable)
                         {
-                            if (!nullable.Contains(nonTerminal))
-                            {
-                                nullable.Add(nonTerminal);
-                                nullableSetChanged = true;
-                            }
+                            nullableSetChanged |= nullable.Add(nonTerminal);
                         }
                     }
                 }
@@ -310,36 +306,44 @@ namespace Piglet.Parser.Construction
                         if (productionRule.Symbols[n] is NonTerminal<T>)
                         {
                             var currentSymbol = (NonTerminal<T>)productionRule.Symbols[n];
-                            var nextSymbol = n == productionRule.Symbols.Length - 1
-                                                 ? null
-                                                 : productionRule.Symbols[n + 1];
-                            if (nextSymbol == null)
-                            {
-                                // Add everything in FOLLOW(production.ResultSymbol) since we were at the end
-                                // of the production
-                                // TODO: This is also a valid action if there is an Epsilon production of nextsymbol
-                                foreach (var terminal in follow[(NonTerminal<T>)productionRule.ResultSymbol])
-                                {
-                                    addedThings |= follow.Add(currentSymbol, terminal);
-                                }
-                            }
 
-                            if (nextSymbol != null)
+                            // Investigate the rule for current symbol. Iterate the following symbols while they are still
+                            // nullable. If they stop being nullable, stop iterating
+                            bool reachedEndOfRule = true;
+                            for (int followSymbolIndex = n + 1; followSymbolIndex < productionRule.Symbols.Length; ++followSymbolIndex)
                             {
-                                // It's not at the end, if the next symbol is a terminal, just add it
+                                var nextSymbol = productionRule.Symbols[followSymbolIndex];
                                 if (nextSymbol is Terminal<T>)
                                 {
                                     addedThings |= follow.Add(currentSymbol, (Terminal<T>)nextSymbol);
-                                }
-                                else
-                                {
-                                    // Add everthing in FIRST(nextSymbol)
-                                    foreach (var terminal in first[(NonTerminal<T>)nextSymbol])
-                                    {
-                                        addedThings |= follow.Add(currentSymbol, terminal);
-                                    }
-
+                                    reachedEndOfRule = false; // Terminals are never nullable, so we go out of the loop
                                     break;
+                                }
+
+                                // Add everthing in FIRST(nextSymbol) except epsilon!
+                                foreach (var terminal in first[(NonTerminal<T>)nextSymbol])
+                                {
+                                    addedThings |= follow.Add(currentSymbol, terminal);
+                                }
+
+                                // If the symbol whose FIRST set we just added wasn't nullable, break out of this
+                                // loop
+                                if (!nullable.Contains(nextSymbol))
+                                {
+                                    reachedEndOfRule = false;
+                                    break;
+                                }
+                            }
+
+                            // If we iterated enough to run out of symbols while everything was nullable, 
+                            // then we have more stuff to add
+                            if (reachedEndOfRule)
+                            {
+                                // Add everything in FOLLOW(production.ResultSymbol) since we were at the end
+                                // of the production
+                                foreach (var terminal in follow[(NonTerminal<T>)productionRule.ResultSymbol])
+                                {
+                                    addedThings |= follow.Add(currentSymbol, terminal);
                                 }
                             }
                         }
@@ -381,21 +385,15 @@ namespace Piglet.Parser.Construction
                             if (productionSymbol is NonTerminal<T>)
                             {
                                 var nonTerminal = (NonTerminal<T>)productionSymbol;
-                                // If it is nullable, it should add Epsilon to the first
-                                // and continue with the next one.
-                                if (nullable.Contains(nonTerminal))
+                                // Add everything in FIRST for the given terminal.
+                                foreach (var f in first[nonTerminal])
                                 {
-                                    // Add epsilon dummy symbol to first
-                                    addedThings |= first.Add(symbol, Terminal<T>.Epsilon);
-
-                                    // Not breaking will cause it to continue with the next symbol in the production rule.
+                                    addedThings |= first.Add(symbol, f);
                                 }
-                                else
+                                
+                                // Stop iterating if it wasn't nullable
+                                if (!nullable.Contains(nonTerminal))
                                 {
-                                    foreach (var f in first[nonTerminal])
-                                    {
-                                        addedThings |= first.Add(symbol, f);
-                                    }
                                     // Jump out since we've found a non nullable symbol
                                     break;
                                 }

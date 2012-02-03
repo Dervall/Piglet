@@ -341,9 +341,13 @@ namespace Piglet.Tests.Parser
         {
             var configurator = ParserConfiguratorFactory.CreateConfigurator<int>();
             var a = configurator.NonTerminal();
+            a.DebugName = "A";
             var b = configurator.NonTerminal();
+            b.DebugName = "B";
             var c = configurator.NonTerminal();
+            c.DebugName = "C";
             var d = configurator.NonTerminal();
+            d.DebugName = "D";
 
             a.Productions(p => p.Production("a", b, c, d, "a"));
             b.Productions(p =>

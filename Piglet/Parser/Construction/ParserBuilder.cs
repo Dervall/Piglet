@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Piglet.Parser.Configuration;
@@ -17,8 +18,8 @@ namespace Piglet.Parser.Construction
 
         private sealed class GotoSetTransition
         {
-            public List<Lr0Item<T>> From { get; set; }
-            public List<Lr0Item<T>> To { get; set; }
+            public List<Lr1Item<T>> From { get; set; }
+            public List<Lr1Item<T>> To { get; set; }
             public ISymbol<T> OnSymbol { get; set; }
         }
 
@@ -38,12 +39,12 @@ namespace Piglet.Parser.Construction
             // be the augmented accept state of the grammar.
             // The closure is all states which are accessible by the dot at the left hand side of the
             // item.
-            var itemSets = new List<List<Lr0Item<T>>>
+            var itemSets = new List<List<Lr1Item<T>>>
                                {
-                                   Closure(new List<Lr0Item<T>>
+                                   Closure(new List<Lr1Item<T>>
                                                {
-                                                   new Lr0Item<T>(start, 0)
-                                               })
+                                                   new Lr1Item<T>(start, 0, new HashSet<Terminal<T>> {grammar.EndOfInputTerminal})
+                                               }, first, nullable)
                                };
             var gotoSetTransitions = new List<GotoSetTransition>();
 
@@ -66,9 +67,12 @@ namespace Piglet.Parser.Construction
                         {
                             // Do a closure on the goto set and see if it's already present in the sets of items that we have
                             // if that is not the case add it to the item sets and restart the entire thing.
-                            gotoSet = Closure(gotoSet);
+                            gotoSet = Closure(gotoSet, first, nullable);
+
+                            // TODO: I think this is the place to merge sets!
+
                             var oldGotoSet = itemSets.FirstOrDefault(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule &&
-                                                                                b.DotLocation == a.DotLocation)));
+                                                                                b.DotLocation == a.DotLocation && b.Lookaheads.SetEquals(a.Lookaheads))));
 
                             if (oldGotoSet == null)
                             {
@@ -110,7 +114,7 @@ namespace Piglet.Parser.Construction
                     break;
             }
 
-            SLRParseTable<T> parseTable = CreateSLRParseTable(itemSets, follow, gotoSetTransitions);
+            LRParseTable<T> parseTable = CreateParseTable(itemSets, gotoSetTransitions);
 
             return new LRParser<T>(parseTable);
         }
@@ -162,9 +166,9 @@ namespace Piglet.Parser.Construction
             return nullable;
         }
 
-        private SLRParseTable<T> CreateSLRParseTable(List<List<Lr0Item<T>>> itemSets, TerminalSet<T> follow, List<GotoSetTransition> gotoSetTransitions)
+        private LRParseTable<T> CreateParseTable(List<List<Lr1Item<T>>> itemSets/*, TerminalSet<T> follow*/, List<GotoSetTransition> gotoSetTransitions)
         {
-            var table = new SLRParseTable<T>();
+            var table = new LRParseTable<T>();
 
             // Holds the generated reduction rules, which we'll feed the table at the end of this method
             // the second part at least, the other is for indexing them while making the table.
@@ -173,24 +177,24 @@ namespace Piglet.Parser.Construction
             for (int i = 0; i < itemSets.Count(); ++i)
             {
                 var itemSet = itemSets[i];
-                foreach (var lr0Item in itemSet)
+                foreach (var lr1Item in itemSet)
                 {
                     // Fill the action table first
 
                     // If the next symbol in the LR0 item is a terminal (symbol
                     // found after the dot, add a SHIFT j IF GOTO(lr0Item, nextSymbol) == j
-                    if (lr0Item.SymbolRightOfDot != null)
+                    if (lr1Item.SymbolRightOfDot != null)
                     {
-                        if (lr0Item.SymbolRightOfDot is Terminal<T>)
+                        if (lr1Item.SymbolRightOfDot is Terminal<T>)
                         {
                             // Look for a transition in the gotoSetTransitions
                             // there should always be one.
-                            var transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr0Item.SymbolRightOfDot);
+                            var transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr1Item.SymbolRightOfDot);
                             int transitionIndex = itemSets.IndexOf(transition.To);
-                            int tokenNumber = ((Terminal<T>)lr0Item.SymbolRightOfDot).TokenNumber;
+                            int tokenNumber = ((Terminal<T>)lr1Item.SymbolRightOfDot).TokenNumber;
                             try
                             {
-                                table.Action[i, tokenNumber] = SLRParseTable<T>.Shift(transitionIndex);
+                                table.Action[i, tokenNumber] = LRParseTable<T>.Shift(transitionIndex);
                             }
                             catch (ShiftReduceConflictException<T> e)
                             {
@@ -198,7 +202,7 @@ namespace Piglet.Parser.Construction
 
                                 // Grammar is ambiguous. Since we have the full grammar at hand and the state table hasn't we
                                 // can augment this exception for the benefit of the user.
-                                e.ShiftSymbol = lr0Item.SymbolRightOfDot;
+                                e.ShiftSymbol = lr1Item.SymbolRightOfDot;
                                 e.ReduceSymbol = reductionRules[-(1 + e.PreviousValue)].Item1.ResultSymbol;
                                 throw;
                             }
@@ -209,13 +213,13 @@ namespace Piglet.Parser.Construction
                         // The dot is at the end. Add reduce action to the parse table for
                         // all FOLLOW for the resulting symbol
                         // Do NOT do this if the resulting symbol is the start symbol
-                        if (lr0Item.ProductionRule.ResultSymbol != grammar.AcceptSymbol)
+                        if (lr1Item.ProductionRule.ResultSymbol != grammar.AcceptSymbol)
                         {
                             int numReductionRules = reductionRules.Count();
                             int reductionRule = 0;
                             for (; reductionRule < numReductionRules; ++reductionRule)
                             {
-                                if (reductionRules[reductionRule].Item1 == lr0Item.ProductionRule)
+                                if (reductionRules[reductionRule].Item1 == lr1Item.ProductionRule)
                                 {
                                     // Found it, it's already created
                                     break;
@@ -225,20 +229,20 @@ namespace Piglet.Parser.Construction
                             if (numReductionRules == reductionRule)
                             {
                                 // Need to create a new reduction rule
-                                reductionRules.Add(new Tuple<IProductionRule<T>, ReductionRule<T>>(lr0Item.ProductionRule,
+                                reductionRules.Add(new Tuple<IProductionRule<T>, ReductionRule<T>>(lr1Item.ProductionRule,
                                     new ReductionRule<T>
                                     {
-                                        NumTokensToPop = lr0Item.ProductionRule.Symbols.Count(),
-                                        OnReduce = lr0Item.ProductionRule.ReduceAction,
-                                        TokenToPush = lr0Item.ProductionRule.ResultSymbol.TokenNumber
+                                        NumTokensToPop = lr1Item.ProductionRule.Symbols.Count(),
+                                        OnReduce = lr1Item.ProductionRule.ReduceAction,
+                                        TokenToPush = lr1Item.ProductionRule.ResultSymbol.TokenNumber
                                     }));
                             }
 
-                            foreach (var followTerminal in follow[(NonTerminal<T>)lr0Item.ProductionRule.ResultSymbol])
+                            foreach (var lookahead in lr1Item.Lookaheads)
                             {
                                 try
                                 {
-                                    table.Action[i, followTerminal.TokenNumber] = SLRParseTable<T>.Reduce(reductionRule);
+                                    table.Action[i, lookahead.TokenNumber] = LRParseTable<T>.Reduce(reductionRule);
                                 }
                                 catch (ReduceReduceConflictException<T> e)
                                 {
@@ -263,7 +267,7 @@ namespace Piglet.Parser.Construction
                         {
                             // This production rule has the start symbol with the dot at the rightmost end in it, add ACCEPT to action
                             // for end of input character.
-                            table.Action[i, grammar.EndOfInputTerminal.TokenNumber] = SLRParseTable<T>.Accept();
+                            table.Action[i, grammar.EndOfInputTerminal.TokenNumber] = LRParseTable<T>.Accept();
                         }
                     }
                 }
@@ -281,7 +285,7 @@ namespace Piglet.Parser.Construction
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
 
             // Useful point to look at the table, since after this point the grammar is pretty much destroyed.
-            // string debugTable = table.ToDebugString(grammar, itemSets.Count());
+            string debugTable = table.ToDebugString(grammar);
 
             return table;
         }
@@ -406,45 +410,133 @@ namespace Piglet.Parser.Construction
             return first;
         }
 
-        private IEnumerable<Lr0Item<T>> Goto(IEnumerable<Lr0Item<T>> closures, ISymbol<T> symbol)
+        private IEnumerable<Lr1Item<T>> Goto(IEnumerable<Lr1Item<T>> closures, ISymbol<T> symbol)
         {
             // Every place there is a symbol to the right of the dot that matches the symbol we are looking for
-            // add a new Lr0 item that has the dot moved one step to the right.
-            return from lr0Item in closures
-                   where lr0Item.SymbolRightOfDot != null && lr0Item.SymbolRightOfDot == symbol
-                   select new Lr0Item<T>(lr0Item.ProductionRule, lr0Item.DotLocation + 1);
+            // add a new Lr1 item that has the dot moved one step to the right.
+            return from lr1Item in closures
+                   where lr1Item.SymbolRightOfDot != null && lr1Item.SymbolRightOfDot == symbol
+                   select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads);
         }
 
-        private List<Lr0Item<T>> Closure(IEnumerable<Lr0Item<T>> items)
+        private List<Lr1Item<T>> Closure(IEnumerable<Lr1Item<T>> items, TerminalSet<T> first, ISet<NonTerminal<T>> nullable  )
         {
             // The items themselves are always in their own closure set
-            var closure = new List<Lr0Item<T>>();
-            closure.AddRange(items);
-
-            var added = new HashSet<ISymbol<T>>();
-            while (true)
+            var closure = new Lr1ItemSet<T>();
+            foreach (var lr1Item in items)
             {
-                var toAdd = new List<Lr0Item<T>>();
+                closure.Add(lr1Item);
+            }
+
+        //    var added = new HashSet<ISymbol<T>>();
+            bool added;
+            do
+            {
+                added = false;
                 foreach (var item in closure)
                 {
                     ISymbol<T> symbolRightOfDot = item.SymbolRightOfDot;
-                    if (symbolRightOfDot != null && !added.Contains(symbolRightOfDot))
+                    if (symbolRightOfDot != null) // && !added.Contains(symbolRightOfDot))
                     {
-                        // Create new Lr0 items from all rules where the resulting symbol of the production rule
+                        // Generate the lookahead items
+                        var lookaheads = new HashSet<Terminal<T>>();
+
+                        bool nonNullableFound = false;
+                        for (int i = item.DotLocation + 1; i < item.ProductionRule.Symbols.Length; ++i)
+                        {
+                            var symbol = item.ProductionRule.Symbols[i];
+
+                            // If symbol is terminal, just add it
+                            if (symbol is Terminal<T>)
+                            {
+                                lookaheads.Add((Terminal<T>) symbol);
+
+                                // Terminals are not nullable, break out of loop
+                                nonNullableFound = true;
+                                break;
+                            }
+
+                            foreach (var terminal in first[(NonTerminal<T>) symbol])
+                            {
+                                lookaheads.Add(terminal);
+                            }
+
+                            if (!nullable.Contains(symbol))
+                            {
+                                nonNullableFound = true;
+                                break;
+                            }
+                        }
+
+                        if (!nonNullableFound)
+                        {
+                            // Add each of the lookahead symbols of the generating rule
+                            // to the new lookahead set
+                            foreach (var lookahead in item.Lookaheads)
+                            {
+                                lookaheads.Add(lookahead);
+                            }
+                        }
+
+                        // Create new Lr1 items from all rules where the resulting symbol of the production rule
                         // matches the symbol that was to the right of the dot.
-                        toAdd.AddRange(
+                        var newLr1Items =
                             grammar.ProductionRules.Where(f => f.ResultSymbol == symbolRightOfDot).Select(
-                                f => new Lr0Item<T>(f, 0)));
-                        added.Add(symbolRightOfDot);
+                                f => new Lr1Item<T>(f, 0, lookaheads));
+
+
+                        added = newLr1Items.Aggregate(added, (current, lr1Item) => current | closure.Add(lr1Item));
+
+                        if (added)
+                        {
+                            // If the list has been altered we need to break out
+                            break;
+                        }
                     }
                 }
 
-                if (!toAdd.Any())
-                    break;
-                closure.AddRange(toAdd);
-            }
+            } while (added);
 
-            return closure;
+            return closure.Items;
+        }
+    }
+
+    internal class Lr1ItemSet<T> : IEnumerable<Lr1Item<T>>
+    {
+        public List<Lr1Item<T>> Items { get; set; }
+
+        public Lr1ItemSet()
+        {
+            Items = new List<Lr1Item<T>>();
+        }
+
+        public bool Add(Lr1Item<T> item)
+        {
+            // See if there already exists an item with the same core
+            var oldItem = Items.FirstOrDefault(f => f.ProductionRule == item.ProductionRule && f.DotLocation == item.DotLocation);
+            if (oldItem != null)
+            {
+                // There might be lookaheads that needs adding
+                bool addedLookahead = false;
+                foreach (var lookahead in item.Lookaheads)
+                {
+                    addedLookahead |= oldItem.Lookaheads.Add(lookahead);
+                }
+                return addedLookahead;
+            }
+            // There's no old item. Add the item and return true to indicate that we've added stuff
+            Items.Add(item);
+            return true;
+        }
+
+        public IEnumerator<Lr1Item<T>> GetEnumerator()
+        {
+            return Items.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Items.GetEnumerator();
         }
     }
 }

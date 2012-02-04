@@ -234,8 +234,11 @@ namespace Piglet.Tests.Parser
             var parser = ParserFactory.Configure<int>(configurator =>
             {
                 var func = configurator.NonTerminal();
+                func.DebugName = "FUNC";
                 var paramList = configurator.NonTerminal();
+                paramList.DebugName = "PARAMLIST";
                 var optionalParamList = configurator.NonTerminal();
+                optionalParamList.DebugName = "OPTIONALPARAMLIST";
 
                 func.Productions(p => p.Production("func", "\\(", optionalParamList, "\\)"));
                 paramList.Productions(p =>
@@ -249,6 +252,8 @@ namespace Piglet.Tests.Parser
                     p.Production(paramList);
                     p.Production();
                 });
+
+               // configurator.LexerSettings.CreateLexer = false;
             });
             parser.Parse("func(ident,ident,ident,ident)");
             parser.Parse("func()");
@@ -292,11 +297,14 @@ namespace Piglet.Tests.Parser
             // 1. S’ ::= S     4. L ::= * R
             // 2. S ::= L = R  5. L ::= id
             // 3. S ::= R      6. R ::= L
-  /*          ParserFactory.Configure<int>(configurator =>
+            ParserFactory.Configure<int>(configurator =>
             {
                 var s = configurator.NonTerminal();
+                s.DebugName = "S";
                 var l = configurator.NonTerminal();
+                l.DebugName = "L";
                 var r = configurator.NonTerminal();
+                r.DebugName = "R";
 
                 s.Productions(p =>
                 {
@@ -317,7 +325,7 @@ namespace Piglet.Tests.Parser
             });
 
             // TODO: This case is interesting because it will work once LALR parsing is operational.
-            */
+            
         }
 
         [TestMethod]
@@ -360,6 +368,39 @@ namespace Piglet.Tests.Parser
             parser.Parse("aca");
             parser.Parse("ada");
             parser.Parse("abda");
+        }
+
+        [TestMethod]
+        public void TestLr1Harness()
+        {
+            // Duplicate grammar from dragon book, for comparison
+            //
+            // S -> CC
+            // C -> cC | d
+            var parser = ParserFactory.Configure<int>(configurator =>
+                                             {
+                                                 var s = configurator.NonTerminal();
+                                                 s.DebugName = "S";
+                                                 var c = configurator.NonTerminal();
+                                                 c.DebugName = "C";
+
+                                                 s.Productions(p => p.Production(c, c));
+                                                 c.Productions(p => p.Production("c", c));
+                                                 c.Productions(p => p.Production("d"));
+                                             });
+
+        }
+
+        [TestMethod]
+        public void TestSingleRuleTerminalGrammar()
+        {
+            var parser = ParserFactory.Configure<int>(configurator =>
+                                                          {
+                                                              var s = configurator.NonTerminal();
+                                                              s.DebugName = "S";
+                                                              s.Productions(p => p.Production("a", "b", "c", "d"));
+                                                          });
+            parser.Parse("abcd");
         }
     }
 }

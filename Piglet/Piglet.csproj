@@ -68,6 +68,7 @@
     <Compile Include="Parser\Configuration\NonTerminal.cs" />
     <Compile Include="Parser\Configuration\ParserConfigurationException.cs" />
     <Compile Include="Parser\Configuration\ParserConfigurator.cs" />
+    <Compile Include="Parser\Construction\Lr1Item.cs" />
     <Compile Include="Parser\ParserFactory.cs" />
     <Compile Include="Parser\Construction\ITable2D.cs" />
     <Compile Include="Parser\Construction\ParserBuilder.cs" />
@@ -77,7 +78,7 @@
     <Compile Include="Parser\Construction\ReduceReduceConflictException.cs" />
     <Compile Include="Parser\Construction\ReductionRule.cs" />
     <Compile Include="Parser\Construction\ShiftReduceConflictException.cs" />
-    <Compile Include="Parser\Construction\SLRParseTable.cs" />
+    <Compile Include="Parser\Construction\LRParseTable.cs" />
     <Compile Include="Parser\Construction\TerminalSet.cs" />
     <Compile Include="Parser\IParser.cs" />
     <Compile Include="Parser\LRParser.cs" />

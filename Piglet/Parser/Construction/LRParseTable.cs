@@ -2,12 +2,12 @@ using System.Collections.Generic;
 
 namespace Piglet.Parser.Construction
 {
-    internal class SLRParseTable<T> : IParseTable<T>
+    internal class LRParseTable<T> : IParseTable<T>
     {
         private readonly ITable2D actionTable;
         private readonly ITable2D gotoTable;
 
-        public SLRParseTable()
+        public LRParseTable()
         {
             actionTable = new SparseDictionaryTable();
             gotoTable = new SparseDictionaryTable();

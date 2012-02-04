@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Piglet.Lexer;
 using Piglet.Parser.Construction;
 
@@ -21,8 +22,8 @@ namespace Piglet.Parser.Configuration
         
             // Set some default settings
             LexerSettings.CreateLexer = true;
-            LexerSettings.EscapeLiterals = false;
-            LexerSettings.Ignore = new string[] {};
+            LexerSettings.EscapeLiterals = true;
+            LexerSettings.Ignore = new[] { "\\s+" };     // Ignore all whitespace by default
         }
 
         private class LexerSettingsImpl : ILexerSettings
@@ -123,7 +124,7 @@ namespace Piglet.Parser.Configuration
         {
             // User wants a default lexer, great. Use the lexer from grammar factory
             // to fix him up
-            return LexerFactory<T>.ConfigureFromGrammar(this);
+            return LexerFactory<T>.ConfigureFromGrammar(this, LexerSettings);
         }
 
         public IParser<T> CreateParser()

@@ -16,16 +16,17 @@ namespace Piglet.Lexer
             return lexerConfigurator.CreateLexer();
         }
 
-        internal static ILexer<T> ConfigureFromGrammar(IGrammar<T> grammar)
+        internal static ILexer<T> ConfigureFromGrammar(IGrammar<T> grammar, ILexerSettings lexerSettings)
         {
             // This works because the grammar tokens will recieve the same token number
             // since they are assigned to this list in just the same way. AND BECAUSE the
             // end of input token is LAST. if this is changed it WILL break.
             // This might be considered dodgy later on, since it makes it kinda sorta hard to
-            // use other lexers with Piglet. Let's see what happens.
+            // use other lexers with Piglet. Let's see what happens, if anyone ever wants to write their
+            // own lexer for Piglet.
             return Configure(c =>
             {
-                List<ITerminal<T>> terminals = grammar.AllSymbols.OfType<ITerminal<T>>().ToList();
+                var terminals = grammar.AllSymbols.OfType<ITerminal<T>>().ToList();
                 foreach (var terminal in terminals)
                 {
                     if (terminal.RegExp != null)
@@ -34,6 +35,11 @@ namespace Piglet.Lexer
                     }
                 }
                 c.EndOfInputTokenNumber = terminals.FindIndex(f => f.RegExp == null);
+                
+                foreach (var ignored in lexerSettings.Ignore)
+                {
+                    c.Ignore(ignored);
+                }
             });
         }
     }

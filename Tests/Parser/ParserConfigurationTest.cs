@@ -27,20 +27,20 @@ namespace Piglet.Tests.Parser
 
                 expr.Productions(p =>
                 {
-                    p.Production(expr, "\\+", term).OnReduce(s => s[0] + s[2]);
+                    p.Production(expr, "+", term).OnReduce(s => s[0] + s[2]);
                     p.Production(term).OnReduce(s => s[0]);
                 });
 
                 term.Productions(p =>
                 {
-                    p.Production(term, "\\*", factor).OnReduce(s => s[0] * s[2]);
+                    p.Production(term, "*", factor).OnReduce(s => s[0] * s[2]);
                     p.Production(factor).OnReduce(s => s[0]);
                 });
 
                 factor.Productions(p =>
                 {
                     p.Production(number).OnReduce(s => s[0]);
-                    p.Production("\\(", expr, "\\)").OnReduce(s => s[1]);
+                    p.Production("(", expr, ")").OnReduce(s => s[1]);
                 });
             });
 
@@ -240,7 +240,7 @@ namespace Piglet.Tests.Parser
                 var optionalParamList = configurator.NonTerminal();
                 optionalParamList.DebugName = "OPTIONALPARAMLIST";
 
-                func.Productions(p => p.Production("func", "\\(", optionalParamList, "\\)"));
+                func.Productions(p => p.Production("func", "(", optionalParamList, ")"));
                 paramList.Productions(p =>
                 {
                     p.Production(paramList, ",", "ident");
@@ -252,8 +252,6 @@ namespace Piglet.Tests.Parser
                     p.Production(paramList);
                     p.Production();
                 });
-
-               // configurator.LexerSettings.CreateLexer = false;
             });
             parser.Parse("func(ident,ident,ident,ident)");
             parser.Parse("func()");

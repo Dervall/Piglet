@@ -24,7 +24,8 @@ namespace Piglet.Parser.Construction
 
         internal IParser<T> CreateParser()
         {
-            // First order of business is to create the canonical list of LR0 states.
+            // First order of business is to create the canonical list of LR1 states, or at least we are going to go through
+            // them as we merge the sets together.
             // This starts with augmenting the grammar with an accept symbol, then we derive the
             // grammar from that
             var start = grammar.Start;
@@ -33,7 +34,7 @@ namespace Piglet.Parser.Construction
             var nullable = CalculateNullable();
             var first = CalculateFirst(nullable);
 
-            // So, we are going to calculate the LR0 closure for the start symbol, which should
+            // So, we are going to calculate the LR1 closure for the start symbol, which should
             // be the augmented accept state of the grammar.
             // The closure is all states which are accessible by the dot at the left hand side of the
             // item.
@@ -46,15 +47,16 @@ namespace Piglet.Parser.Construction
                                };
             var gotoSetTransitions = new List<GotoSetTransition>();
 
-            // TODO: This method is probably one big stupid performance sink since it iterates WAY to many times over the input
-
             // Repeat until nothing gets added any more
-            while (true)
+            // This is neccessary since we are merging sets as we go, which changes things around.
+            bool added;
+            do
             {
-                bool anythingAdded = false;
-
-                foreach (var itemSet in itemSets)
+                added = false;
+                for (int i = 0; i < itemSets.Count(); ++i)
                 {
+                    var itemSet = itemSets[i];
+
                     foreach (var symbol in grammar.AllSymbols)
                     {
                         // Calculate the itemset for by goto for each symbol in the grammar
@@ -64,13 +66,10 @@ namespace Piglet.Parser.Construction
                         if (gotoSet.Any())
                         {
                             // Do a closure on the goto set and see if it's already present in the sets of items that we have
-                            // if that is not the case add it to the item sets and restart the entire thing.
+                            // if that is not the case add it to the item set
                             gotoSet = Closure(gotoSet, first, nullable);
 
-                            // TODO: I think this is the place to merge sets!
                             var oldGotoSet = itemSets.FirstOrDefault(f => f.CoreEquals(gotoSet));
-                  //          var oldGotoSet = itemSets.FirstOrDefault(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule &&
-                 //                                                               b.DotLocation == a.DotLocation && b.Lookaheads.SetEquals(a.Lookaheads))));
 
                             if (oldGotoSet == null)
                             {
@@ -84,33 +83,32 @@ namespace Piglet.Parser.Construction
                                                                OnSymbol = symbol,
                                                                To = gotoSet
                                                            });
-
-                                anythingAdded = true;
-                                break;
+                                added = true;
                             }
-                            // Already found the set
-                            // Merge the lookaheads for all rules
-                            oldGotoSet.MergeLookaheads(gotoSet);
-
-                            // Add a transition if it already isn't there
-                            var nt = new GotoSetTransition
-                                         {
-                                             From = itemSet,
-                                             OnSymbol = symbol,
-                                             To = oldGotoSet
-                                         };
-                            if (!gotoSetTransitions.Any(a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
+                            else
                             {
-                                gotoSetTransitions.Add(nt);
+                                // Already found the set
+                                // Merge the lookaheads for all rules
+                                oldGotoSet.MergeLookaheads(gotoSet);
+
+                                // Add a transition if it already isn't there
+                                var nt = new GotoSetTransition
+                                             {
+                                                 From = itemSet,
+                                                 OnSymbol = symbol,
+                                                 To = oldGotoSet
+                                             };
+                                if (
+                                    !gotoSetTransitions.Any(
+                                        a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
+                                {
+                                    gotoSetTransitions.Add(nt);
+                                }
                             }
                         }
                     }
-                    if (anythingAdded)
-                        break;
                 }
-                if (!anythingAdded)
-                    break;
-            }
+            } while (added);
 
             LRParseTable<T> parseTable = CreateParseTable(itemSets, gotoSetTransitions);
 
@@ -143,16 +141,8 @@ namespace Piglet.Parser.Construction
                         // Iterate over symbols. If we find a terminal it is never nullable
                         // if we find a nonterminal continue iterating only if this terminal itself is not nullable.
                         // By this rule, empty production rules will always return nullable true
-                        bool symbolIsNullable = true;
+                        bool symbolIsNullable = production.Symbols.All(symbol => !(symbol is Terminal<T>) && nullable.Contains((NonTerminal<T>) symbol));
 
-                        foreach (var symbol in production.Symbols)
-                        {
-                            if (symbol is Terminal<T> || !nullable.Contains((NonTerminal<T>)symbol))
-                            {
-                                symbolIsNullable = false;
-                                break;
-                            }
-                        }
                         if (symbolIsNullable)
                         {
                             nullableSetChanged |= nullable.Add(nonTerminal);
@@ -283,7 +273,7 @@ namespace Piglet.Parser.Construction
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
 
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
-            //     string debugTable = table.ToDebugString(grammar);
+          //  string debugTable = table.ToDebugString(grammar);
 
             return table;
         }
@@ -345,8 +335,8 @@ namespace Piglet.Parser.Construction
             // Every place there is a symbol to the right of the dot that matches the symbol we are looking for
             // add a new Lr1 item that has the dot moved one step to the right.
             return new Lr1ItemSet<T>(from lr1Item in closures
-                   where lr1Item.SymbolRightOfDot != null && lr1Item.SymbolRightOfDot == symbol
-                   select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads));
+                                     where lr1Item.SymbolRightOfDot != null && lr1Item.SymbolRightOfDot == symbol
+                                     select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads));
         }
 
         private Lr1ItemSet<T> Closure(IEnumerable<Lr1Item<T>> items, TerminalSet<T> first, ISet<NonTerminal<T>> nullable)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
@@ -76,7 +77,14 @@ namespace Piglet.Parser.Configuration
                 {
                     if (part is string)
                     {
-                        this.symbols[i] = configurator.Terminal((string)part, null);
+                        var regex = (string) part;
+                        if (configurator.LexerSettings.EscapeLiterals)
+                        {
+                            regex = Regex.Escape(regex);
+                        }
+
+                        this.symbols[i] = configurator.Terminal(regex, null);
+                        this.symbols[i].DebugName = (string)part;   // Set debug name to unescaped string, so it's easy on the eyes.
                     }
                     else
                     {

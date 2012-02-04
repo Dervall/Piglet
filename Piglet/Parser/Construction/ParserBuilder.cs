@@ -33,7 +33,6 @@ namespace Piglet.Parser.Construction
             // Get the first and follow sets for all nonterminal symbols
             var nullable = CalculateNullable();
             var first = CalculateFirst(nullable);
-            var follow = CalculateFollow(first, nullable);
 
             // So, we are going to calculate the LR0 closure for the start symbol, which should
             // be the augmented accept state of the grammar.
@@ -166,7 +165,7 @@ namespace Piglet.Parser.Construction
             return nullable;
         }
 
-        private LRParseTable<T> CreateParseTable(List<List<Lr1Item<T>>> itemSets/*, TerminalSet<T> follow*/, List<GotoSetTransition> gotoSetTransitions)
+        private LRParseTable<T> CreateParseTable(List<List<Lr1Item<T>>> itemSets, List<GotoSetTransition> gotoSetTransitions)
         {
             var table = new LRParseTable<T>();
 
@@ -285,77 +284,9 @@ namespace Piglet.Parser.Construction
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
 
             // Useful point to look at the table, since after this point the grammar is pretty much destroyed.
-            string debugTable = table.ToDebugString(grammar);
+            //       string debugTable = table.ToDebugString(grammar);
 
             return table;
-        }
-
-        private TerminalSet<T> CalculateFollow(TerminalSet<T> first, ISet<NonTerminal<T>> nullable)
-        {
-            var follow = new TerminalSet<T>(grammar);
-
-            // As per the dragon book, add end-of-input token to 
-            // follow on the start symbol
-            follow.Add(grammar.AcceptSymbol, grammar.EndOfInputTerminal);
-
-            bool addedThings;
-            do
-            {
-                addedThings = false;
-                foreach (var productionRule in grammar.ProductionRules)
-                {
-                    for (int n = 0; n < productionRule.Symbols.Length; ++n)
-                    {
-                        // Skip all terminals
-                        if (productionRule.Symbols[n] is NonTerminal<T>)
-                        {
-                            var currentSymbol = (NonTerminal<T>)productionRule.Symbols[n];
-
-                            // Investigate the rule for current symbol. Iterate the following symbols while they are still
-                            // nullable. If they stop being nullable, stop iterating
-                            bool reachedEndOfRule = true;
-                            for (int followSymbolIndex = n + 1; followSymbolIndex < productionRule.Symbols.Length; ++followSymbolIndex)
-                            {
-                                var nextSymbol = productionRule.Symbols[followSymbolIndex];
-                                if (nextSymbol is Terminal<T>)
-                                {
-                                    addedThings |= follow.Add(currentSymbol, (Terminal<T>)nextSymbol);
-                                    reachedEndOfRule = false; // Terminals are never nullable, so we go out of the loop
-                                    break;
-                                }
-
-                                // Add everthing in FIRST(nextSymbol) except epsilon!
-                                foreach (var terminal in first[(NonTerminal<T>)nextSymbol])
-                                {
-                                    addedThings |= follow.Add(currentSymbol, terminal);
-                                }
-
-                                // If the symbol whose FIRST set we just added wasn't nullable, break out of this
-                                // loop
-                                if (!nullable.Contains(nextSymbol))
-                                {
-                                    reachedEndOfRule = false;
-                                    break;
-                                }
-                            }
-
-                            // If we iterated enough to run out of symbols while everything was nullable, 
-                            // then we have more stuff to add
-                            if (reachedEndOfRule)
-                            {
-                                // Add everything in FOLLOW(production.ResultSymbol) since we were at the end
-                                // of the production
-                                foreach (var terminal in follow[(NonTerminal<T>)productionRule.ResultSymbol])
-                                {
-                                    addedThings |= follow.Add(currentSymbol, terminal);
-                                }
-                            }
-                        }
-                    }
-                }
-            } while (addedThings);
-
-            return follow;
         }
 
         private TerminalSet<T> CalculateFirst(ISet<NonTerminal<T>> nullable)
@@ -394,7 +325,7 @@ namespace Piglet.Parser.Construction
                                 {
                                     addedThings |= first.Add(symbol, f);
                                 }
-                                
+
                                 // Stop iterating if it wasn't nullable
                                 if (!nullable.Contains(nonTerminal))
                                 {
@@ -419,7 +350,7 @@ namespace Piglet.Parser.Construction
                    select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads);
         }
 
-        private List<Lr1Item<T>> Closure(IEnumerable<Lr1Item<T>> items, TerminalSet<T> first, ISet<NonTerminal<T>> nullable  )
+        private List<Lr1Item<T>> Closure(IEnumerable<Lr1Item<T>> items, TerminalSet<T> first, ISet<NonTerminal<T>> nullable)
         {
             // The items themselves are always in their own closure set
             var closure = new Lr1ItemSet<T>();
@@ -428,74 +359,67 @@ namespace Piglet.Parser.Construction
                 closure.Add(lr1Item);
             }
 
-        //    var added = new HashSet<ISymbol<T>>();
-            bool added;
-            do
+            // This needs to be a normal for loop since we add to the underlying collection
+            // as we go along. This avoids investigating the same rule twice
+            for (int currentItem = 0; currentItem < closure.Count(); ++currentItem)
             {
-                added = false;
-                foreach (var item in closure)
+                var item = closure[currentItem];
+
+                ISymbol<T> symbolRightOfDot = item.SymbolRightOfDot;
+                if (symbolRightOfDot != null) // && !added.Contains(symbolRightOfDot))
                 {
-                    ISymbol<T> symbolRightOfDot = item.SymbolRightOfDot;
-                    if (symbolRightOfDot != null) // && !added.Contains(symbolRightOfDot))
+                    // Generate the lookahead items
+                    var lookaheads = new HashSet<Terminal<T>>();
+
+                    bool nonNullableFound = false;
+                    for (int i = item.DotLocation + 1; i < item.ProductionRule.Symbols.Length; ++i)
                     {
-                        // Generate the lookahead items
-                        var lookaheads = new HashSet<Terminal<T>>();
+                        var symbol = item.ProductionRule.Symbols[i];
 
-                        bool nonNullableFound = false;
-                        for (int i = item.DotLocation + 1; i < item.ProductionRule.Symbols.Length; ++i)
+                        // If symbol is terminal, just add it
+                        if (symbol is Terminal<T>)
                         {
-                            var symbol = item.ProductionRule.Symbols[i];
+                            lookaheads.Add((Terminal<T>)symbol);
 
-                            // If symbol is terminal, just add it
-                            if (symbol is Terminal<T>)
-                            {
-                                lookaheads.Add((Terminal<T>) symbol);
-
-                                // Terminals are not nullable, break out of loop
-                                nonNullableFound = true;
-                                break;
-                            }
-
-                            foreach (var terminal in first[(NonTerminal<T>) symbol])
-                            {
-                                lookaheads.Add(terminal);
-                            }
-
-                            if (!nullable.Contains(symbol))
-                            {
-                                nonNullableFound = true;
-                                break;
-                            }
+                            // Terminals are not nullable, break out of loop
+                            nonNullableFound = true;
+                            break;
                         }
 
-                        if (!nonNullableFound)
+                        foreach (var terminal in first[(NonTerminal<T>)symbol])
                         {
-                            // Add each of the lookahead symbols of the generating rule
-                            // to the new lookahead set
-                            foreach (var lookahead in item.Lookaheads)
-                            {
-                                lookaheads.Add(lookahead);
-                            }
+                            lookaheads.Add(terminal);
                         }
 
-                        // Create new Lr1 items from all rules where the resulting symbol of the production rule
-                        // matches the symbol that was to the right of the dot.
-                        var newLr1Items =
-                            grammar.ProductionRules.Where(f => f.ResultSymbol == symbolRightOfDot).Select(
-                                f => new Lr1Item<T>(f, 0, lookaheads));
-
-
-                        added = newLr1Items.Aggregate(added, (current, lr1Item) => current | closure.Add(lr1Item));
-
-                        if (added)
+                        if (!nullable.Contains(symbol))
                         {
-                            // If the list has been altered we need to break out
+                            nonNullableFound = true;
                             break;
                         }
                     }
-                }
 
-            } while (added);
+                    if (!nonNullableFound)
+                    {
+                        // Add each of the lookahead symbols of the generating rule
+                        // to the new lookahead set
+                        foreach (var lookahead in item.Lookaheads)
+                        {
+                            lookaheads.Add(lookahead);
+                        }
+                    }
+
+                    // Create new Lr1 items from all rules where the resulting symbol of the production rule
+                    // matches the symbol that was to the right of the dot.
+                    var newLr1Items =
+                        grammar.ProductionRules.Where(f => f.ResultSymbol == symbolRightOfDot).Select(
+                            f => new Lr1Item<T>(f, 0, lookaheads));
+
+                    foreach (var lr1Item in newLr1Items)
+                    {
+                        closure.Add(lr1Item);
+                    }
+                }
+            }
 
             return closure.Items;
         }
@@ -537,6 +461,11 @@ namespace Piglet.Parser.Construction
         IEnumerator IEnumerable.GetEnumerator()
         {
             return Items.GetEnumerator();
+        }
+
+        public Lr1Item<T> this[int index]
+        {
+            get { return Items[index]; }
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Piglet.Parser.Configuration;
@@ -18,8 +17,8 @@ namespace Piglet.Parser.Construction
 
         private sealed class GotoSetTransition
         {
-            public List<Lr1Item<T>> From { get; set; }
-            public List<Lr1Item<T>> To { get; set; }
+            public Lr1ItemSet<T> From { get; set; }
+            public Lr1ItemSet<T> To { get; set; }
             public ISymbol<T> OnSymbol { get; set; }
         }
 
@@ -38,7 +37,7 @@ namespace Piglet.Parser.Construction
             // be the augmented accept state of the grammar.
             // The closure is all states which are accessible by the dot at the left hand side of the
             // item.
-            var itemSets = new List<List<Lr1Item<T>>>
+            var itemSets = new List<Lr1ItemSet<T>>
                                {
                                    Closure(new List<Lr1Item<T>>
                                                {
@@ -59,7 +58,7 @@ namespace Piglet.Parser.Construction
                     foreach (var symbol in grammar.AllSymbols)
                     {
                         // Calculate the itemset for by goto for each symbol in the grammar
-                        var gotoSet = Goto(itemSet, symbol).ToList();
+                        var gotoSet = Goto(itemSet, symbol);
 
                         // If there is anything found in the set
                         if (gotoSet.Any())
@@ -69,9 +68,9 @@ namespace Piglet.Parser.Construction
                             gotoSet = Closure(gotoSet, first, nullable);
 
                             // TODO: I think this is the place to merge sets!
-
-                            var oldGotoSet = itemSets.FirstOrDefault(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule &&
-                                                                                b.DotLocation == a.DotLocation && b.Lookaheads.SetEquals(a.Lookaheads))));
+                            var oldGotoSet = itemSets.FirstOrDefault(f => f.CoreEquals(gotoSet));
+                  //          var oldGotoSet = itemSets.FirstOrDefault(f => f.All(a => gotoSet.Any(b => b.ProductionRule == a.ProductionRule &&
+                 //                                                               b.DotLocation == a.DotLocation && b.Lookaheads.SetEquals(a.Lookaheads))));
 
                             if (oldGotoSet == null)
                             {
@@ -89,7 +88,11 @@ namespace Piglet.Parser.Construction
                                 anythingAdded = true;
                                 break;
                             }
-                            // Already found the set, add a transition if it already isn't there
+                            // Already found the set
+                            // Merge the lookaheads for all rules
+                            oldGotoSet.MergeLookaheads(gotoSet);
+
+                            // Add a transition if it already isn't there
                             var nt = new GotoSetTransition
                                          {
                                              From = itemSet,
@@ -99,10 +102,6 @@ namespace Piglet.Parser.Construction
                             if (!gotoSetTransitions.Any(a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
                             {
                                 gotoSetTransitions.Add(nt);
-
-                                // TODO: Not sure if should set anything added to true. Better set it
-                                // TODO: Only thing that can happen is that this function is EVEN slower than it already is
-                                anythingAdded = true;
                             }
                         }
                     }
@@ -165,7 +164,7 @@ namespace Piglet.Parser.Construction
             return nullable;
         }
 
-        private LRParseTable<T> CreateParseTable(List<List<Lr1Item<T>>> itemSets, List<GotoSetTransition> gotoSetTransitions)
+        private LRParseTable<T> CreateParseTable(List<Lr1ItemSet<T>> itemSets, List<GotoSetTransition> gotoSetTransitions)
         {
             var table = new LRParseTable<T>();
 
@@ -283,8 +282,8 @@ namespace Piglet.Parser.Construction
             // anymore.
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
 
-            // Useful point to look at the table, since after this point the grammar is pretty much destroyed.
-            //       string debugTable = table.ToDebugString(grammar);
+            // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
+            //     string debugTable = table.ToDebugString(grammar);
 
             return table;
         }
@@ -341,16 +340,16 @@ namespace Piglet.Parser.Construction
             return first;
         }
 
-        private IEnumerable<Lr1Item<T>> Goto(IEnumerable<Lr1Item<T>> closures, ISymbol<T> symbol)
+        private Lr1ItemSet<T> Goto(IEnumerable<Lr1Item<T>> closures, ISymbol<T> symbol)
         {
             // Every place there is a symbol to the right of the dot that matches the symbol we are looking for
             // add a new Lr1 item that has the dot moved one step to the right.
-            return from lr1Item in closures
+            return new Lr1ItemSet<T>(from lr1Item in closures
                    where lr1Item.SymbolRightOfDot != null && lr1Item.SymbolRightOfDot == symbol
-                   select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads);
+                   select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads));
         }
 
-        private List<Lr1Item<T>> Closure(IEnumerable<Lr1Item<T>> items, TerminalSet<T> first, ISet<NonTerminal<T>> nullable)
+        private Lr1ItemSet<T> Closure(IEnumerable<Lr1Item<T>> items, TerminalSet<T> first, ISet<NonTerminal<T>> nullable)
         {
             // The items themselves are always in their own closure set
             var closure = new Lr1ItemSet<T>();
@@ -366,7 +365,7 @@ namespace Piglet.Parser.Construction
                 var item = closure[currentItem];
 
                 ISymbol<T> symbolRightOfDot = item.SymbolRightOfDot;
-                if (symbolRightOfDot != null) // && !added.Contains(symbolRightOfDot))
+                if (symbolRightOfDot != null)
                 {
                     // Generate the lookahead items
                     var lookaheads = new HashSet<Terminal<T>>();
@@ -421,51 +420,7 @@ namespace Piglet.Parser.Construction
                 }
             }
 
-            return closure.Items;
-        }
-    }
-
-    internal class Lr1ItemSet<T> : IEnumerable<Lr1Item<T>>
-    {
-        public List<Lr1Item<T>> Items { get; set; }
-
-        public Lr1ItemSet()
-        {
-            Items = new List<Lr1Item<T>>();
-        }
-
-        public bool Add(Lr1Item<T> item)
-        {
-            // See if there already exists an item with the same core
-            var oldItem = Items.FirstOrDefault(f => f.ProductionRule == item.ProductionRule && f.DotLocation == item.DotLocation);
-            if (oldItem != null)
-            {
-                // There might be lookaheads that needs adding
-                bool addedLookahead = false;
-                foreach (var lookahead in item.Lookaheads)
-                {
-                    addedLookahead |= oldItem.Lookaheads.Add(lookahead);
-                }
-                return addedLookahead;
-            }
-            // There's no old item. Add the item and return true to indicate that we've added stuff
-            Items.Add(item);
-            return true;
-        }
-
-        public IEnumerator<Lr1Item<T>> GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
-
-        public Lr1Item<T> this[int index]
-        {
-            get { return Items[index]; }
+            return closure;
         }
     }
 }

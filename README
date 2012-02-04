@@ -3,6 +3,5 @@ Piglet, the little friendly parser and lexer tool
 Hello, and thank you for looking at Piglet. Piglet is a tool in the spirit of all those big parser and lexer generators that are out there, in .NET and configurable in
 code instead of doing it as a compile time step. While not as fast or flexible as the big libraries, Piglet is depedency free, open source and hopefully well tested.
 It is also well commented and as understandable as these tools can get, which should be helpful for those looking to understand the LALR(1) parser generation algorithm.
-(though right now, it's only SLR(1))
 
 If you're looking to fork or contribute or use, no one would be happier than me. :)

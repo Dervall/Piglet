@@ -388,6 +388,7 @@ namespace Piglet.Tests.Parser
                                                  c.Productions(p => p.Production("c", c));
                                                  c.Productions(p => p.Production("d"));
                                              });
+            parser.Parse("ccccccccdd");
 
         }
 

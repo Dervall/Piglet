@@ -10,7 +10,8 @@ namespace Piglet.Parser.Construction
 
         public Lr1Item(IProductionRule<T> productionRule, int dotLocation, ISet<Terminal<T>> lookaheads) : base(productionRule, dotLocation)
         {
-            Lookaheads = lookaheads;
+            Lookaheads = new HashSet<Terminal<T>>();
+            Lookaheads.UnionWith(lookaheads);
         }
 
         public override string ToString()

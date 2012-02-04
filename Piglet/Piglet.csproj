@@ -69,6 +69,7 @@
     <Compile Include="Parser\Configuration\ParserConfigurationException.cs" />
     <Compile Include="Parser\Configuration\ParserConfigurator.cs" />
     <Compile Include="Parser\Construction\Lr1Item.cs" />
+    <Compile Include="Parser\Construction\Lr1ItemSet.cs" />
     <Compile Include="Parser\ParserFactory.cs" />
     <Compile Include="Parser\Construction\ITable2D.cs" />
     <Compile Include="Parser\Construction\ParserBuilder.cs" />

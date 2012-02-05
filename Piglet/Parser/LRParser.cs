@@ -22,6 +22,7 @@ namespace Piglet.Parser
         /// This is accessible for test and debug reasons
         /// </summary>
         internal IParseTable<T> Table { get { return parseTable; } }
+
         public ILexer<T> Lexer { get; set; }
 
         private T Parse()

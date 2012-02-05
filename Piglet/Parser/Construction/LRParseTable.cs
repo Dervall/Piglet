@@ -36,6 +36,7 @@ namespace Piglet.Parser.Construction
                     }
                     return int.MinValue; // No action, error action
                 }
+
                 set
                 {
                     if (table.ContainsKey(stateNumber))

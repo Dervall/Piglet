@@ -3,8 +3,17 @@ using Piglet.Parser.Configuration;
 
 namespace Piglet.Parser
 {
+    /// <summary>
+    /// The parserfactory is the main way of obtaining parsers from Piglet.
+    /// </summary>
     public static class ParserFactory
     {
+        /// <summary>
+        /// Configure a parser using code based configuration
+        /// </summary>
+        /// <typeparam name="T">Semantic value type of tokens</typeparam>
+        /// <param name="configureAction">Action that configures the parser</param>
+        /// <returns>A parser, ready for use</returns>
         public static IParser<T> Configure<T>(Action<IParserConfigurator<T>> configureAction )
         {
             var parserConfigurator = new ParserConfigurator<T>();

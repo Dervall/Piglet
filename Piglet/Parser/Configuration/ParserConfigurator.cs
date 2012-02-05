@@ -179,7 +179,7 @@ namespace Piglet.Parser.Configuration
             int t = 0;
             foreach (var symbol in AllSymbols)
             {
-                symbol.TokenNumber = t++;
+                ((Symbol<T>)symbol).TokenNumber = t++;
             }
         }
     }

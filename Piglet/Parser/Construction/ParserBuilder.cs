@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Piglet.Parser.Configuration;
-using Piglet.Parser.Construction.Debug;
 
 namespace Piglet.Parser.Construction
 {
@@ -222,7 +221,7 @@ namespace Piglet.Parser.Construction
                                     {
                                         NumTokensToPop = lr1Item.ProductionRule.Symbols.Count(),
                                         OnReduce = lr1Item.ProductionRule.ReduceAction,
-                                        TokenToPush = lr1Item.ProductionRule.ResultSymbol.TokenNumber
+                                        TokenToPush = ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber
                                     }));
                             }
 
@@ -246,7 +245,7 @@ namespace Piglet.Parser.Construction
                                     // The old value is the shift
                                     e.ShiftSymbol = e.PreviousValue == int.MaxValue
                                         ? grammar.AcceptSymbol // Conflicting with the accept symbol
-                                        : grammar.AllSymbols.FirstOrDefault(f => f.TokenNumber == e.PreviousValue);
+                                        : grammar.AllSymbols.FirstOrDefault(f => ((Symbol<T>)f).TokenNumber == e.PreviousValue);
                                     throw;
                                 }
                             }
@@ -264,7 +263,7 @@ namespace Piglet.Parser.Construction
                 // produced by the GOTO operation from this state
                 foreach (var gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet && f.OnSymbol is NonTerminal<T>))
                 {
-                    table.Goto[i, gotoTransition.OnSymbol.TokenNumber] = itemSets.IndexOf(gotoTransition.To);
+                    table.Goto[i, ((Symbol<T>)gotoTransition.OnSymbol).TokenNumber] = itemSets.IndexOf(gotoTransition.To);
                 }
             }
 

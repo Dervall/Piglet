@@ -55,6 +55,7 @@
     <Compile Include="Lexer\LexerFactory.cs" />
     <Compile Include="Lexer\TransitionTable.cs" />
     <Compile Include="Parser\Configuration\IConfigureProductionAction.cs" />
+    <Compile Include="Parser\Configuration\ILexerSettings.cs" />
     <Compile Include="Parser\Configuration\INonTerminal.cs" />
     <Compile Include="Parser\Construction\AmbiguousGrammarException.cs" />
     <Compile Include="Parser\Construction\Debug\ParseTableToString.cs" />

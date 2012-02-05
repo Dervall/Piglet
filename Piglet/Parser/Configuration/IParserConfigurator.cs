@@ -3,18 +3,34 @@ using Piglet.Lexer;
 
 namespace Piglet.Parser.Configuration
 {
+    /// <summary>
+    /// This interface is the main interface for configuring a new parser in code. It is only valid in the context that is is
+    /// obtained, typically in ParserFactory. If methods are called after the parser has been created no changes will be applied
+    /// to the already created parser.
+    /// </summary>
+    /// <typeparam name="T">Semantic value of tokens</typeparam>
     public interface IParserConfigurator<T>
     {
+        /// <summary>
+        /// Create a new Terminal. If using the built in lexer terminals will be recognized in the order
+        /// of declaration. A terminal may not be redefined using different onParse actions.
+        /// </summary>
+        /// <param name="regExp">Regular expression to match</param>
+        /// <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
+        /// <returns>A terminal symbol</returns>
         ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null);
+        
+        /// <summary>
+        /// Create a new NonTerminal. Production actions may be specified directly, or deferred until later. The
+        /// latter is more typical since rules are often recursive in their nature.
+        /// </summary>
+        /// <param name="productionAction">Specifies a production action directly.</param>
+        /// <returns></returns>
         INonTerminal<T> NonTerminal(Action<IProductionConfigurator<T>> productionAction = null);
 
+        /// <summary>
+        /// Additional lexer settings in addition to the settings provided by the declared terminals.
+        /// </summary>
         ILexerSettings LexerSettings { get; }
-    }
-
-    public interface ILexerSettings
-    {
-        bool CreateLexer { get; set; }
-        bool EscapeLiterals { get; set; }
-        string[] Ignore { get; set; }
     }
 }

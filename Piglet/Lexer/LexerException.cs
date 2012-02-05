@@ -2,11 +2,25 @@ using System;
 
 namespace Piglet.Lexer
 {
+    /// <summary>
+    /// LexerExceptions are thrown when the lexer cannot make sense of the current input.
+    /// </summary>
     public class LexerException : Exception
     {
-        public int LineNumber { get; set; }
-        public string LineContents { get; set; }
+        /// <summary>
+        /// The current line number of the document the lexer is scanning.
+        /// </summary>
+        public int LineNumber { get; internal set; }
 
+        /// <summary>
+        /// The contents of the current line so far of the current document
+        /// </summary>
+        public string LineContents { get; internal set; }
+
+        /// <summary>
+        /// Construct a new LexerException
+        /// </summary>
+        /// <param name="message">Message to display</param>
         public LexerException(string message)
             : base(message)
         {

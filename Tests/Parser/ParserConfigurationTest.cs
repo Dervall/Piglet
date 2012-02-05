@@ -117,12 +117,12 @@ namespace Piglet.Tests.Parser
             // t := "A"
             // y := "A"
             //
-            INonTerminal<object> x, y = null, t = null;
+            INonTerminal<object> y = null, t = null;
             try
             {
                 ParserFactory.Configure<object>( configurator =>
                 {
-                    x = configurator.NonTerminal();
+                    INonTerminal<object> x = configurator.NonTerminal();
                     x.DebugName = "X";
 
                     t = configurator.NonTerminal();
@@ -312,18 +312,12 @@ namespace Piglet.Tests.Parser
 
                 l.Productions(p =>
                 {
-                    p.Production("\\*", r);
+                    p.Production("*", r);
                     p.Production("id");
                 });
 
-                r.Productions(p =>
-                {
-                    p.Production(l);
-                });
+                r.Productions(p => p.Production(l));
             });
-
-            // TODO: This case is interesting because it will work once LALR parsing is operational.
-            
         }
 
         [TestMethod]

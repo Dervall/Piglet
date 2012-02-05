@@ -12,8 +12,8 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// http://hughesbennett.co.uk/Graphviz copy and paste your text to view graph
         /// 
         /// </summary>
-        /// <param name="automata"></param>
-        /// <param name="graphName"></param>
+        /// <param name="automata">Automata to generate graph for</param>
+        /// <param name="graphName">Graph name as specified in notation</param>
         /// <returns></returns>
         public static string AsDotNotation<TState>(this FiniteAutomata<TState> automata, string graphName = "automata") where TState : FiniteAutomata<TState>.BaseState
         {
@@ -34,7 +34,7 @@ namespace Piglet.Lexer.Construction.DotNotation
 
             foreach (var state in automata.States.Where(f=>f.AcceptState))
             {
-                sb.Append(string.Format("{0} [shape=\"doublecircle\"]\n", state.StateNumber));
+                sb.Append(string.Format("\t{0} [shape=\"doublecircle\"]\n", state.StateNumber));
             }
             
             foreach (var transition in automata.Transitions)

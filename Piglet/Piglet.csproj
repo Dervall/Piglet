@@ -50,6 +50,7 @@
     <Compile Include="Lexer\Construction\PostFixConverter.cs" />
     <Compile Include="Lexer\Construction\Transition.cs" />
     <Compile Include="Lexer\ILexer.cs" />
+    <Compile Include="Lexer\ILexerState.cs" />
     <Compile Include="Lexer\Lexer.cs" />
     <Compile Include="Lexer\LexerException.cs" />
     <Compile Include="Lexer\LexerFactory.cs" />

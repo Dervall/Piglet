@@ -11,6 +11,11 @@ namespace Piglet.Lexer
     public interface ILexer<T>
     {
         /// <summary>
+        /// Get the current state of the lexer. This is primarily for error reporting purposes
+        /// </summary>
+        ILexerState LexerState { get; }
+
+        /// <summary>
         /// Gets the next token from the input stream.
         /// </summary>
         /// <returns>A tuple where firstitem is token number, and second item is the tokens semantic value. If the 

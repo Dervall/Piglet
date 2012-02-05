@@ -23,6 +23,27 @@ namespace Piglet.Lexer
             this.endOfInputTokenNumber = endOfInputTokenNumber;
         }
 
+        public ILexerState LexerState
+        {
+            get { return new LexerStateImpl(lineNumber, currentLine.ToString()); }
+        }
+
+        private class LexerStateImpl : ILexerState
+        {
+            private readonly int lineNumber;
+            private readonly string currentLine;
+
+            
+            public LexerStateImpl(int lineNumber, string currentLine)
+            {
+                this.lineNumber = lineNumber;
+                this.currentLine = currentLine;
+            }
+
+            public int CurrentLineNumber { get { return lineNumber; } }
+            public string CurrentLine { get { return currentLine; } }
+        }
+
         public Tuple<int, T> Next()
         {
             // Reset state

@@ -1,4 +1,5 @@
 using System;
+using Piglet.Lexer;
 
 namespace Piglet.Parser
 {
@@ -8,6 +9,11 @@ namespace Piglet.Parser
     /// </summary>
     public class ParseException : Exception
     {
+        /// <summary>
+        /// Current state of the lexer
+        /// </summary>
+        public ILexerState LexerState { get; internal set; }
+
         /// <summary>
         /// Construct a new Parseexception
         /// </summary>

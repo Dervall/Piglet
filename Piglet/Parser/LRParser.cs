@@ -42,7 +42,7 @@ namespace Piglet.Parser
                 int action = parseTable.Action[state, input.Item1];
                 if (action >= 0)
                 {
-                    if (action == int.MaxValue)
+                    if (action == short.MaxValue)
                     {
                         // Accept!
                         return valueStack.Pop();
@@ -60,7 +60,7 @@ namespace Piglet.Parser
                 }
                 else
                 {
-                    if (action == int.MinValue)
+                    if (action == short.MinValue)
                     {
                         throw new ParseException(string.Format("Illegal token {0}", input.Item1)) { LexerState = Lexer.LexerState };
                     }

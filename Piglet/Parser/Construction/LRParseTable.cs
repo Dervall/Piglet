@@ -1,15 +1,18 @@
 using System.Collections.Generic;
+using Piglet.Common;
 
 namespace Piglet.Parser.Construction
 {
     internal class LRParseTable<T> : IParseTable<T>
     {
-        private readonly ITable2D actionTable;
+        public ITable2D Action { get; internal set; }
+        public ITable2D Goto { get { return gotoTable; } }
+        public ReductionRule<T>[] ReductionRules { get; set; }
+
         private readonly ITable2D gotoTable;
 
         public LRParseTable()
         {
-            actionTable = new SparseDictionaryTable();
             gotoTable = new SparseDictionaryTable();
         }
 
@@ -78,34 +81,24 @@ namespace Piglet.Parser.Construction
             }
         }
 
-        public ITable2D Action
-        {
-            get { return actionTable; }
-        }
+        
 
-        public ITable2D Goto
-        {
-            get { return gotoTable; }
-        }
-
-        public ReductionRule<T>[] ReductionRules { get; set; }
-
-        public static int Shift(int stateToChangeTo)
+        public static short Shift(int stateToChangeTo)
         {
             // Shift is positive integers
-            return stateToChangeTo;
+            return (short) stateToChangeTo;
         }
         
-        public static int Reduce(int reductionRule)
+        public static short Reduce(int reductionRule)
         {
             // Reduce is negative integers
             // with -1 to not conflict with a possible shift to state 0
-            return -(reductionRule + 1);
+            return (short)-(reductionRule + 1);
         }
 
-        public static int Accept()
+        public static short Accept()
         {
-            return int.MaxValue; // Max means accept
+            return short.MaxValue; // Max means accept
         }
     }
 }

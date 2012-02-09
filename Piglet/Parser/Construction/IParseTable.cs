@@ -1,3 +1,5 @@
+using Piglet.Common;
+
 namespace Piglet.Parser.Construction
 {
     internal interface IParseTable<T>

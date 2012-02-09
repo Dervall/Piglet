@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CompressedTable.cs" />
     <Compile Include="Lexer\Configuration\ILexerConfigurator.cs" />
     <Compile Include="Lexer\Configuration\LexerConfigurator.cs" />
     <Compile Include="Lexer\Construction\DFA.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="Parser\Construction\Lr1Item.cs" />
     <Compile Include="Parser\Construction\Lr1ItemSet.cs" />
     <Compile Include="Parser\ParserFactory.cs" />
-    <Compile Include="Parser\Construction\ITable2D.cs" />
+    <Compile Include="Common\ITable2D.cs" />
     <Compile Include="Parser\Construction\ParserBuilder.cs" />
     <Compile Include="Parser\Configuration\Symbol.cs" />
     <Compile Include="Parser\Configuration\Terminal.cs" />

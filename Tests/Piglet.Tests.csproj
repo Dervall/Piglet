@@ -48,6 +48,7 @@
     <Compile Include="Parser\Configuration\TestNonTerminal.cs" />
     <Compile Include="Parser\Configuration\TestTerminal.cs" />
     <Compile Include="Parser\Construction\Debug\TestDebugStrings.cs" />
+    <Compile Include="Common\TestParseTables.cs" />
     <Compile Include="Parser\ParserConfigurationTest.cs" />
     <Compile Include="Parser\ParsingErrorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

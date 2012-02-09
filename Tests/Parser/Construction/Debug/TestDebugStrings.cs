@@ -34,7 +34,7 @@ namespace Piglet.Tests.Parser.Construction.Debug
                 grammar = (IGrammar<int>) configurator;
             });
            
-            string debugString = parser.Table.ToDebugString(grammar);
+            string debugString = parser.Table.ToDebugString(grammar, 3);
             Assert.IsNotNull(debugString);
         }
 

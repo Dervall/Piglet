@@ -30,6 +30,7 @@ namespace Piglet.Parser.Construction
                 // Select the most common NewState for this token
                 int g1 = g;
                 defaultGotos[g] = (short)gotos.Where(f => f.Token == g1).GroupBy(f => f.NewState).OrderBy(f => f.Count()).Select(f => f.Key).FirstOrDefault( f => true);
+                defaultGotos[g] = short.MinValue;
             }
 
             // Iterate through the states, and find out where the default GOTOs are not applicable
@@ -102,7 +103,14 @@ namespace Piglet.Parser.Construction
 
         public int this[int state, int input]
         {
-            get { return gotoOffsets[stateDictionary[state] + input]; }
+            get
+            {
+                // This check is really unneccessary since the parser will never access outside of the legal state list
+                // but for now the debug printer will. So that is why we check for the state bounds
+                if (state >= stateDictionary.Length)
+                    return short.MinValue; // Nothing to see here.
+                return gotoOffsets[stateDictionary[state] + input];
+            }
         }
     }
 }

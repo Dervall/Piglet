@@ -8,7 +8,7 @@ namespace Piglet.Parser.Construction.Debug
     {
         internal static string ToDebugString<T>(this IParseTable<T> table, IGrammar<T> grammar, int numStates)
         {
-            int numTokens = grammar.AllSymbols.Count();
+            int numTokens = grammar.AllSymbols.Count() - 1;
             int numTerminals = grammar.AllSymbols.OfType<Terminal<T>>().Count();
 
             var formatString = new StringBuilder("{0,8}|");
@@ -43,7 +43,7 @@ namespace Piglet.Parser.Construction.Debug
                     }
 
                     return "s" + actionValue;
-                }).Concat(grammar.AllSymbols.OfType<NonTerminal<T>>().Select(f => table.Goto[i, f.TokenNumber] ==
+                }).Concat(grammar.AllSymbols.OfType<NonTerminal<T>>().Where(f => f.ProductionRules.All(p => p.ResultSymbol != grammar.AcceptSymbol)).Select(f => table.Goto[i, f.TokenNumber - numTerminals] ==
                                                                                       short.MinValue
                                                                                           ? ""
                                                                                           : table.Goto[i, f.TokenNumber - numTerminals].ToString()))).ToArray<object>();

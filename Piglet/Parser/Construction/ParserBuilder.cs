@@ -295,7 +295,7 @@ namespace Piglet.Parser.Construction
             table.Goto = new GotoTable(gotos);
 
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
-//            string debugTable = table.ToDebugString(grammar, itemSets.Count);
+            string debugTable = table.ToDebugString(grammar, itemSets.Count);
 
             return table;
         }

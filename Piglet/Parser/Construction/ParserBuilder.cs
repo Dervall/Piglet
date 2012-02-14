@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Piglet.Parser.Configuration;
+using Piglet.Parser.Construction.Debug;
 
 namespace Piglet.Parser.Construction
 {
@@ -272,7 +273,7 @@ namespace Piglet.Parser.Construction
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
 
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
-          //  string debugTable = table.ToDebugString(grammar);
+            string debugTable = table.ToDebugString(grammar);
 
             return table;
         }

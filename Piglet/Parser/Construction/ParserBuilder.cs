@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Piglet.Common;
 using Piglet.Parser.Configuration;
 using Piglet.Parser.Construction.Debug;
 
@@ -141,7 +142,7 @@ namespace Piglet.Parser.Construction
                         // Iterate over symbols. If we find a terminal it is never nullable
                         // if we find a nonterminal continue iterating only if this terminal itself is not nullable.
                         // By this rule, empty production rules will always return nullable true
-                        bool symbolIsNullable = production.Symbols.All(symbol => !(symbol is Terminal<T>) && nullable.Contains((NonTerminal<T>) symbol));
+                        bool symbolIsNullable = production.Symbols.All(symbol => !(symbol is Terminal<T>) && nullable.Contains((NonTerminal<T>)symbol));
 
                         if (symbolIsNullable)
                         {
@@ -162,6 +163,17 @@ namespace Piglet.Parser.Construction
             // the second part at least, the other is for indexing them while making the table.
             var reductionRules = new List<Tuple<IProductionRule<T>, ReductionRule<T>>>();
 
+            // Create a temporary uncompressed action table. This is what we will use to create
+            // the compressed action table later on. This could probably be improved upon to save
+            // memory if needed.
+            var uncompressedActionTable = new short[itemSets.Count, grammar.AllSymbols.OfType<Terminal<T>>().Count()];
+            for (int i = 0; i < itemSets.Count(); ++i)
+                for (int j = 0; j < grammar.AllSymbols.OfType<Terminal<T>>().Count(); ++j)
+                    uncompressedActionTable[i, j] = short.MinValue;
+
+            int firstNonTerminalTokenNumber = grammar.AllSymbols.OfType<NonTerminal<T>>().First().TokenNumber;
+            var gotos = new List<GotoTable.GotoTableValue>();
+
             for (int i = 0; i < itemSets.Count(); ++i)
             {
                 var itemSet = itemSets[i];
@@ -180,9 +192,10 @@ namespace Piglet.Parser.Construction
                             var transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr1Item.SymbolRightOfDot);
                             int transitionIndex = itemSets.IndexOf(transition.To);
                             int tokenNumber = ((Terminal<T>)lr1Item.SymbolRightOfDot).TokenNumber;
+
                             try
                             {
-                                table.Action[i, tokenNumber] = LRParseTable<T>.Shift(transitionIndex);
+                                SetActionTable(uncompressedActionTable, i, tokenNumber, LRParseTable<T>.Shift(transitionIndex));
                             }
                             catch (ShiftReduceConflictException<T> e)
                             {
@@ -222,7 +235,7 @@ namespace Piglet.Parser.Construction
                                     {
                                         NumTokensToPop = lr1Item.ProductionRule.Symbols.Count(),
                                         OnReduce = lr1Item.ProductionRule.ReduceAction,
-                                        TokenToPush = ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber
+                                        TokenToPush = ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber - firstNonTerminalTokenNumber
                                     }));
                             }
 
@@ -230,7 +243,7 @@ namespace Piglet.Parser.Construction
                             {
                                 try
                                 {
-                                    table.Action[i, lookahead.TokenNumber] = LRParseTable<T>.Reduce(reductionRule);
+                                    SetActionTable(uncompressedActionTable, i, lookahead.TokenNumber, LRParseTable<T>.Reduce(reductionRule));
                                 }
                                 catch (ReduceReduceConflictException<T> e)
                                 {
@@ -244,7 +257,7 @@ namespace Piglet.Parser.Construction
                                     // We know we're the cause of the reduce part
                                     e.ReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
                                     // The old value is the shift
-                                    e.ShiftSymbol = e.PreviousValue == int.MaxValue
+                                    e.ShiftSymbol = e.PreviousValue == short.MaxValue
                                         ? grammar.AcceptSymbol // Conflicting with the accept symbol
                                         : grammar.AllSymbols.FirstOrDefault(f => ((Symbol<T>)f).TokenNumber == e.PreviousValue);
                                     throw;
@@ -255,7 +268,7 @@ namespace Piglet.Parser.Construction
                         {
                             // This production rule has the start symbol with the dot at the rightmost end in it, add ACCEPT to action
                             // for end of input character.
-                            table.Action[i, grammar.EndOfInputTerminal.TokenNumber] = LRParseTable<T>.Accept();
+                            SetActionTable(uncompressedActionTable, i, grammar.EndOfInputTerminal.TokenNumber, LRParseTable<T>.Accept());
                         }
                     }
                 }
@@ -264,18 +277,56 @@ namespace Piglet.Parser.Construction
                 // produced by the GOTO operation from this state
                 foreach (var gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet && f.OnSymbol is NonTerminal<T>))
                 {
-                    table.Goto[i, ((Symbol<T>)gotoTransition.OnSymbol).TokenNumber] = itemSets.IndexOf(gotoTransition.To);
+                    gotos.Add(new GotoTable.GotoTableValue
+                                  {
+                                      NewState = itemSets.IndexOf(gotoTransition.To),
+                                      State = i,
+                                      Token =
+                                          ((Symbol<T>) gotoTransition.OnSymbol).TokenNumber -
+                                          firstNonTerminalTokenNumber
+                                  });
                 }
             }
 
             // Move the reduction rules to the table. No need for the impromptu dictionary
             // anymore.
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
+            table.Action = new CompressedTable(uncompressedActionTable);
+            table.Goto = new GotoTable(gotos);
 
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
-            string debugTable = table.ToDebugString(grammar);
+            string debugTable = table.ToDebugString(grammar, itemSets.Count);
 
             return table;
+        }
+
+        private void SetActionTable(short[,] table, int state, int tokenNumber, short value)
+        {
+            // This is an error condition, find out what sort of exception it is
+            int oldValue = table[state, tokenNumber];
+            if (oldValue != value && oldValue != short.MinValue)
+            {
+                try
+                {
+                    if (oldValue < 0 && value < 0)
+                    {
+                        // Both values are reduce. Throw a reduce reduce conflict
+                        throw new ReduceReduceConflictException<T>("Grammar contains a reduce reduce conflict");
+                    }
+                    throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict");
+                }
+                catch (AmbiguousGrammarException ex)
+                {
+                    // Fill in more information on the error and rethrow the error
+                    ex.StateNumber = state;
+                    ex.TokenNumber = tokenNumber;
+                    ex.PreviousValue = oldValue;
+                    ex.NewValue = value;
+                    throw;
+                }
+            }
+
+            table[state, tokenNumber] = value;
         }
 
         private TerminalSet<T> CalculateFirst(ISet<NonTerminal<T>> nullable)

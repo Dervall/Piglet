@@ -1,18 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Piglet.Common;
 using Piglet.Lexer.Construction;
 
 namespace Piglet.Lexer
 {
     internal class TransitionTable<T>
     {
-        private readonly IDictionary<Tuple<int, int>, int> table;
+        private readonly ITable2D table;
         private readonly Tuple<int, Func<string, T>>[] actions;
 
         public TransitionTable(DFA dfa, IList<NFA> nfas, IList<Tuple<string, Func<string, T>>> tokens)
         {
-            table = new Dictionary<Tuple<int, int>, int>();
+            var uncompressed = new short[dfa.States.Count(),256];
+
+            // Fill table with -1
+            for (int i = 0; i < dfa.States.Count(); ++i )
+            {
+                for (int j = 0; j < 256; ++j)
+                {
+                    uncompressed[i, j] = -1;
+                }
+            }
+
             actions = new Tuple<int, Func<string, T>>[dfa.States.Count];
 
             foreach (var state in dfa.States)
@@ -24,7 +35,7 @@ namespace Piglet.Lexer
                     // Set the table entry
                     foreach (var input in transition.ValidInput)
                     {
-                        table[new Tuple<int, int>(state.StateNumber, input)] = (short)transition.To.StateNumber;
+                        uncompressed[state.StateNumber, input] = (short)transition.To.StateNumber;
                     }
                 }
 
@@ -57,16 +68,15 @@ namespace Piglet.Lexer
                     }
                 }
             }
+
+            table = new CompressedTable(uncompressed);
         }
 
         public int this[int state, char c]
         {
             get
             {
-                int v;
-                if (table.TryGetValue(new Tuple<int, int>(state, c), out v))
-                    return v;
-                return -1;
+                return table[state, c];
             }
         }
 

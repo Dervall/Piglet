@@ -6,9 +6,9 @@ namespace Piglet.Parser.Construction.Debug
 {
     internal static class ParseTableToString
     {
-        internal static string ToDebugString<T>(this IParseTable<T> table, IGrammar<T> grammar)
+        internal static string ToDebugString<T>(this IParseTable<T> table, IGrammar<T> grammar, int numStates)
         {
-            int numTokens = grammar.AllSymbols.Count();
+            int numTokens = grammar.AllSymbols.Count() - 1;
             int numTerminals = grammar.AllSymbols.OfType<Terminal<T>>().Count();
 
             var formatString = new StringBuilder("{0,8}|");
@@ -22,17 +22,17 @@ namespace Piglet.Parser.Construction.Debug
             string format = formatString.ToString();
             var sb = new StringBuilder();
             sb.Append(string.Format(format, new[] { "STATE" }.Concat(grammar.AllSymbols.Select(f => f.DebugName)).ToArray<object>()));
-            for (int i = 0;; ++i)
+            for (int i = 0; i<numStates; ++i)
             {
                 object[] formatParams = new[] { i.ToString() }.Concat(grammar.AllSymbols.OfType<Terminal<T>>().Select(f =>
                 {
                     var actionValue = table.Action[i, f.TokenNumber];
-                    if (actionValue == int.MaxValue)
+                    if (actionValue == short.MaxValue)
                     {
                         return "acc";
                     }
 
-                    if (actionValue == int.MinValue)
+                    if (actionValue == short.MinValue)
                     {
                         return "";
                     }
@@ -43,10 +43,10 @@ namespace Piglet.Parser.Construction.Debug
                     }
 
                     return "s" + actionValue;
-                }).Concat(grammar.AllSymbols.OfType<NonTerminal<T>>().Select(f => table.Goto[i, f.TokenNumber] ==
-                                                                                      int.MinValue
+                }).Concat(grammar.AllSymbols.OfType<NonTerminal<T>>().Where(f => f.ProductionRules.All(p => p.ResultSymbol != grammar.AcceptSymbol)).Select(f => table.Goto[i, f.TokenNumber - numTerminals] ==
+                                                                                      short.MinValue
                                                                                           ? ""
-                                                                                          : table.Goto[i, f.TokenNumber].ToString()))).ToArray<object>();
+                                                                                          : table.Goto[i, f.TokenNumber - numTerminals].ToString()))).ToArray<object>();
                 
                 // If formatparams is all empty, we have run out of table to process.
                 // This is perhaps not the best way to determine if the table has ended but the grammar

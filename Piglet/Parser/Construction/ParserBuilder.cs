@@ -171,6 +171,9 @@ namespace Piglet.Parser.Construction
                 for (int j = 0; j < grammar.AllSymbols.OfType<Terminal<T>>().Count(); ++j)
                     uncompressedActionTable[i, j] = short.MinValue;
 
+            int firstNonTerminalTokenNumber = grammar.AllSymbols.OfType<NonTerminal<T>>().First().TokenNumber;
+            var gotos = new List<GotoTable.GotoTableValue>();
+
             for (int i = 0; i < itemSets.Count(); ++i)
             {
                 var itemSet = itemSets[i];
@@ -232,7 +235,7 @@ namespace Piglet.Parser.Construction
                                     {
                                         NumTokensToPop = lr1Item.ProductionRule.Symbols.Count(),
                                         OnReduce = lr1Item.ProductionRule.ReduceAction,
-                                        TokenToPush = ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber
+                                        TokenToPush = ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber - firstNonTerminalTokenNumber
                                     }));
                             }
 
@@ -254,7 +257,7 @@ namespace Piglet.Parser.Construction
                                     // We know we're the cause of the reduce part
                                     e.ReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
                                     // The old value is the shift
-                                    e.ShiftSymbol = e.PreviousValue == int.MaxValue
+                                    e.ShiftSymbol = e.PreviousValue == short.MaxValue
                                         ? grammar.AcceptSymbol // Conflicting with the accept symbol
                                         : grammar.AllSymbols.FirstOrDefault(f => ((Symbol<T>)f).TokenNumber == e.PreviousValue);
                                     throw;
@@ -274,7 +277,14 @@ namespace Piglet.Parser.Construction
                 // produced by the GOTO operation from this state
                 foreach (var gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet && f.OnSymbol is NonTerminal<T>))
                 {
-                    table.Goto[i, ((Symbol<T>)gotoTransition.OnSymbol).TokenNumber] = itemSets.IndexOf(gotoTransition.To);
+                    gotos.Add(new GotoTable.GotoTableValue
+                                  {
+                                      NewState = itemSets.IndexOf(gotoTransition.To),
+                                      State = i,
+                                      Token =
+                                          ((Symbol<T>) gotoTransition.OnSymbol).TokenNumber -
+                                          firstNonTerminalTokenNumber
+                                  });
                 }
             }
 
@@ -282,9 +292,10 @@ namespace Piglet.Parser.Construction
             // anymore.
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
             table.Action = new CompressedTable(uncompressedActionTable);
+            table.Goto = new GotoTable(gotos);
 
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
-            string debugTable = table.ToDebugString(grammar, itemSets.Count);
+//            string debugTable = table.ToDebugString(grammar, itemSets.Count);
 
             return table;
         }

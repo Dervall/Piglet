@@ -46,7 +46,7 @@ namespace Piglet.Parser.Construction.Debug
                 }).Concat(grammar.AllSymbols.OfType<NonTerminal<T>>().Select(f => table.Goto[i, f.TokenNumber] ==
                                                                                       short.MinValue
                                                                                           ? ""
-                                                                                          : table.Goto[i, f.TokenNumber].ToString()))).ToArray<object>();
+                                                                                          : table.Goto[i, f.TokenNumber - numTerminals].ToString()))).ToArray<object>();
                 
                 // If formatparams is all empty, we have run out of table to process.
                 // This is perhaps not the best way to determine if the table has ended but the grammar

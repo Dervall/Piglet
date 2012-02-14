@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\CompressedTable.cs" />
+    <Compile Include="Common\SublistSearch.cs" />
     <Compile Include="Lexer\Configuration\ILexerConfigurator.cs" />
     <Compile Include="Lexer\Configuration\LexerConfigurator.cs" />
     <Compile Include="Lexer\Construction\DFA.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Parser\Configuration\INonTerminal.cs" />
     <Compile Include="Parser\Construction\AmbiguousGrammarException.cs" />
     <Compile Include="Parser\Construction\Debug\ParseTableToString.cs" />
+    <Compile Include="Parser\Construction\GotoTable.cs" />
     <Compile Include="Parser\Construction\IGrammar.cs" />
     <Compile Include="Parser\Configuration\IParserConfigurator.cs" />
     <Compile Include="Parser\Configuration\IProductionConfigurator.cs" />

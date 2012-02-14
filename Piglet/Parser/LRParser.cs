@@ -91,8 +91,6 @@ namespace Piglet.Parser
             }
         }
 
-        
-
         public T Parse(string input)
         {
             Lexer.SetSource(input);

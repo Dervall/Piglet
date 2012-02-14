@@ -11,7 +11,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
         public void TestDotForNFA()
         {
             // Make sure it does not crash and does not return null.
-            var nfa = NFA.Create(PostFixConverter.ToPostFix("((hej)|(tjo))+hopp"));
+            var nfa = NFA.Create(PostFixConverter.ToPostFix("(a|b)+bcd"));
             string dotString = nfa.AsDotNotation();
             Assert.IsNotNull(dotString);
         }
@@ -20,7 +20,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
         public void TestDotForDFA()
         {
             // Make sure it does not crash and does not return null.
-            var dfa = DFA.Create(NFA.Create(PostFixConverter.ToPostFix("((hej)|(tjo))+hopp")));
+            var dfa = DFA.Create(NFA.Create(PostFixConverter.ToPostFix("(a|b)+bcd")));
             string dotString = dfa.AsDotNotation();
             Assert.IsNotNull(dotString);
         }

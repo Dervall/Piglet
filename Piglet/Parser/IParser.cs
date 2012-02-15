@@ -28,6 +28,6 @@ namespace Piglet.Parser
         /// </summary>
         /// <param name="input">Input stream to parse</param>
         /// <returns>The resulting semantic value symbol</returns>
-        T Parse(StringReader input);
+        T Parse(TextReader input);
     }
 }

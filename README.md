@@ -22,16 +22,39 @@ Lexer
 A lexer is a tool for identifying tokens in a much more flexible way than parsing it yourself. An example:
 
 ```csharp
-void StringIntoNumbersAndWords(string source)
+// Create a lexer returning type object
+var lexer = LexerFactory<object>.Configure(configurator =>
+                                    {
+                                        // Returns an integer for each number it finds
+                                        configurator.Token(@"\d+", f => int.Parse(f));
+
+                                        // Returns a string for each string found
+                                        configurator.Token(@"[a-zA-Z]+", f => f);
+
+                                        // Ignores all white space
+                                        configurator.Ignore(@"\s+");
+                                    });
+
+// Run the lexer
+string input = "10 piglets 5 boars 1 big sow";
+lexer.SetSource(input);
+for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
 {
-    LexerFactory(...) {
-	}
-	
-	
+    if (token.Item2 is int)
+    {
+        Console.WriteLine("Lexer found an integer {0}", token.Item2);
+    }
+    else
+    {
+        Console.WriteLine("Lexer found a string {0}", token.Item2);
+    }
 }
 ```
 
-As you can see, the lexer reacts whenever a pattern is matched by executing the proper function and returning the result. The tokens defined are matched greedily (it tries to find the largest match possible) and if multiple tokens match it will match the token that is defined first.
+As you can see, the lexer reacts whenever a pattern is matched by executing the proper function and returning the result. The tokens defined are matched greedily (it tries to find the largest match possible) and if multiple tokens match it will match the token that is defined first. Another use of the lexer is to run actions to react on words. Like this:
+
+
+
 
 Parser
 ------

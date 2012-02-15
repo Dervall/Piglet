@@ -97,7 +97,7 @@ namespace Piglet.Parser
             return Parse();
         }
 
-        public T Parse(StringReader input)
+        public T Parse(TextReader input)
         {
             Lexer.SetSource(input);
             return Parse();

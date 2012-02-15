@@ -9,11 +9,12 @@ namespace Piglet.Common
     {
         public static int IndexOf<T>(this IList<T> haystack, IList<T> needle)
         {
-            // Stupid implementation
-            for (int i = 0; i < haystack.Count(); ++i)
+            // Stupid implementation. This could probably benefit from 
+            // using a string search algorithm.
+            for (int i = 0; i < haystack.Count - needle.Count; ++i)
             {
                 bool found = true;
-                for (int j = 0; j < needle.Count(); ++j)
+                for (int j = 0; j < needle.Count; ++j)
                 {
                     if (!haystack[i + j].Equals(needle[j]))
                     {
@@ -28,5 +29,7 @@ namespace Piglet.Common
 
             return -1;
         }
+
+        
     }
 }

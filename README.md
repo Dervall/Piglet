@@ -62,7 +62,7 @@ Bug tracker
 
 Please create an issue here on GitHub!
 
-https://github.com/Derval/Piglet/issues
+https://github.com/Dervall/Piglet/issues
 
 Authors
 -------

@@ -74,4 +74,4 @@ Authors
 Copyright and license
 ---------------------
 
-Piglet is licenced under the MIT license. 
+Piglet is licenced under the MIT license. Refer to LICENSE.txt for more information.

@@ -14,7 +14,7 @@ namespace Piglet.Demo
        //     WordsAndNumbers.Run();
             Movement.Run();
 
-            Console.ReadKey();
+         //   Console.ReadKey();
         }
     }
 }

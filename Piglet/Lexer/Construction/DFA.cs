@@ -9,12 +9,12 @@ namespace Piglet.Lexer.Construction
     {
         public class State : BaseState
         {
-            public IEnumerable<NFA.State> NfaStates { get; set; }
+            public IList<NFA.State> NfaStates { get; private set; }
             public bool Mark { get; set; }
 
             public State(IEnumerable<NFA.State> nfaStates)
             {
-                NfaStates = nfaStates;
+                NfaStates = nfaStates.ToList();
             }
 
             public IEnumerable<char> LegalMoves(NFA nfa)

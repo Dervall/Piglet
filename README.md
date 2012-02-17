@@ -53,17 +53,50 @@ for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
 
 As you can see, the lexer reacts whenever a pattern is matched by executing the proper function and returning the result. The tokens defined are matched greedily (it tries to find the largest match possible) and if multiple tokens match it will match the token that is defined first. Another use of the lexer is to run actions to react on words. Like this:
 
+```csharp
+int positionX = 0;
+int positionY = 0;
+
+var lexer = LexerFactory<string>.Configure(configurator =>
+{
+    configurator.Token(@"(up|north)", s =>
+    {
+        positionY--;
+        return "Moved north";
+    });
+    configurator.Token(@"(down|south)", s =>
+    {
+        positionY++;
+        return "Moved south";
+    });
+    configurator.Token(@"(right|east)", s =>
+    {
+        positionX++;
+        return "Moved east";
+    });
+    configurator.Token(@"(left|west)", s =>
+    {
+        positionX--;
+        return "Moved west";
+    });
+    configurator.Ignore(@"\s+");
+});
+
+lexer.SetSource("up down left right right north west left north up");
 
 
+for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
+{
+    Console.WriteLine("{0} Current position is {1},{2}", token.Item2, positionX, positionY);
+}
+```
 
 Parser
 ------
 
 Parsing is inheritly a more complex subject, and Piglet tries it's best to make it as accessible as possible.
 
-```csharp
 
-```
 
 More samples and documentation
 ------------------------------

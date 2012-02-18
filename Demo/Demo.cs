@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Piglet.Demo.Lexer;
+using Piglet.Demo.Parser;
 
 namespace Piglet.Demo
 {
@@ -12,9 +13,9 @@ namespace Piglet.Demo
         {
             // Simple demo runner
        //     WordsAndNumbers.Run();
-            Movement.Run();
-
-         //   Console.ReadKey();
+        //    Movement.Run();
+            JsonParser.Run();
+            //   Console.ReadKey();
         }
     }
 }

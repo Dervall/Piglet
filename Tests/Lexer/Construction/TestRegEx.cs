@@ -20,6 +20,12 @@ namespace Piglet.Tests.Lexer.Construction
         }
 
         [TestMethod]
+        public void TestMatchingQuotesWithEscapes()
+        {
+            CheckMatch("\" A quoted string with \\\" inside\"", "\"(\\.|[^\"])*\"");
+        }
+
+        [TestMethod]
         public void TestEscapedCharacters()
         {
             CheckMatch("++++", "\\++");

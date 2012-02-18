@@ -154,6 +154,8 @@ namespace Piglet.Lexer.Construction
                             case '(':
                             case ')':
                             case '\\':
+                            case '{':
+                            case '}':
                                 stack.Push(AcceptSingle(c));
                                 break;
 

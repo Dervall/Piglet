@@ -13,6 +13,8 @@ namespace Piglet.Demo.Lexer
             int positionX = 0;
             int positionY = 0;
 
+            var ticks = System.DateTime.Now.Ticks;
+
             var lexer = LexerFactory<string>.Configure(configurator =>
             {
                 configurator.Token(@"(up|north)", s =>
@@ -40,10 +42,13 @@ namespace Piglet.Demo.Lexer
 
             lexer.SetSource("up down left right right north west left north up");
 
+
             for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
             {
                 Console.WriteLine("{0} Current position is {1},{2}", token.Item2, positionX, positionY);
             }
+
+            Console.WriteLine(System.DateTime.Now.Ticks - ticks);
         }
     }
 }

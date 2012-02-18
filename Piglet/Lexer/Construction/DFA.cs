@@ -9,12 +9,17 @@ namespace Piglet.Lexer.Construction
     {
         public class State : BaseState
         {
-            public IEnumerable<NFA.State> NfaStates { get; set; }
+            public IList<NFA.State> NfaStates { get; private set; }
             public bool Mark { get; set; }
 
             public State(IEnumerable<NFA.State> nfaStates)
             {
-                NfaStates = nfaStates;
+                NfaStates = nfaStates.ToList();
+            }
+
+            public IEnumerable<char> LegalMoves(NFA nfa)
+            {
+                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From)) select e.ValidInput).SelectMany(f => f).Distinct();
             }
 
             public NFA.State[] Move(NFA nfa, char c)
@@ -56,7 +61,7 @@ namespace Piglet.Lexer.Construction
 
                 // Get the move states by stimulating this DFA state with
                 // all possible characters.
-                for (var c = (char)1; c < 255; ++c)
+                foreach (char c in t.LegalMoves(nfa))
                 {
                     NFA.State[] moveSet = t.Move(nfa, c);
                     if (moveSet.Any())

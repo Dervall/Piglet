@@ -28,12 +28,14 @@ namespace Piglet.Tests.Parser
                 expr.Productions(p =>
                 {
                     p.Production(expr, "+", term).OnReduce(s => s[0] + s[2]);
+                    p.Production(expr, "-", term).OnReduce(s => s[0] - s[2]);
                     p.Production(term).OnReduce(s => s[0]);
                 });
 
                 term.Productions(p =>
                 {
                     p.Production(term, "*", factor).OnReduce(s => s[0] * s[2]);
+                    p.Production(term, "/", factor).OnReduce(s => s[0] / s[2]);
                     p.Production(factor).OnReduce(s => s[0]);
                 });
 
@@ -44,7 +46,7 @@ namespace Piglet.Tests.Parser
                 });
             });
 
-            int result = parser.Parse(new StringReader("7+8*2"));
+            int result = parser.Parse(new StringReader("7+8*2-2+2"));
 
             Assert.AreEqual(23, result);
         }

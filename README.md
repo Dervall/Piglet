@@ -94,14 +94,47 @@ for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
 Parser
 ------
 
-Parsing is inheritly a more complex subject, and Piglet tries it's best to make it as accessible as possible.
+Parsing is inheritly a more complex subject, and Piglet tries it's best to make it as accessible as possible. The classic example is the calculator. Here it is, implemented in Piglet
 
+```csharp
+var parser = ParserFactory.Configure<int>( configurator =>
+{
+    ITerminal<int> number = configurator.Terminal("\\d+", int.Parse);
 
+    INonTerminal<int> expr = configurator.NonTerminal();
+    INonTerminal<int> term = configurator.NonTerminal();
+    INonTerminal<int> factor = configurator.NonTerminal();
+
+    expr.Productions(p =>
+    {
+        p.Production(expr, "+", term).OnReduce(s => s[0] + s[2]);
+        p.Production(expr, "-", term).OnReduce(s => s[0] - s[2]);
+        p.Production(term).OnReduce(s => s[0]);
+    });
+
+    term.Productions(p =>
+    {
+        p.Production(term, "*", factor).OnReduce(s => s[0] * s[2]);
+        p.Production(term, "/", factor).OnReduce(s => s[0] / s[2]);
+        p.Production(factor).OnReduce(s => s[0]);
+    });
+
+    factor.Productions(p =>
+    {
+        p.Production(number).OnReduce(s => s[0]);
+        p.Production("(", expr, ")").OnReduce(s => s[1]);
+    });
+});
+
+int result = parser.Parse(new StringReader("7+8*2-2+2"));
+
+Assert.AreEqual(23, result);
+```
 
 More samples and documentation
 ------------------------------
 
-Piglet is quite extensively covered by integration type tests, that provides many sample uses of both the parser and the lexer. There is also the wiki here on github which I hope will get filled out as this library matures.
+Piglet is quite extensively covered by integration type tests, that provides many sample uses of both the parser and the lexer. There is also the wiki here on github which I hope will get filled out as this library matures. There is also a Demo project that comes with the Solution, which has a few interesting sample uses of both the lexer and parser components.
 
 Releases
 --------

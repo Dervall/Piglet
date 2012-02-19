@@ -99,8 +99,7 @@ namespace Piglet.Parser.Construction
                                                  OnSymbol = symbol,
                                                  To = oldGotoSet
                                              };
-                                if (
-                                    !gotoSetTransitions.Any(
+                                if (!gotoSetTransitions.Any(
                                         a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
                                 {
                                     gotoSetTransitions.Add(nt);
@@ -294,9 +293,10 @@ namespace Piglet.Parser.Construction
             table.Action = new CompressedTable(uncompressedActionTable);
             table.Goto = new GotoTable(gotos);
 
+#if DEBUG
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
             string debugTable = table.ToDebugString(grammar, itemSets.Count);
-
+#endif
             return table;
         }
 
@@ -336,7 +336,6 @@ namespace Piglet.Parser.Construction
             // Algorithm is that if a nonterminal has a production that starts with a 
             // terminal, we add that to the first set. If it starts with a nonterminal, we add
             // that nonterminals firsts to the known firsts of our nonterminal.
-            // TODO: There is probably performance benefits to optimizing this.
             bool addedThings;
             do
             {

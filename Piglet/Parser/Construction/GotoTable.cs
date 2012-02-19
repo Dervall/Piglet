@@ -25,24 +25,9 @@ namespace Piglet.Parser.Construction
         {
             // Gather the most common gotos for each token.
             var maxToken = gotos.Max(f => f.Token) + 1;
-            var defaultGotos = new short[maxToken];
-
-            var gotoCounts = new Dictionary<Tuple<int, int>, int>();
-            foreach (var g in gotos)
-            {
-                var t = new Tuple<int, int>(g.Token, g.NewState);
-
-                if (!gotoCounts.ContainsKey(t))
-                    gotoCounts.Add(t, 0);
-                gotoCounts[t] = gotoCounts[t] + 1;
-            }
             
-            // For every token in the grammar, store the most stored count as the default goto
-            for (int t = 0; t < maxToken; ++t)
-            {
-                var mostCommonNewState = gotoCounts.Where(f => f.Key.Item1 == t).OrderBy(f => -f.Value).Select(f => f.Key.Item2);
-                defaultGotos[t] = (short)mostCommonNewState.First();
-            }
+            // Get the most common gotos and store them in the start
+            var defaultGotos = GetMostCommonGotos(gotos, maxToken);
 
             // Iterate through the states, and find out where the default GOTOs are not applicable
             // for those states, store an offset
@@ -79,6 +64,8 @@ namespace Piglet.Parser.Construction
                     if (stateGotos[i] != defaultGotos[i])
                     {
                         // Mismatch, we will need to create things in the gotoValues table
+                        // Get the lowest and the highest token number that the goto table
+                        // can be called with.
                         firstMisMatchIndex = gotosForState.Min(f => f.Token);
                         lastMisMatchIndex = gotosForState.Max(f => f.Token);
                     }
@@ -104,6 +91,28 @@ namespace Piglet.Parser.Construction
 
             // Remove the list and condense into array for fast use once parsing starts
             gotoValues = offsets.ToArray();
+        }
+
+        private static short[] GetMostCommonGotos(IEnumerable<GotoTableValue> gotos, int maxToken)
+        {
+            var defaultGotos = new short[maxToken];
+            var gotoCounts = new Dictionary<Tuple<int, int>, int>();
+            foreach (var g in gotos)
+            {
+                var t = new Tuple<int, int>(g.Token, g.NewState);
+
+                if (!gotoCounts.ContainsKey(t))
+                    gotoCounts.Add(t, 0);
+                gotoCounts[t] = gotoCounts[t] + 1;
+            }
+
+            // For every token in the grammar, store the most stored count as the default goto
+            for (int t = 0; t < maxToken; ++t)
+            {
+                var mostCommonNewState = gotoCounts.Where(f => f.Key.Item1 == t).OrderBy(f => -f.Value).Select(f => f.Key.Item2);
+                defaultGotos[t] = (short) mostCommonNewState.First();
+            }
+            return defaultGotos;
         }
 
         public int this[int state, int input]

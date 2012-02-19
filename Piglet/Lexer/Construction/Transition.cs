@@ -19,10 +19,7 @@ namespace Piglet.Lexer.Construction
             To = to;
             if (validInput != null)
             {
-                foreach (var c in validInput)
-                {
-                    ValidInput.Add(c);
-                }
+                ValidInput.UnionWith(validInput);
             }
         }
 

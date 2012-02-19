@@ -40,6 +40,7 @@ namespace Piglet.Demo.Parser
                 {
                     p.Production(elementList)
                      .OnReduce(f => f[0]);
+
                     p.Production()
                      .OnReduce(f => new List<JsonElement>());
                 });
@@ -52,6 +53,7 @@ namespace Piglet.Demo.Parser
                                        list.Add((JsonElement)f[2]);
                                        return list;
                                    });
+
                     p.Production(element)
                      .OnReduce(f => new List<JsonElement> { (JsonElement)f[0] });
                 });
@@ -61,22 +63,14 @@ namespace Piglet.Demo.Parser
 
                 value.Productions(p =>
                 {
-                    p.Production(quotedString)
-                     .OnReduce(f => f[0]);
-                    p.Production(integerValue)
-                     .OnReduce(f => f[0]);
-                    p.Production(doubleValue)
-                     .OnReduce(f => f[0]);
-                    p.Production(jsonObject)
-                     .OnReduce(f => f[0]);
-                    p.Production(array)
-                     .OnReduce(f => f[0]);
-                    p.Production("true")
-                     .OnReduce(f => true);
-                    p.Production("false")
-                     .OnReduce(f => false);
-                    p.Production("null")
-                     .OnReduce(f => null);
+                    p.Production(quotedString)  .OnReduce(f => f[0]);
+                    p.Production(integerValue)  .OnReduce(f => f[0]);
+                    p.Production(doubleValue)   .OnReduce(f => f[0]);
+                    p.Production(jsonObject)    .OnReduce(f => f[0]);
+                    p.Production(array)         .OnReduce(f => f[0]);
+                    p.Production("true")        .OnReduce(f => true);
+                    p.Production("false")       .OnReduce(f => false);
+                    p.Production("null")        .OnReduce(f => null);
                 });
 
                 array.Productions(p => p.Production("[", optionalValueList, "]")
@@ -108,7 +102,6 @@ namespace Piglet.Demo.Parser
 
 
             var jObject = (JsonObject)parser.Parse("{ \"Property1\":\"value\", \"IntegerProperty\" : 1234 }");
-            int apa = 3;
         }
     }
 }

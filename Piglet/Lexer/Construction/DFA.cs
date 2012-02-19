@@ -43,9 +43,11 @@ namespace Piglet.Lexer.Construction
 
         public static DFA Create(NFA nfa)
         {
+            var closures = nfa.GetAllClosures();
+
             // Get the closure set of S0
             var dfa = new DFA();
-            dfa.States.Add(new State(nfa.Closure(new[] { nfa.StartState })));
+            dfa.States.Add(new State(closures[nfa.StartState]));
 
             while (true)
             {
@@ -66,8 +68,14 @@ namespace Piglet.Lexer.Construction
                     NFA.State[] moveSet = t.Move(nfa, c);
                     if (moveSet.Any())
                     {
-                        // Get the closer of the move set. This is the NFA states that will form the new set
-                        IEnumerable<NFA.State> moveClosure = nfa.Closure(moveSet);
+                        // Get the closure of the move set. This is the NFA states that will form the new set
+                        ISet<NFA.State> moveClosure = new HashSet<NFA.State>();
+
+                        foreach (var moveState in moveSet)
+                        {
+                            moveClosure.UnionWith(closures[moveState]);
+                        }
+
                         var newState = new State(moveClosure);
 
                         // See if the new state already exists. If so change the reference to point to 

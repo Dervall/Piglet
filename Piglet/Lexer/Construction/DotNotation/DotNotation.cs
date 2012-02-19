@@ -70,7 +70,7 @@ namespace Piglet.Lexer.Construction.DotNotation
 
         private static string ToGraphSafeString(this char c)
         {
-            return char.IsLetterOrDigit(c) && c <= 'Z'
+            return c >= 33 && c <= 0x7e
                 ? c.ToString()
                 : string.Format("0x{0:x2}", (int) c);
         }
@@ -84,7 +84,7 @@ namespace Piglet.Lexer.Construction.DotNotation
                 if (i == input.Length || input[i] != input[i - 1] + 1)
                 {
                     char end = input[i - 1];
-                    if ((end - start) > 1)
+                    if ((end - start) > 0)
                     {
                         yield return string.Format("{0}-{1}",
                                                    start.ToGraphSafeString(),

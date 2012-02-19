@@ -231,6 +231,7 @@ namespace Piglet.Lexer.Construction
                                 {
                                     classState.ClassChars.Add(from);
                                 }
+                                state = LexerState.InsideCharacterClass;
                                 break;
                         }
                         break;

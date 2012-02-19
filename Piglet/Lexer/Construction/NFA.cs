@@ -581,6 +581,20 @@ namespace Piglet.Lexer.Construction
 
             return merged;
         }
+
+        public IDictionary<State, ISet<State>> GetAllClosures()
+        {
+            var output = new Dictionary<State, ISet<State>>();
+
+            foreach (var state in States)
+            {
+                ISet<State> set = new HashSet<State>();
+                set.UnionWith(Closure(new[] {state}));
+                output.Add(state, set);
+            }
+
+            return output;
+        }
     }
 }
 

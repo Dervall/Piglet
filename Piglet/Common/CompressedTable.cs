@@ -24,15 +24,19 @@ namespace Piglet.Common
             // For each additional state, try to match as best as possible with the existing list
             for (int state = 1; state < numStates; ++state)
             {
+                var stateActions = StateActions(state, uncompressed).ToArray();
+
                 // Need to run *past* the table in order to add wholly incompatible matches
                 // this will not index out of the table, so there is no need to worry.
-                for (short displacementIndex = 0; displacementIndex <= table.Count(); ++displacementIndex)
+                var tableCount = table.Count();
+
+                for (short displacementIndex = 0; displacementIndex <= tableCount; ++displacementIndex)
                 {
                     bool spotFound = true;
                     int offset = displacementIndex;
-                    foreach (var stateAction in StateActions(state, uncompressed))
+                    foreach (var stateAction in stateActions)
                     {
-                        if (offset >= table.Count())
+                        if (offset >= tableCount)
                         {
                             // Run out of table to check, but is still OK.
                             break;
@@ -52,7 +56,7 @@ namespace Piglet.Common
                         displacement[state] = displacementIndex;
 
                         // Add to the state table as much as is needed.
-                        table.AddRange(StateActions(state, uncompressed).Skip(offset - displacementIndex));
+                        table.AddRange(stateActions.Skip(offset - displacementIndex));
 
                         // Break loop to process next state.
                         break;

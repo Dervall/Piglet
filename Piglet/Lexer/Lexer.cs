@@ -16,6 +16,7 @@ namespace Piglet.Lexer
         // This is for error reporting purposes
         private int lineNumber = 1;
         private StringBuilder currentLine = new StringBuilder();
+        private StringBuilder lexeme = new StringBuilder();
 
         public Lexer(TransitionTable<T> transitionTable, int endOfInputTokenNumber)
         {
@@ -25,23 +26,25 @@ namespace Piglet.Lexer
 
         public ILexerState LexerState
         {
-            get { return new LexerStateImpl(lineNumber, currentLine.ToString()); }
+            get { return new LexerStateImpl(lineNumber, currentLine.ToString(), lexeme.ToString()); }
         }
 
         private class LexerStateImpl : ILexerState
         {
             private readonly int lineNumber;
             private readonly string currentLine;
+            private readonly string lastLexeme;
 
-            
-            public LexerStateImpl(int lineNumber, string currentLine)
+            public LexerStateImpl(int lineNumber, string currentLine, string lastLexeme)
             {
                 this.lineNumber = lineNumber;
                 this.currentLine = currentLine;
+                this.lastLexeme = lastLexeme;
             }
 
             public int CurrentLineNumber { get { return lineNumber; } }
             public string CurrentLine { get { return currentLine; } }
+            public string LastLexeme { get { return lastLexeme; } }
         }
 
         public Tuple<int, T> Next()
@@ -49,7 +52,7 @@ namespace Piglet.Lexer
             // Reset state
             state = 0;
 
-            var lexeme = new StringBuilder();
+            lexeme = new StringBuilder();
 
             while(true)
             {

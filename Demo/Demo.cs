@@ -16,7 +16,8 @@ namespace Piglet.Demo
             // Simple demo runner
          //   WordsAndNumbers.Run();
         //    Movement.Run();
-            JsonParser.Run();
+           // JsonParser.Run();
+            BlogFormatParser.Run();
             //   Console.ReadKey();
         }
     }

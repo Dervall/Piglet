@@ -14,5 +14,10 @@ namespace Piglet.Lexer
         /// The contents so far of the current line
         /// </summary>
         string CurrentLine { get; }
+
+        /// <summary>
+        /// Get the last lexeme found by the lexer.
+        /// </summary>
+        string LastLexeme { get; }
     }
 }

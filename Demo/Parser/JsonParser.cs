@@ -20,7 +20,7 @@ namespace Piglet.Demo.Parser
         {
             var parser = ParserFactory.Configure<object>(configurator =>
             {
-                var quotedString = configurator.Terminal("\"(\\.|[^\"])*\"",    f => f.Substring(1, f.Length - 2));
+                var quotedString = configurator.Terminal("\"(\\\\.|[^\"])*\"",    f => f.Substring(1, f.Length - 2));
                 var doubleValue = configurator.Terminal(@"\d+\.\d+",            f => double.Parse(f));
                 var integerValue = configurator.Terminal(@"\d+",                f => int.Parse(f));
 
@@ -101,7 +101,7 @@ namespace Piglet.Demo.Parser
             });
 
 
-            var jObject = (JsonObject)parser.Parse("{ \"Property1\":\"value\", \"IntegerProperty\" : 1234 }");
+            var jObject = (JsonObject)parser.Parse("{ \"Property1\":\"va\\\"lue\", \"IntegerProperty\" : 1234 }");
         }
     }
 }

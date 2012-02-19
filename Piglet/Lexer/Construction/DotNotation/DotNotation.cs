@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Piglet.Lexer.Construction.DotNotation
@@ -31,6 +32,7 @@ namespace Piglet.Lexer.Construction.DotNotation
 
             sb.Append("digraph " + graphName + " {\n");
             sb.Append("\t[node shape=\"circle\"]\n");
+            sb.Append("\tgraph [rankdir=\"LR\"]\n");
 
             foreach (var state in automata.States.Where(f=>f.AcceptState))
             {
@@ -39,10 +41,10 @@ namespace Piglet.Lexer.Construction.DotNotation
             
             foreach (var transition in automata.Transitions)
             {
-                sb.Append(string.Format("\t{0} -> {1} [label={2}]\n", 
+                sb.Append(string.Format("\t{0} -> {1} [label=\"{2}\"]\n", 
                     transition.From.StateNumber,
                     transition.To.StateNumber,
-                    transition.TransitionLabel() ));
+                    transition.TransitionLabel().Replace("\\", "\\\\").Replace("\"", "\\\"")));
             }
             sb.Append("}");
 
@@ -62,7 +64,40 @@ namespace Piglet.Lexer.Construction.DotNotation
 
             if (transition.ValidInput.Count == 1)
                 return transition.ValidInput.First().ToString();
-            return string.Join(", ", transition.ValidInput);
+
+            return string.Join(", ", ValidInputToTransitionLabel(transition.ValidInput));
+        }
+
+        private static string ToGraphSafeString(this char c)
+        {
+            return char.IsLetterOrDigit(c) && c <= 'Z'
+                ? c.ToString()
+                : string.Format("0x{0:x2}", (int) c);
+        }
+
+        private static IEnumerable<string> ValidInputToTransitionLabel(IEnumerable<char> validInput)
+        {
+            var input = validInput.OrderBy(f => f).ToArray();
+            char start = input[0];
+            for (int i = 1; i < input.Length + 1; ++i)
+            {
+                if (i == input.Length || input[i] != input[i - 1] + 1)
+                {
+                    char end = input[i - 1];
+                    if ((end - start) > 1)
+                    {
+                        yield return string.Format("{0}-{1}",
+                                                   start.ToGraphSafeString(),
+                                                   end.ToGraphSafeString());
+                    }
+                    else
+                    {
+                        yield return start.ToGraphSafeString();
+                    }
+                    if(i != input.Length) 
+                        start = input[i];
+                }
+            }
         }
     }
 }

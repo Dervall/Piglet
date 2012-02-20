@@ -22,6 +22,11 @@ namespace Piglet.Parser.Construction
             }
         }
 
+        public override string ToString()
+        {
+            return string.Join("\n", Items);
+        }
+
         public bool Add(Lr1Item<T> item)
         {
             // See if there already exists an item with the same core

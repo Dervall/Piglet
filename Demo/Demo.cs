@@ -14,9 +14,9 @@ namespace Piglet.Demo
         public static void Main(string[] args)
         {
             // Simple demo runner
-            WordsAndNumbers.Run();
+          //  WordsAndNumbers.Run();
         //    Movement.Run();
-         //   JsonParser.Run();
+            JsonParser.Run();
          //   BlogFormatParser.Run();
             //   Console.ReadKey();
         }

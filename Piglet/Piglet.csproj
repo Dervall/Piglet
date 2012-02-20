@@ -61,6 +61,7 @@
     <Compile Include="Parser\Configuration\ILexerSettings.cs" />
     <Compile Include="Parser\Configuration\INonTerminal.cs" />
     <Compile Include="Parser\Construction\AmbiguousGrammarException.cs" />
+    <Compile Include="Parser\Construction\Debug\DotNotation.cs" />
     <Compile Include="Parser\Construction\Debug\ParseTableToString.cs" />
     <Compile Include="Parser\Construction\GotoTable.cs" />
     <Compile Include="Parser\Construction\IGrammar.cs" />

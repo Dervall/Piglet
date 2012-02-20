@@ -13,10 +13,5 @@ namespace Piglet.Parser.Construction
             Lookaheads = new HashSet<Terminal<T>>();
             Lookaheads.UnionWith(lookaheads);
         }
-
-        public override string ToString()
-        {
-            return string.Format("{0}, {1}", base.ToString(), string.Join("/", Lookaheads.Select(f => f.DebugName)));
-        }
     }
 }

@@ -24,16 +24,16 @@ A lexer is a tool for identifying tokens in a much more flexible way than parsin
 ```csharp
 // Create a lexer returning type object
 var lexer = LexerFactory<object>.Configure(configurator =>
-                                    {
-                                        // Returns an integer for each number it finds
-                                        configurator.Token(@"\d+", f => int.Parse(f));
+{
+    // Returns an integer for each number it finds
+    configurator.Token(@"\d+", f => int.Parse(f));
 
-                                        // Returns a string for each string found
-                                        configurator.Token(@"[a-zA-Z]+", f => f);
+    // Returns a string for each string found
+    configurator.Token(@"[a-zA-Z]+", f => f);
 
-                                        // Ignores all white space
-                                        configurator.Ignore(@"\s+");
-                                    });
+    // Ignores all white space
+    configurator.Ignore(@"\s+");
+});
 
 // Run the lexer
 string input = "10 piglets 5 boars 1 big sow";

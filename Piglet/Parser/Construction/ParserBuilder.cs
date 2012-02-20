@@ -16,7 +16,7 @@ namespace Piglet.Parser.Construction
             this.grammar = grammar;
         }
 
-        private sealed class GotoSetTransition
+        internal sealed class GotoSetTransition
         {
             public Lr1ItemSet<T> From { get; set; }
             public Lr1ItemSet<T> To { get; set; }
@@ -293,10 +293,10 @@ namespace Piglet.Parser.Construction
             table.Action = new CompressedTable(uncompressedActionTable);
             table.Goto = new GotoTable(gotos);
 
-#if DEBUG
+       //     string gotoGraph = gotoSetTransitions.AsDotNotation(itemSets);
+
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
-            string debugTable = table.ToDebugString(grammar, itemSets.Count);
-#endif
+        //    string debugTable = table.ToDebugString(grammar, itemSets.Count);
             return table;
         }
 

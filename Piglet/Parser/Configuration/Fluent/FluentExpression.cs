@@ -1,24 +1,21 @@
-using System;
-
 namespace Piglet.Parser.Configuration.Fluent
 {
-    internal class FluentExpression<T> : IExpressionConfigurator<T>
+    internal class FluentExpression : IExpressionConfigurator
     {
-        private readonly ParserConfigurator<T> configurator;
-        private string regex;
-        private Terminal<T> terminal; 
+        private readonly ParserConfigurator<object> configurator;
+        private Terminal<object> terminal; 
 
-        public FluentExpression(ParserConfigurator<T> configurator)
+        public FluentExpression(ParserConfigurator<object> configurator)
         {
             this.configurator = configurator;
         }
 
-        public Terminal<T> Terminal
+        public Terminal<object> Terminal
         {
             get { return terminal; }
         }
 
-        public IExpressionConfigurator<T> ThatMatches<TExpressionType>()
+        public IExpressionConfigurator ThatMatches<TExpressionType>()
         {
             var type = typeof (TExpressionType);
             if (type == typeof(int))
@@ -32,9 +29,9 @@ namespace Piglet.Parser.Configuration.Fluent
             throw new ParserConfigurationException("Unknown type passed to ThatMatches.");
         }
 
-        public IExpressionConfigurator<T> ThatMatches(string regex)
+        public IExpressionConfigurator ThatMatches(string regex)
         {
-            terminal = (Terminal<T>) configurator.Terminal(regex);
+            terminal = (Terminal<object>) configurator.Terminal(regex);
             return this;
         }
     }

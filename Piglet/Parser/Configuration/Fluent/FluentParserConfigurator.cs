@@ -3,30 +3,34 @@ using System.Collections.Generic;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
-    internal class FluentParserConfigurator<T> : IFluentParserConfigurator<T>
+    internal class FluentParserConfigurator : IFluentParserConfigurator
     {
-        private readonly ParserConfigurator<T> configurator;
-        private readonly List<FluentRule<T>> rules;
+        private readonly ParserConfigurator<object> configurator;
+        private readonly List<FluentRule> rules;
+        private readonly Dictionary<Tuple<IRule, string>, NonTerminal<object>> listRules;
+        private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> optionalRules;
 
-        public FluentParserConfigurator(ParserConfigurator<T> configurator)
+        public FluentParserConfigurator(ParserConfigurator<object> configurator)
         {
             this.configurator = configurator;
-            this.rules = new List<FluentRule<T>>();
+            rules = new List<FluentRule>();
+            listRules = new Dictionary<Tuple<IRule, string>, NonTerminal<object>>();
+            optionalRules = new Dictionary<NonTerminal<object>, NonTerminal<object>>();
         }
 
-        public IRule<T> Rule()
+        public IRule Rule()
         {
-            var rule = new FluentRule<T>(this, configurator.NonTerminal());
+            var rule = new FluentRule(this, configurator.NonTerminal());
             rules.Add(rule);
             return rule;
         }
 
-        public IExpressionConfigurator<T> Expression()
+        public IExpressionConfigurator Expression()
         {
-            return new FluentExpression<T>(configurator);
+            return new FluentExpression(configurator);
         }
 
-        public IExpressionConfigurator<T> QuotedString
+        public IExpressionConfigurator QuotedString
         {
             get
             {
@@ -36,24 +40,70 @@ namespace Piglet.Parser.Configuration.Fluent
             }
         }
 
-        public IParser<T> CreateParser()
+        public IParser<object> CreateParser()
         {
             // At this point the underlying parser configurator contains a bunch of nonterminals
             // It won't contain all of the nonterminals. We are going to replace everything in every rule with the proper
             // [non]terminals. Then we are going to generate the parser.
             foreach (var rule in rules)
             {
-                rule.PrepareProductions();
+                rule.ConfigureProductions();
             }
+
 
             return configurator.CreateParser();
         }
 
-        public IExpressionConfigurator<T> TypeToRegex(Type type)
+        public NonTerminal<object> MakeListRule(IRule rule, string separator)
         {
-            var expr = Expression();
-            expr.ThatMatches<int>();
-            return expr;
+            var t = new Tuple<IRule, string>(rule, separator);
+            if (listRules.ContainsKey(t))
+                return listRules[t];
+            
+            // Create a new nonterminal
+            var listRule = (NonTerminal<object>)configurator.NonTerminal();
+            
+            listRule.Productions(p =>
+            {
+                if (separator != null)
+                {
+                    p.Production(listRule, separator, ((FluentRule)rule).NonTerminal).OnReduce(f =>
+                    {
+                        var list = (List<object>)f[0];
+                        list.Add(f[2]);
+                        return list;
+                    });                                             
+                }
+                else
+                {
+                    p.Production(listRule, ((FluentRule)rule).NonTerminal).OnReduce( f =>
+                    {
+                        var list = (List<object>)f[0];
+                        list.Add(f[1]);
+                        return list;
+                    } );                                             
+                }
+                p.Production(((FluentRule)rule).NonTerminal);
+            });
+
+            listRules.Add(t, listRule);
+            return listRule;
+        }
+
+        public NonTerminal<object> MakeOptionalRule(NonTerminal<object> nonTerminal)
+        {
+            if (optionalRules.ContainsKey(nonTerminal))
+                return optionalRules[nonTerminal];
+
+            // Makes a new rule
+            var optionalRule = (NonTerminal<object>) configurator.NonTerminal();
+            optionalRule.Productions(p =>
+                                         {
+                                             p.Production(nonTerminal).OnReduce(f => f[0]);
+                                             p.Production();
+                                         });
+            optionalRules.Add(nonTerminal, optionalRule);
+            return optionalRule;
         }
     }
 }

@@ -1,47 +1,47 @@
 namespace Piglet.Parser.Configuration.Fluent
 {
-    public interface IFluentParserConfigurator<T>
+    public interface IFluentParserConfigurator
     {
-        IRule<T> Rule();
-        IExpressionConfigurator<T> Expression();
-        IExpressionConfigurator<T> QuotedString { get; }
-        IParser<T> CreateParser();
+        IRule Rule();
+        IExpressionConfigurator Expression();
+        IExpressionConfigurator QuotedString { get; }
+        IParser<object> CreateParser();
     }
 
-    public interface IRule<T>
+    public interface IRule
     {
-        IRuleByConfigurator<T> IsMadeUp { get; } 
+        IRuleByConfigurator IsMadeUp { get; }
     }
 
-    public interface IExpressionConfigurator<T>
+    public interface IExpressionConfigurator
     {
-        IExpressionConfigurator<T> ThatMatches<TExpressionType>();
-        IExpressionConfigurator<T> ThatMatches(string regex);
+        IExpressionConfigurator ThatMatches<TExpressionType>();
+        IExpressionConfigurator ThatMatches(string regex);
     }
 
-    public interface IRuleByConfigurator<T>
+    public interface IRuleByConfigurator
     {
-        IRuleSequenceConfigurator<T> By(string literal);
-        IRuleSequenceConfigurator<T> By<TExpressionType>();
-        IRuleSequenceConfigurator<T> By(IExpressionConfigurator<T> expression);
-        IRuleSequenceConfigurator<T> By(IRule<T> rule);
-        IListRuleSequenceConfigurator<T> ByListOf(IRule<T> listElement);
+        IRuleSequenceConfigurator By(string literal);
+        IRuleSequenceConfigurator By<TExpressionType>();
+        IRuleSequenceConfigurator By(IExpressionConfigurator expression);
+        IRuleSequenceConfigurator By(IRule rule);
+        IListRuleSequenceConfigurator ByListOf(IRule listElement);
     }
 
-    public interface IRuleSequenceConfigurator<T>
+    public interface IRuleSequenceConfigurator
     {
-        IRuleByConfigurator<T> Or { get; }
-        IRuleByConfigurator<T> Followed { get; }
+        IRuleByConfigurator Or { get; }
+        IRuleByConfigurator Followed { get; }
     }
 
-    public interface IListRuleSequenceConfigurator<T> : IRuleSequenceConfigurator<T>
+    public interface IListRuleSequenceConfigurator : IRuleSequenceConfigurator
     {
-        IListItemConfigurator<T> ThatIs { get; }
+        IListItemConfigurator ThatIs { get; }
     }
 
-    public interface IListItemConfigurator<T> : IRuleSequenceConfigurator<T>
+    public interface IListItemConfigurator : IRuleSequenceConfigurator
     {
-        IListItemConfigurator<T> SeparatedBy(string separator);
-        IListItemConfigurator<T> Optional { get; }
+        IListItemConfigurator SeparatedBy(string separator);
+        IListItemConfigurator Optional { get; }
     }
 }

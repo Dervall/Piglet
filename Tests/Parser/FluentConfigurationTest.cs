@@ -21,9 +21,9 @@ namespace Piglet.Tests.Parser
         [TestMethod]
         public void TestFluentJsonParserConfiguration()
         {
-            var config = ParserFactory.Fluent<object>();
+            var config = ParserFactory.Fluent();
 
-            var name = config.Expression();
+            var name = config.Expression().ThatMatches("[a-zA-Z]+");
 
             var jsonObject = config.Rule();
             var jsonElement = config.Rule();

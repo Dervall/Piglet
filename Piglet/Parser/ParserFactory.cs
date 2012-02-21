@@ -33,11 +33,9 @@ namespace Piglet.Parser
             return parser;
         }
 
-        public static IFluentParserConfigurator<T> Fluent<T>()
+        public static IFluentParserConfigurator Fluent()
         {
-            throw new NotImplementedException();
+            return new FluentParserConfigurator(new ParserConfigurator<object>());
         }
     }
-
-    
 }

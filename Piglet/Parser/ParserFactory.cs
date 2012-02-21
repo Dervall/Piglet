@@ -1,5 +1,6 @@
 using System;
 using Piglet.Parser.Configuration;
+using Piglet.Parser.Configuration.Fluent;
 
 namespace Piglet.Parser
 {
@@ -31,5 +32,12 @@ namespace Piglet.Parser
 
             return parser;
         }
+
+        public static IFluentParserConfigurator<T> Fluent<T>()
+        {
+            throw new NotImplementedException();
+        }
     }
+
+    
 }

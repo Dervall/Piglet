@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Piglet.Lexer;
 using Piglet.Parser.Construction;
 
@@ -66,6 +65,10 @@ namespace Piglet.Parser.Configuration
         public ILexerSettings LexerSettings
         {
             get { return lexerSettings; }
+        }
+
+        public void LeftAssociative(params ITerminal<T>[] symbols)
+        {
         }
 
         public void SetStartSymbol(INonTerminal<T> start)

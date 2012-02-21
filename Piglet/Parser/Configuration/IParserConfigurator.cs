@@ -1,5 +1,4 @@
 using System;
-using Piglet.Lexer;
 
 namespace Piglet.Parser.Configuration
 {
@@ -32,5 +31,13 @@ namespace Piglet.Parser.Configuration
         /// Additional lexer settings in addition to the settings provided by the declared terminals.
         /// </summary>
         ILexerSettings LexerSettings { get; }
+
+        /// <summary>
+        /// Makes a group of tokens left associative at a given precedence level. If you require two or more tokens
+        /// to have the same precedence you must pass both at the same time to the precedence call. If you pass
+        /// the same token to a precedence function more than once you will get a ParserConfigurationException.
+        /// </summary>
+        /// <param name="symbols"></param>
+        void LeftAssociative(params ITerminal<T>[] symbols);
     }
 }

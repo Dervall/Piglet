@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Parser;
 
@@ -31,7 +29,7 @@ namespace Piglet.Tests.Parser
             var jsonArray = config.Rule();
 
             jsonObject.IsMadeUp.By("{")
-                      .Followed.ByListOf(jsonElement).As("ElementList").ThatIs.SeparatedBy(",").Optional
+                      .Followed.ByListOf<JsonElement>(jsonElement).As("ElementList").ThatIs.SeparatedBy(",").Optional
                       .Followed.By("}")
                 .WhenFound( o => new JsonObject { Elements = o.ElementList } );
 
@@ -55,8 +53,19 @@ namespace Piglet.Tests.Parser
 
             var parser = config.CreateParser();
 
-            var jObject = (JsonObject)parser.Parse("{ \"Property1\":\"va\\\"lue\", \"IntegerProperty\" : 1234, \"array\":[1,2,3,4,5] }");
-            
+            var jObject = (JsonObject)parser.Parse(
+                @"{ 
+                     ""Property1"":""va\""lue"", 
+                     ""IntegerProperty"" : 1234, 
+                     ""array"":[1,2,3,4,5],
+                     ""another_object"" : {
+                        ""another_property"":13.37
+                     },
+                     ""empty_object"" : {
+                        
+                     }
+                }");
+            Assert.AreEqual(5, jObject.Elements.Count);
         }
     }
 }

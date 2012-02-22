@@ -18,11 +18,21 @@ namespace Piglet.Parser.Configuration.Fluent
             public string Name;
         };
 
-        private class ListOfRule : ProductionElement
+        private abstract class ListOfRule : ProductionElement
         {
             public string Separator;
             public bool Optional;
+
+            public abstract NonTerminal<object> MakeListRule(FluentParserConfigurator fluentParserConfigurator);
         };
+
+        private class ListOfTypedObjectRule<TListType> : ListOfRule
+        {
+            public override NonTerminal<object> MakeListRule(FluentParserConfigurator fluentParserConfigurator)
+            {
+                return fluentParserConfigurator.MakeListRule<TListType>((IRule)Symbol, Separator);
+            }
+        }
 
         public FluentRule(FluentParserConfigurator configurator, INonTerminal<object> nonTerminal)
         {
@@ -66,7 +76,12 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public IMaybeListNamed ByListOf(IRule listElement)
         {
-            CurrentProduction.Add(new ListOfRule { Symbol = listElement });
+            return ByListOf<object>(listElement);
+        }
+
+        public IMaybeListNamed ByListOf<TListType>(IRule listElement)
+        {
+            CurrentProduction.Add(new ListOfTypedObjectRule<TListType> { Symbol = listElement });
             return this;
         }
 
@@ -155,7 +170,8 @@ namespace Piglet.Parser.Configuration.Fluent
                         {
                             // This will create new rules, we want to reduce production[i] 
                             var listRule = (ListOfRule)part;
-                            var listNonTerminal = configurator.MakeListRule((IRule)listRule.Symbol, listRule.Separator);
+                            var listNonTerminal = listRule.MakeListRule(configurator);
+                            
                             if (listRule.Optional)
                             {
                                 listNonTerminal = configurator.MakeOptionalRule(listNonTerminal);

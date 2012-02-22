@@ -61,7 +61,7 @@ namespace Piglet.Parser.Configuration.Fluent
             return parser;
         }
 
-        public NonTerminal<object> MakeListRule(IRule rule, string separator)
+        public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)
         {
             var t = new Tuple<IRule, string>(rule, separator);
             if (listRules.ContainsKey(t))
@@ -76,8 +76,8 @@ namespace Piglet.Parser.Configuration.Fluent
                 {
                     p.Production(listRule, separator, ((FluentRule)rule).NonTerminal).OnReduce(f =>
                     {
-                        var list = (List<object>)f[0];
-                        list.Add(f[2]);
+                        var list = (List<TListType>)f[0];
+                        list.Add((TListType)f[2]);
                         return list;
                     });                                             
                 }
@@ -85,15 +85,12 @@ namespace Piglet.Parser.Configuration.Fluent
                 {
                     p.Production(listRule, ((FluentRule)rule).NonTerminal).OnReduce( f =>
                     {
-                        var list = (List<object>)f[0];
-                        list.Add(f[1]);
+                        var list = (List<TListType>)f[0];
+                        list.Add((TListType)f[1]);
                         return list;
                     } );                                             
                 }
-                p.Production(((FluentRule) rule).NonTerminal).OnReduce(f =>
-                {
-                    return new List<object> { f[0] };
-                });
+                p.Production(((FluentRule) rule).NonTerminal).OnReduce(f => new List<TListType> { (TListType) f[0] });
             });
 
             listRules.Add(t, listRule);

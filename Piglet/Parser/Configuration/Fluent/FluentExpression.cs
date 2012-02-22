@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
@@ -29,7 +30,7 @@ namespace Piglet.Parser.Configuration.Fluent
             }
             if (type == typeof(double))
             {
-                func = f => double.Parse(f);
+                func = f => double.Parse(f, CultureInfo.InvariantCulture);
                 return ThatMatches(@"\d+(\.\d+)?");
             }
             if (type == typeof(bool))

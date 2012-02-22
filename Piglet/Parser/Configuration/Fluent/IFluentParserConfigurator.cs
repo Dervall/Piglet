@@ -32,6 +32,8 @@ namespace Piglet.Parser.Configuration.Fluent
         IOptionalAsConfigurator By<TExpressionType>();
         IOptionalAsConfigurator By(IExpressionConfigurator expression);
         IOptionalAsConfigurator By(IRule rule);
+
+        IMaybeListNamed ByListOf<TListType>(IRule listElement);
         IMaybeListNamed ByListOf(IRule listElement);
     }
 

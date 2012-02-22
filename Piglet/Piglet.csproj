@@ -60,6 +60,7 @@
     <Compile Include="Parser\Configuration\Fluent\FluentExpression.cs" />
     <Compile Include="Parser\Configuration\Fluent\FluentParserConfigurator.cs" />
     <Compile Include="Parser\Configuration\Fluent\FluentRule.cs" />
+    <Compile Include="Parser\Configuration\Fluent\IHideObjectMembers.cs" />
     <Compile Include="Parser\Configuration\IConfigureProductionAction.cs" />
     <Compile Include="Parser\Configuration\ILexerSettings.cs" />
     <Compile Include="Parser\Configuration\INonTerminal.cs" />

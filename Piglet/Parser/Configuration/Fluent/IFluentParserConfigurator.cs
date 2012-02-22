@@ -1,6 +1,6 @@
 namespace Piglet.Parser.Configuration.Fluent
 {
-    public interface IFluentParserConfigurator
+    public interface IFluentParserConfigurator : IHideObjectMembers
     {
         IRule Rule();
         IExpressionConfigurator Expression();
@@ -8,18 +8,18 @@ namespace Piglet.Parser.Configuration.Fluent
         IParser<object> CreateParser();
     }
 
-    public interface IRule
+    public interface IRule : IHideObjectMembers
     {
         IRuleByConfigurator IsMadeUp { get; }
     }
 
-    public interface IExpressionConfigurator
+    public interface IExpressionConfigurator : IHideObjectMembers
     {
         IExpressionConfigurator ThatMatches<TExpressionType>();
         IExpressionConfigurator ThatMatches(string regex);
     }
 
-    public interface IRuleByConfigurator
+    public interface IRuleByConfigurator : IHideObjectMembers
     {
         IRuleSequenceConfigurator By(string literal);
         IRuleSequenceConfigurator By<TExpressionType>();
@@ -28,7 +28,7 @@ namespace Piglet.Parser.Configuration.Fluent
         IListRuleSequenceConfigurator ByListOf(IRule listElement);
     }
 
-    public interface IRuleSequenceConfigurator
+    public interface IRuleSequenceConfigurator : IHideObjectMembers
     {
         IRuleByConfigurator Or { get; }
         IRuleByConfigurator Followed { get; }

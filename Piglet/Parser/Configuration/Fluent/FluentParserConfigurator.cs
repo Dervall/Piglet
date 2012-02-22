@@ -50,8 +50,14 @@ namespace Piglet.Parser.Configuration.Fluent
                 rule.ConfigureProductions();
             }
 
+            configurator.LexerSettings.CreateLexer = true;
+            configurator.LexerSettings.EscapeLiterals = true;
+            configurator.LexerSettings.Ignore = new[] {@"\s+"};
 
-            return configurator.CreateParser();
+            var parser = configurator.CreateParser();
+            parser.Lexer = configurator.CreateLexer();
+            
+            return parser;
         }
 
         public NonTerminal<object> MakeListRule(IRule rule, string separator)
@@ -83,7 +89,10 @@ namespace Piglet.Parser.Configuration.Fluent
                         return list;
                     } );                                             
                 }
-                p.Production(((FluentRule)rule).NonTerminal);
+                p.Production(((FluentRule) rule).NonTerminal).OnReduce(f =>
+                {
+                    return new List<object> { f[0] };
+                });
             });
 
             listRules.Add(t, listRule);

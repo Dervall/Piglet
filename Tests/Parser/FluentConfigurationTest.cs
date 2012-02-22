@@ -30,9 +30,9 @@ namespace Piglet.Tests.Parser
             var jsonAttributeValue = config.Rule();
             var jsonArray = config.Rule();
             
-            jsonObject.IsMadeUp.By(name).Followed.By("{").Followed.ByListOf(jsonElement).ThatIs.Optional.Followed.By("}");
+            jsonObject.IsMadeUp.By(name).Followed.By("{").Followed.ByListOf(jsonElement).ThatIs.SeparatedBy(",").Optional.Followed.By("}");
 
-            jsonElement.IsMadeUp.By("[").Followed.By(config.QuotedString).Followed.By(":").Followed.By(jsonAttributeValue);
+            jsonElement.IsMadeUp.By(config.QuotedString).Followed.By(":").Followed.By(jsonAttributeValue);
 
             jsonAttributeValue.IsMadeUp.By(config.QuotedString)
                 .Or.By<int>()
@@ -47,7 +47,7 @@ namespace Piglet.Tests.Parser
 
             var parser = config.CreateParser();
 
-            var jObject = (JsonObject)parser.Parse("{ \"Property1\":\"va\\\"lue\", \"IntegerProperty\" : 1234 }");
+            var jObject = (JsonObject)parser.Parse("myobject { \"Property1\":\"va\\\"lue\", \"IntegerProperty\" : 1234 }");
             
         }
     }

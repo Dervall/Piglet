@@ -35,7 +35,8 @@ namespace Piglet.Parser.Configuration.Fluent
             get
             {
                 var expr = Expression();
-                expr.ThatMatches("\"(\\\\.|[^\"])*\"");
+                expr.ThatMatches("\"(\\\\.|[^\"])*\"").AndReturns(f => f.Substring(1, f.Length - 2));
+                
                 return expr;
             }
         }

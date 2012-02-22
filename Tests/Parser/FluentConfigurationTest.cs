@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Parser;
 
@@ -24,44 +26,37 @@ namespace Piglet.Tests.Parser
             var config = ParserFactory.Fluent();
 
             var jsonObject = config.Rule();
-            var jsonObjectContents = config.Rule();
             var jsonElement = config.Rule();
-            var jsonAttributeValue = config.Rule();
+            var jsonValue = config.Rule();
             var jsonArray = config.Rule();
-            
-            jsonObject.IsMadeUp.By("{").Followed.ByListOf(jsonObject).ThatIs.SeparatedBy(",").Optional.Followed.By("}");
-            //   .WhenFound(f => {s,sdfbjksfdbj})
-      //          .WhenFound.Pick<List<JsonElement>>(1).Return(elementList => { return new JsonObject {Elements = elementList}; });
 
-        //    jsonObjectContents.IsMadeUp.ByListOf(jsonElement).ThatIs.SeparatedBy(",").Optional;
+            jsonObject.IsMadeUp.By("{")
+                      .Followed.ByListOf(jsonElement).As("ElementList").ThatIs.SeparatedBy(",").Optional
+                      .Followed.By("}")
+                .WhenFound( o => new JsonObject { Elements = o.ElementList } );
 
-            jsonElement.IsMadeUp.By(config.QuotedString).Followed.By(":").Followed.By(jsonAttributeValue);
-            //    .WhenFound.Pick<string,object>(0,2).Return((name, value) => { return new JsonElement {Name = name, Value = value}; );
+            jsonElement.IsMadeUp.By(config.QuotedString).As("Name")
+                       .Followed.By(":")
+                       .Followed.By(jsonValue).As("Value")
+                .WhenFound( o => new JsonElement { Name = o.Name, Value = o.Value } );
 
-            jsonAttributeValue.IsMadeUp.By(config.QuotedString)
+            jsonValue.IsMadeUp.By(config.QuotedString)
                 .Or.By<int>()
                 .Or.By<double>()
                 .Or.By(jsonObject)
                 .Or.By(jsonArray)
                 .Or.By<bool>()
-                .Or.By("null");
+                .Or.By("null").WhenFound(o => null);
 
-            jsonArray.IsMadeUp.By("[").Followed.ByListOf(jsonAttributeValue).ThatIs.SeparatedBy(",").Optional.Followed.By("]");
-            //       .WhenFound.Pick<object>(1);
+            jsonArray.IsMadeUp.By("[")
+                     .Followed.ByListOf(jsonValue).As("Values").ThatIs.SeparatedBy(",").Optional
+                     .Followed.By("]")
+                   .WhenFound(o => o.Values);
 
             var parser = config.CreateParser();
 
-            var jObject = (JsonObject)parser.Parse("{ \"Property1\":\"va\\\"lue\", \"IntegerProperty\" : 1234 }");
+            var jObject = (JsonObject)parser.Parse("{ \"Property1\":\"va\\\"lue\", \"IntegerProperty\" : 1234, \"array\":[1,2,3,4,5] }");
             
-        }
-
-        public object X(dynamic z)
-        {
-            var u = z.kalle;
-
-            var y = z.Value;
-
-            return new object();
         }
     }
 }

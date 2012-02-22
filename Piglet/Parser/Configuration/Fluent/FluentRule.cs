@@ -1,16 +1,25 @@
+using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
-    internal class FluentRule : IRuleByConfigurator, IRule, IListRuleSequenceConfigurator, IListItemConfigurator
+    internal class FluentRule : IRuleByConfigurator, IRule, IListItemConfigurator, IOptionalAsConfigurator, IMaybeListNamed
     {
         private readonly FluentParserConfigurator configurator;
         private readonly NonTerminal<object> nonTerminal;
-        private readonly List<List<object>> productionList;
+        private readonly List<List<ProductionElement>> productionList;
+        private readonly List<Func<dynamic, object>> funcList; 
 
-        private class ListOfRule
+        private class ProductionElement
         {
-            public IRule Rule;
+            public object Symbol;
+            public string Name;
+        };
+
+        private class ListOfRule : ProductionElement
+        {
             public string Separator;
             public bool Optional;
         };
@@ -19,10 +28,11 @@ namespace Piglet.Parser.Configuration.Fluent
         {
             this.configurator = configurator;
             this.nonTerminal = (NonTerminal<object>)nonTerminal;
-            productionList = new List<List<object>> { new List<object>() };
+            productionList = new List<List<ProductionElement>> { new List<ProductionElement>() };
+            funcList = new List<Func<dynamic, object>> { null };
         }
 
-        private List<object> CurrentProduction
+        private List<ProductionElement> CurrentProduction
         {
             get
             {
@@ -30,33 +40,33 @@ namespace Piglet.Parser.Configuration.Fluent
             }
         }
 
-        public IRuleSequenceConfigurator By(string literal)
+        public IOptionalAsConfigurator By(string literal)
         {
-            CurrentProduction.Add(literal);
+            CurrentProduction.Add(new ProductionElement { Symbol = literal } );
             return this;
         }
 
-        public IRuleSequenceConfigurator By<TExpressionType>()
+        public IOptionalAsConfigurator By<TExpressionType>()
         {
-            CurrentProduction.Add(configurator.Expression().ThatMatches<TExpressionType>());
+            CurrentProduction.Add(new ProductionElement { Symbol = configurator.Expression().ThatMatches<TExpressionType>() });
             return this;
         }
 
-        public IRuleSequenceConfigurator By(IExpressionConfigurator expression)
+        public IOptionalAsConfigurator By(IExpressionConfigurator expression)
         {
-            CurrentProduction.Add(expression);
+            CurrentProduction.Add(new ProductionElement { Symbol = expression } );
             return this;
         }
 
-        public IRuleSequenceConfigurator By(IRule rule)
+        public IOptionalAsConfigurator By(IRule rule)
         {
-            CurrentProduction.Add(rule);
+            CurrentProduction.Add(new ProductionElement { Symbol = rule } );
             return this;
         }
 
-        public IListRuleSequenceConfigurator ByListOf(IRule listElement)
+        public IMaybeListNamed ByListOf(IRule listElement)
         {
-            CurrentProduction.Add(new ListOfRule { Rule = listElement });
+            CurrentProduction.Add(new ListOfRule { Symbol = listElement });
             return this;
         }
 
@@ -65,7 +75,8 @@ namespace Piglet.Parser.Configuration.Fluent
             get
             {
                 // Finish the current rule
-                productionList.Add(new List<object>());
+                productionList.Add(new List<ProductionElement>());
+                funcList.Add(null);
                 return this;
             }
         }
@@ -73,6 +84,18 @@ namespace Piglet.Parser.Configuration.Fluent
         public IRuleByConfigurator Followed
         {
             get { return this; }
+        }
+
+        public IRuleByConfigurator WhenFound(Func<dynamic, object> func)
+        {
+            funcList[funcList.Count - 1] = func;
+            return this;
+        }
+
+        public IRuleSequenceConfigurator As(string name)
+        {
+            CurrentProduction[CurrentProduction.Count - 1].Name = name;
+            return this;
         }
 
         public IRuleByConfigurator IsMadeUp
@@ -83,6 +106,12 @@ namespace Piglet.Parser.Configuration.Fluent
         public IListItemConfigurator ThatIs
         {
             get { return this; }
+        }
+
+        IListRuleSequenceConfigurator IMaybeListNamed.As(string name)
+        {
+            CurrentProduction[CurrentProduction.Count - 1].Name = name;
+            return this;
         }
 
         public IListItemConfigurator SeparatedBy(string separator)
@@ -115,34 +144,36 @@ namespace Piglet.Parser.Configuration.Fluent
             // Use the nonterminal to configure the production
             nonTerminal.Productions(p =>
             {
-                foreach (var production in productionList)
+                for (var productionIndex = 0; productionIndex < productionList.Count; ++productionIndex)
                 {
+                    var production = productionList[productionIndex];
+
                     for (int i = 0; i < production.Count; ++i)
                     {
                         var part = production[i];
-                        if (part is string)
-                        {
-                            // Pre-escaped literal
-                            // Do nothing, this is already handled.
-                        }
-                        else if (part is FluentRule)
-                        {
-                            production[i] = ((FluentRule)part).nonTerminal;
-                        }
-                        else if (part is FluentExpression)
-                        {
-                            production[i] = ((FluentExpression)part).Terminal;
-                        }
-                        else if (part is ListOfRule)
+                        if (part is ListOfRule)
                         {
                             // This will create new rules, we want to reduce production[i] 
                             var listRule = (ListOfRule)part;
-                            var listNonTerminal = configurator.MakeListRule(listRule.Rule, listRule.Separator);
+                            var listNonTerminal = configurator.MakeListRule((IRule)listRule.Symbol, listRule.Separator);
                             if (listRule.Optional)
                             {
                                 listNonTerminal = configurator.MakeOptionalRule(listNonTerminal);
                             }
-                            production[i] = listNonTerminal;
+                            production[i].Symbol = listNonTerminal;
+                        }
+                        else if (part.Symbol is string)
+                        {
+                            // Pre-escaped literal
+                            // Do nothing, this is already handled.
+                        }
+                        else if (part.Symbol is FluentRule)
+                        {
+                            production[i].Symbol = ((FluentRule)part.Symbol).nonTerminal;
+                        }
+                        else if (part.Symbol is FluentExpression)
+                        {
+                            production[i].Symbol = ((FluentExpression)part.Symbol).Terminal;
                         }
                         else
                         {
@@ -151,9 +182,47 @@ namespace Piglet.Parser.Configuration.Fluent
                         }
                     }
 
-                    p.Production(production.ToArray()); // TODO: Insert onreduce here.
+                    var configureProductionAction = p.Production(production.Select(f => f.Symbol).ToArray());
+                    
+                    // If there is no specific rule specified.
+                    var func = funcList[productionIndex];
+                    if (func == null)
+                    {
+                        if (production.Count == 1)
+                        {
+                            // Use default rule where all rules of length 1 will autoreduce to the
+                            // first propertys semantic value
+                            configureProductionAction.OnReduce(f => f[0]);
+                        }
+                    }
+                    else
+                    {
+                        // Specific function found. This needs to be wrapped in another function
+                        // which translates the index parameters into a dynamic object by the property names
+                        var indexNames = production.Select((f, index) => new Tuple<int, string>(index, f.Name)).Where(f => f.Item2 != null).ToArray();
+
+                        configureProductionAction.OnReduce(f =>
+                        {
+                            var expandoObject = new ExpandoObject();
+                            foreach (var indexName in indexNames)
+                            {
+                                ((IDictionary<string, object>)expandoObject).Add(indexName.Item2, f[indexName.Item1]);
+                            }
+                            return func(expandoObject);
+                        });
+                    }
                 }
             });
         }
     }
 }
+
+/*
+        public void baj()
+        {
+            var expandoObject = new ExpandoObject();
+            ((IDictionary<string, object>)expandoObject).Add("asdasd", null);
+            dynamic tjoff = expandoObject;
+            tjoff.sdfs = "hej";
+            var s  = new String(tjoff.sdfaff);
+        }*/

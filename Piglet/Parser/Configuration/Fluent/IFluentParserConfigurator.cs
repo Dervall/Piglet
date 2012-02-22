@@ -1,3 +1,5 @@
+using System;
+
 namespace Piglet.Parser.Configuration.Fluent
 {
     public interface IFluentParserConfigurator : IHideObjectMembers
@@ -15,23 +17,39 @@ namespace Piglet.Parser.Configuration.Fluent
 
     public interface IExpressionConfigurator : IHideObjectMembers
     {
-        IExpressionConfigurator ThatMatches<TExpressionType>();
-        IExpressionConfigurator ThatMatches(string regex);
+        IExpressionReturnConfigurator ThatMatches<TExpressionType>();
+        IExpressionReturnConfigurator ThatMatches(string regex);
+    }
+
+    public interface IExpressionReturnConfigurator : IHideObjectMembers
+    {
+        void AndReturns(Func<string, object> func);
     }
 
     public interface IRuleByConfigurator : IHideObjectMembers
     {
-        IRuleSequenceConfigurator By(string literal);
-        IRuleSequenceConfigurator By<TExpressionType>();
-        IRuleSequenceConfigurator By(IExpressionConfigurator expression);
-        IRuleSequenceConfigurator By(IRule rule);
-        IListRuleSequenceConfigurator ByListOf(IRule listElement);
+        IOptionalAsConfigurator By(string literal);
+        IOptionalAsConfigurator By<TExpressionType>();
+        IOptionalAsConfigurator By(IExpressionConfigurator expression);
+        IOptionalAsConfigurator By(IRule rule);
+        IMaybeListNamed ByListOf(IRule listElement);
+    }
+
+    public interface IOptionalAsConfigurator : IRuleSequenceConfigurator
+    {
+        IRuleSequenceConfigurator As(string name);
     }
 
     public interface IRuleSequenceConfigurator : IHideObjectMembers
     {
         IRuleByConfigurator Or { get; }
         IRuleByConfigurator Followed { get; }
+        IRuleByConfigurator WhenFound(Func<dynamic, object> func);
+    }
+
+    public interface IMaybeListNamed : IListRuleSequenceConfigurator
+    {
+        IListRuleSequenceConfigurator As(string name);
     }
 
     public interface IListRuleSequenceConfigurator : IRuleSequenceConfigurator

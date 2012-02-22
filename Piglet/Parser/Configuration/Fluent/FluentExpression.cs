@@ -1,9 +1,13 @@
+using System;
+
 namespace Piglet.Parser.Configuration.Fluent
 {
-    internal class FluentExpression : IExpressionConfigurator
+    internal class FluentExpression : IExpressionConfigurator, IExpressionReturnConfigurator
     {
         private readonly ParserConfigurator<object> configurator;
-        private Terminal<object> terminal; 
+        private Terminal<object> terminal;
+        private string regex;
+        private Func<string, object> func;
 
         public FluentExpression(ParserConfigurator<object> configurator)
         {
@@ -12,27 +16,39 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public Terminal<object> Terminal
         {
-            get { return terminal; }
+            get { return terminal ?? (terminal = (Terminal<object>) configurator.Terminal(regex, func)); }
         }
 
-        public IExpressionConfigurator ThatMatches<TExpressionType>()
+        public IExpressionReturnConfigurator ThatMatches<TExpressionType>()
         {
             var type = typeof (TExpressionType);
             if (type == typeof(int))
             {
+                func = f => int.Parse(f);
                 return ThatMatches(@"\d+");
             }
             if (type == typeof(double))
             {
+                func = f => double.Parse(f);
                 return ThatMatches(@"\d+(\.\d+)?");
+            }
+            if (type == typeof(bool))
+            {
+                func = f => bool.Parse(f);
+                return ThatMatches(@"((true)|(false))");
             }
             throw new ParserConfigurationException("Unknown type passed to ThatMatches.");
         }
 
-        public IExpressionConfigurator ThatMatches(string regex)
+        public IExpressionReturnConfigurator ThatMatches(string regex)
         {
-            terminal = (Terminal<object>) configurator.Terminal(regex);
+            this.regex = regex;
             return this;
+        }
+
+        public void AndReturns(Func<string, object> func)
+        {
+            this.func = func;
         }
     }
 }

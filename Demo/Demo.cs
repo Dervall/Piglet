@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using Piglet.Demo.Lexer;
-using Piglet.Demo.Parser;
-using Piglet.Lexer;
+﻿using Piglet.Demo.Parser;
 
 namespace Piglet.Demo
 {

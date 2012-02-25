@@ -57,6 +57,10 @@
     <Compile Include="Lexer\LexerException.cs" />
     <Compile Include="Lexer\LexerFactory.cs" />
     <Compile Include="Lexer\TransitionTable.cs" />
+    <Compile Include="Parser\Configuration\Fluent\FluentExpression.cs" />
+    <Compile Include="Parser\Configuration\Fluent\FluentParserConfigurator.cs" />
+    <Compile Include="Parser\Configuration\Fluent\FluentRule.cs" />
+    <Compile Include="Parser\Configuration\Fluent\IHideObjectMembers.cs" />
     <Compile Include="Parser\Configuration\IConfigureProductionAction.cs" />
     <Compile Include="Parser\Configuration\ILexerSettings.cs" />
     <Compile Include="Parser\Configuration\INonTerminal.cs" />
@@ -76,6 +80,7 @@
     <Compile Include="Parser\Configuration\ParserConfigurator.cs" />
     <Compile Include="Parser\Construction\Lr1Item.cs" />
     <Compile Include="Parser\Construction\Lr1ItemSet.cs" />
+    <Compile Include="Parser\Configuration\Fluent\IFluentParserConfigurator.cs" />
     <Compile Include="Parser\ParserFactory.cs" />
     <Compile Include="Common\ITable2D.cs" />
     <Compile Include="Parser\Construction\ParserBuilder.cs" />

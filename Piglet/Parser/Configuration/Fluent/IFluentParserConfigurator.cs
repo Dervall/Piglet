@@ -1,0 +1,71 @@
+using System;
+
+namespace Piglet.Parser.Configuration.Fluent
+{
+    public interface IFluentParserConfigurator : IHideObjectMembers
+    {
+        IRule Rule();
+        IExpressionConfigurator Expression();
+        IExpressionConfigurator QuotedString { get; }
+        IParser<object> CreateParser();
+    }
+
+    public interface IRule : IHideObjectMembers
+    {
+        IRuleByConfigurator IsMadeUp { get; }
+    }
+
+    public interface IExpressionConfigurator : IHideObjectMembers
+    {
+        IExpressionReturnConfigurator ThatMatches<TExpressionType>();
+        IExpressionReturnConfigurator ThatMatches(string regex);
+    }
+
+    public interface IExpressionReturnConfigurator : IHideObjectMembers
+    {
+        void AndReturns(Func<string, object> func);
+    }
+
+    public interface IRuleByConfigurator : IHideObjectMembers
+    {
+        IOptionalAsConfigurator By(string literal);
+        IOptionalAsConfigurator By<TExpressionType>();
+        IOptionalAsConfigurator By(IExpressionConfigurator expression);
+        IOptionalAsConfigurator By(IRule rule);
+
+        IMaybeListNamed ByListOf<TListType>(IRule listElement);
+        IMaybeListNamed ByListOf(IRule listElement);
+    }
+
+    public interface IOptionalAsConfigurator : IRuleSequenceConfigurator
+    {
+        IRuleSequenceConfigurator As(string name);
+    }
+
+    public interface IMaybeNewRuleConfigurator : IHideObjectMembers
+    {
+        IRuleByConfigurator Or { get; }        
+    }
+
+    public interface IRuleSequenceConfigurator : IMaybeNewRuleConfigurator
+    {
+        IRuleByConfigurator Followed { get; }
+        IMaybeNewRuleConfigurator WhenFound(Func<dynamic, object> func);
+    }
+
+    public interface IMaybeListNamed : IListRuleSequenceConfigurator
+    {
+        IListRuleSequenceConfigurator As(string name);
+    }
+
+    public interface IListRuleSequenceConfigurator : IRuleSequenceConfigurator
+    {
+        IListItemConfigurator ThatIs { get; }
+    }
+
+    public interface IListItemConfigurator : IRuleSequenceConfigurator
+    {
+        IListItemConfigurator SeparatedBy(string separator);
+        IListItemConfigurator Optional { get; }
+    }
+}

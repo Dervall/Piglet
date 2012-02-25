@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -49,6 +50,7 @@
     <Compile Include="Parser\Configuration\TestTerminal.cs" />
     <Compile Include="Parser\Construction\Debug\TestDebugStrings.cs" />
     <Compile Include="Common\TestParseTables.cs" />
+    <Compile Include="Parser\FluentConfigurationTest.cs" />
     <Compile Include="Parser\ParserConfigurationTest.cs" />
     <Compile Include="Parser\ParsingErrorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

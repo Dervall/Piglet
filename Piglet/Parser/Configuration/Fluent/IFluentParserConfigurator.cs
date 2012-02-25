@@ -42,11 +42,15 @@ namespace Piglet.Parser.Configuration.Fluent
         IRuleSequenceConfigurator As(string name);
     }
 
-    public interface IRuleSequenceConfigurator : IHideObjectMembers
+    public interface IMaybeNewRuleConfigurator : IHideObjectMembers
     {
-        IRuleByConfigurator Or { get; }
+        IRuleByConfigurator Or { get; }        
+    }
+
+    public interface IRuleSequenceConfigurator : IMaybeNewRuleConfigurator
+    {
         IRuleByConfigurator Followed { get; }
-        IRuleByConfigurator WhenFound(Func<dynamic, object> func);
+        IMaybeNewRuleConfigurator WhenFound(Func<dynamic, object> func);
     }
 
     public interface IMaybeListNamed : IListRuleSequenceConfigurator

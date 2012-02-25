@@ -101,7 +101,7 @@ namespace Piglet.Parser.Configuration.Fluent
             get { return this; }
         }
 
-        public IRuleByConfigurator WhenFound(Func<dynamic, object> func)
+        public IMaybeNewRuleConfigurator WhenFound(Func<dynamic, object> func)
         {
             funcList[funcList.Count - 1] = func;
             return this;

@@ -67,5 +67,40 @@ namespace Piglet.Tests.Parser
                 }");
             Assert.AreEqual(5, jObject.Elements.Count);
         }
+
+        [TestMethod]
+        public void TestFluentCalculator()
+        {
+            var config = ParserFactory.Fluent();
+            var expr = config.Rule();
+            var term = config.Rule();
+            var factor = config.Rule();
+            var plusOrMinus = config.Rule();
+            var mulOrDiv = config.Rule();
+
+            plusOrMinus.IsMadeUp.By("+").WhenFound(f => '+')
+                             .Or.By("-").WhenFound(f => '-');
+
+            expr.IsMadeUp.By(expr).As("Left").Followed.By(plusOrMinus).As("Operator").Followed.By(term).As("Right")
+                .WhenFound(f => f.Operator == '+' ? f.Left + f.Right : f.Left - f.Right)
+                .Or.By(term);
+
+            mulOrDiv.IsMadeUp.By("*").WhenFound(f => '*')
+                          .Or.By("/").WhenFound(f => '/');
+
+            term.IsMadeUp.By(term).As("Left").Followed.By(mulOrDiv).As("Operator").Followed.By(factor).As("Right")
+                .WhenFound(f => f.Operator == '*' ? f.Left * f.Right : f.Left / f.Right)
+                .Or.By(factor);
+
+            factor.IsMadeUp.By<int>()
+                .Or.By("(").Followed.By(expr).As("Expression").Followed.By(")")
+                .WhenFound(f => f.Expression);
+
+            var parser = config.CreateParser();
+
+            int result = (int)parser.Parse("7+8*2-2+2");
+
+            Assert.AreEqual(23, result);
+        }
     }
 }

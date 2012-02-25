@@ -94,7 +94,42 @@ for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
 Parser
 ------
 
-Parsing is inheritly a more complex subject, and Piglet tries it's best to make it as accessible as possible. The classic example is the calculator. Here it is, implemented in Piglet
+Parsing is inheritly a more complex subject, and Piglet tries it's best to make it as accessible as possible. The classic example is the calculator. Here it is, implemented in Piglet:
+
+```csharp
+var config = ParserFactory.Fluent();
+var expr = config.Rule();
+var term = config.Rule();
+var factor = config.Rule();
+var plusOrMinus = config.Rule();
+var mulOrDiv = config.Rule();
+
+plusOrMinus.IsMadeUp.By("+").WhenFound(f => '+')
+                    .Or.By("-").WhenFound(f => '-');
+
+expr.IsMadeUp.By(expr).As("Left").Followed.By(plusOrMinus).As("Operator").Followed.By(term).As("Right")
+    .WhenFound(f => f.Operator == '+' ? f.Left + f.Right : f.Left - f.Right)
+    .Or.By(term);
+
+mulOrDiv.IsMadeUp.By("*").WhenFound(f => '*')
+                .Or.By("/").WhenFound(f => '/');
+
+term.IsMadeUp.By(term).As("Left").Followed.By(mulOrDiv).As("Operator").Followed.By(factor).As("Right")
+    .WhenFound(f => f.Operator == '*' ? f.Left * f.Right : f.Left / f.Right)
+    .Or.By(factor);
+
+factor.IsMadeUp.By<int>()
+    .Or.By("(").Followed.By(expr).As("Expression").Followed.By(")")
+    .WhenFound(f => f.Expression);
+
+var parser = config.CreateParser();
+
+int result = (int)parser.Parse("7+8*2-2+2");
+
+Assert.AreEqual(23, result);
+```
+
+If the fluent style configuration is too verbose for you, there is also the option of doing the configuration using a more "technical" API. This configuration is exactly the same as the configuration above.
 
 ```csharp
 var parser = ParserFactory.Configure<int>( configurator =>

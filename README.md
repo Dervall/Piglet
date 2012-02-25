@@ -11,6 +11,12 @@ Mission statement
 * To be easy to use
 * To be a source of understanding of the underlying algorithms by using understandable code
 
+Why use piglet
+==============
+
+Piglets mission in life is to fill the void where regular expressions aren't enough and a full-blown parser generator is way too much work to integrate into your project.
+A typical example is when you have hierarchical data, something which regular expressions cannot parse. Don't revert to hand writing parsers when Piglet can help you out!
+
 How to use
 ==========
 

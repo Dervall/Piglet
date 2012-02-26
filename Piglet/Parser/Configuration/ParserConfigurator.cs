@@ -12,12 +12,27 @@ namespace Piglet.Parser.Configuration
         private readonly List<NonTerminal<T>> nonTerminals;
         private readonly List<Terminal<T>> terminals;
         private readonly ILexerSettings lexerSettings;
+        private readonly List<TokenPrecedence> tokenPrecedences;
+
+        private class TokenPrecedence
+        {
+            public enum AssociativityDirection
+            {
+                Left,
+                Right,
+                NonAssociative
+            };
+
+            public AssociativityDirection Associativity { get; set; }
+            public Terminal<T>[] Terminals { get; set; } 
+        }
 
         public ParserConfigurator()
         {
             nonTerminals = new List<NonTerminal<T>>();
             terminals = new List<Terminal<T>>();
             lexerSettings = new LexerSettingsImpl();
+            tokenPrecedences = new List<TokenPrecedence>();
         
             // Set some default settings
             LexerSettings.CreateLexer = true;
@@ -69,6 +84,11 @@ namespace Piglet.Parser.Configuration
 
         public void LeftAssociative(params ITerminal<T>[] symbols)
         {
+            tokenPrecedences.Add(new TokenPrecedence
+                                     {
+                                         Associativity = TokenPrecedence.AssociativityDirection.Left,
+                                         Terminals = symbols.OfType<Terminal<T>>().ToArray()
+                                     });
         }
 
         public void SetStartSymbol(INonTerminal<T> start)

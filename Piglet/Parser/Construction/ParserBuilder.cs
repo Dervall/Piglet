@@ -310,10 +310,15 @@ namespace Piglet.Parser.Construction
                 {
                     if (oldValue < 0 && value < 0)
                     {
-                        // Both values are reduce. Throw a reduce reduce conflict
+                        // Both values are reduce. Throw a reduce reduce conflict. This is not solveable
                         throw new ReduceReduceConflictException<T>("Grammar contains a reduce reduce conflict");
                     }
-                    throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict");
+                    else
+                    {
+                        // We might have a shot at fixing this! Obtain the tokens for both states
+                        Terminal<T> shiftingTerminal = grammar.AllSymbols.OfType<Terminal<T>>().Select( f => f.TokenNumber == oldValue < 0 ? value : oldValue) 
+                        throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict");                        
+                    }
                 }
                 catch (AmbiguousGrammarException ex)
                 {

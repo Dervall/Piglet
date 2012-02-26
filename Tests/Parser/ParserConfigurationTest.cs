@@ -46,9 +46,9 @@ namespace Piglet.Tests.Parser
                 });
             });
 
-            int result = parser.Parse(new StringReader("7+8*2-2+2"));
+            int result = parser.Parse(new StringReader("2-2-5"));
 
-            Assert.AreEqual(23, result);
+            Assert.AreEqual(-5, result);
         }
 
         [TestMethod]

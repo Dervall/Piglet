@@ -9,8 +9,8 @@ namespace Piglet.Demo
             // Simple demo runner
           //  WordsAndNumbers.Run();
         //    Movement.Run();
-            JsonParser.Run();
-         //   BlogFormatParser.Run();
+      //      JsonParser.Run();
+            BlogFormatParser.RunFluent();
             //   Console.ReadKey();
         }
     }

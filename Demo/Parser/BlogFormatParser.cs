@@ -7,7 +7,41 @@ namespace Piglet.Demo.Parser
     /// </summary>
     public class BlogFormatParser
     {
-        public static void Run()
+        public static void RunFluent()
+        {
+            var config = ParserFactory.Fluent();
+            var name = config.Expression();
+            name.ThatMatches("[a-z]+");
+
+            var obj = config.Rule();
+            var attribute = config.Rule();
+
+            obj.IsMadeUp.By(name)
+                .Followed.By("{")
+                .Followed.ByListOf(obj).ThatIs.Optional
+                .Followed.ByListOf(attribute).ThatIs.Optional
+                .Followed.By("}");
+            attribute.IsMadeUp.By("[")
+                .Followed.By(name)
+                .Followed.By("=")
+                .Followed.By(config.QuotedString).Followed.By("]");
+
+            var parser = config.CreateParser();
+
+            parser.Parse("fruits {" +
+                         "    banana {" +
+                         "        [tasty=\"true\"]" +
+                         "        [colour=\"yellow\"]" +
+                         "    }" +
+                         "" +
+                         "    orange {" +
+                         "    }" +
+                         "    " +
+                         "    [eatable=\"if not rotten\"]" +
+                         "}");
+        }
+
+        public static void RunTechnical()
         {
             var parser = ParserFactory.Configure<bool>(configurator =>
             {

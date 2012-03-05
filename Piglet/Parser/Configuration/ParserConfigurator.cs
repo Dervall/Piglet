@@ -13,18 +13,13 @@ namespace Piglet.Parser.Configuration
         private readonly List<Terminal<T>> terminals;
         private readonly ILexerSettings lexerSettings;
         private readonly List<TokenPrecedence> tokenPrecedences;
+        private int currentPrecedence;
 
-        private class TokenPrecedence
+        private class TokenPrecedence : ITokenPrecedence
         {
-            public enum AssociativityDirection
-            {
-                Left,
-                Right,
-                NonAssociative
-            };
-
             public AssociativityDirection Associativity { get; set; }
-            public Terminal<T>[] Terminals { get; set; } 
+            public Terminal<T> Terminal { get; set; }
+            public int Precedence { get; set; }
         }
 
         public ParserConfigurator()
@@ -33,6 +28,7 @@ namespace Piglet.Parser.Configuration
             terminals = new List<Terminal<T>>();
             lexerSettings = new LexerSettingsImpl();
             tokenPrecedences = new List<TokenPrecedence>();
+            currentPrecedence = 0;
         
             // Set some default settings
             LexerSettings.CreateLexer = true;
@@ -84,11 +80,16 @@ namespace Piglet.Parser.Configuration
 
         public void LeftAssociative(params ITerminal<T>[] symbols)
         {
-            tokenPrecedences.Add(new TokenPrecedence
-                                     {
-                                         Associativity = TokenPrecedence.AssociativityDirection.Left,
-                                         Terminals = symbols.OfType<Terminal<T>>().ToArray()
-                                     });
+            foreach (var terminal in symbols.OfType<Terminal<T>>())
+            {
+                tokenPrecedences.Add(new TokenPrecedence
+                                         {
+                                             Associativity = AssociativityDirection.Left,
+                                             Terminal = terminal,
+                                             Precedence = currentPrecedence
+                                         });
+            }
+            ++currentPrecedence;
         }
 
         public void SetStartSymbol(INonTerminal<T> start)
@@ -195,6 +196,11 @@ namespace Piglet.Parser.Configuration
         public Terminal<T> EndOfInputTerminal
         {
             get { return terminals.Single(f => f.RegExp == null); }
+        }
+
+        public ITokenPrecedence GetPrecedence(ITerminal<T> terminal)
+        {
+            return tokenPrecedences.FirstOrDefault(f => f.Terminal == terminal);
         }
 
         private void AssignTokenNumbers()

@@ -357,7 +357,7 @@ namespace Piglet.Parser.Construction
                     else if (shiftPrecedence.Associativity == AssociativityDirection.Left)
                     {
                         // Prefer reducing
-                        table[state, tokenNumber] = reduceValue;
+                        table[state, tokenNumber] = shiftValue; //  reduceValue;
                     }
                     else if (shiftPrecedence.Associativity == AssociativityDirection.Right)
                     {

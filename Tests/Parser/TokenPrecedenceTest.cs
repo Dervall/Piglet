@@ -18,9 +18,9 @@ namespace Piglet.Tests.Parser
                 var mul = configurator.Terminal("\\*");
                 var div = configurator.Terminal("/");
 
+                configurator.LeftAssociative(plus, minus);
                 configurator.LeftAssociative(mul, div);
 
-                configurator.LeftAssociative(plus, minus);
 
                 var exp = configurator.NonTerminal();
                 exp.Productions(p =>
@@ -54,11 +54,11 @@ namespace Piglet.Tests.Parser
                 });
             });
 
-           // Assert.AreEqual(-2, parser.Parse("1 - (1 + (1 * 2))"));
-           // Assert.AreEqual(2, parser.Parse("(((1 - 1) + 1) * 2)"));
-           // Assert.AreEqual(1, parser.Parse("1 + 1 - 1"));
-           // Assert.AreEqual(1 + 2 - (3 * 4), parser.Parse("1 + 2 - 3 * 4"));
-           // Assert.AreEqual(5*5/5, parser.Parse("5*5/5"));
+            Assert.AreEqual(-2, parser.Parse("1 - (1 + (1 * 2))"));
+            Assert.AreEqual(2, parser.Parse("(((1 - 1) + 1) * 2)"));
+            Assert.AreEqual(4 - 7 - 3, parser.Parse("4 - 7 - 3"));
+            Assert.AreEqual(1 + 2 - 3 * 4, parser.Parse("1 + 2 - 3 * 4"));
+            Assert.AreEqual(5*5/5, parser.Parse("5*5/5"));
 
             Assert.AreEqual(1 + 2 - 3 * 4 / 5 + 124 * 8, parser.Parse("1 + 2 - 3 * 4 / 5 + 124 * 8"));
         }

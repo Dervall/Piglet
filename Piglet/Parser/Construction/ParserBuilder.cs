@@ -384,8 +384,10 @@ namespace Piglet.Parser.Construction
                     throw;
                 }
             }
-
-            table[state, tokenNumber] = value;
+            else
+            {
+                table[state, tokenNumber] = value;                
+            }
         }
 
         private TerminalSet<T> CalculateFirst(ISet<NonTerminal<T>> nullable)

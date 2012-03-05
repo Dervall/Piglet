@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Piglet.Lexer;
 using Piglet.Parser.Construction;
 
@@ -13,12 +12,23 @@ namespace Piglet.Parser.Configuration
         private readonly List<NonTerminal<T>> nonTerminals;
         private readonly List<Terminal<T>> terminals;
         private readonly ILexerSettings lexerSettings;
+        private readonly List<TokenPrecedence> tokenPrecedences;
+        private int currentPrecedence;
+
+        private class TokenPrecedence : ITokenPrecedence
+        {
+            public AssociativityDirection Associativity { get; set; }
+            public Terminal<T> Terminal { get; set; }
+            public int Precedence { get; set; }
+        }
 
         public ParserConfigurator()
         {
             nonTerminals = new List<NonTerminal<T>>();
             terminals = new List<Terminal<T>>();
             lexerSettings = new LexerSettingsImpl();
+            tokenPrecedences = new List<TokenPrecedence>();
+            currentPrecedence = 0;
         
             // Set some default settings
             LexerSettings.CreateLexer = true;
@@ -66,6 +76,43 @@ namespace Piglet.Parser.Configuration
         public ILexerSettings LexerSettings
         {
             get { return lexerSettings; }
+        }
+
+        public void NonAssociative(params ITerminal<T>[] symbols)
+        {
+            SetSymbolAssociativity(symbols, AssociativityDirection.NonAssociative);
+        }
+
+        public void RightAssociative(params ITerminal<T>[] symbols)
+        {
+            SetSymbolAssociativity(symbols, AssociativityDirection.Right);
+        }
+
+        public void LeftAssociative(params ITerminal<T>[] symbols)
+        {
+            SetSymbolAssociativity(symbols, AssociativityDirection.Left);
+        }
+
+        private void SetSymbolAssociativity(IEnumerable<ITerminal<T>> symbols, AssociativityDirection associativityDirection)
+        {
+            foreach (var terminal in symbols.OfType<Terminal<T>>())
+            {
+                if (tokenPrecedences.Any( f => f.Terminal == terminal))
+                {
+                    // This terminal is defined multiple times
+                    throw new ParserConfigurationException(
+                        string.Format("Terminal {0} has been declared to have a precedence multiple times",
+                                      terminal.DebugName));
+                }
+
+                tokenPrecedences.Add(new TokenPrecedence
+                                         {
+                                             Associativity = associativityDirection,
+                                             Terminal = terminal,
+                                             Precedence = currentPrecedence
+                                         });
+            }
+            ++currentPrecedence;
         }
 
         public void SetStartSymbol(INonTerminal<T> start)
@@ -172,6 +219,11 @@ namespace Piglet.Parser.Configuration
         public Terminal<T> EndOfInputTerminal
         {
             get { return terminals.Single(f => f.RegExp == null); }
+        }
+
+        public ITokenPrecedence GetPrecedence(ITerminal<T> terminal)
+        {
+            return tokenPrecedences.FirstOrDefault(f => f.Terminal == terminal);
         }
 
         private void AssignTokenNumbers()

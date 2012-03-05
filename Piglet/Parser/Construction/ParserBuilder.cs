@@ -11,9 +11,14 @@ namespace Piglet.Parser.Construction
     {
         private readonly IGrammar<T> grammar;
 
+        // Holds the generated reduction rules, which we'll feed the table at the end of this method
+        // the second part at least, the other is for indexing them while making the table.
+        private readonly List<Tuple<IProductionRule<T>, ReductionRule<T>>> reductionRules;
+
         public ParserBuilder(IGrammar<T> grammar)
         {
             this.grammar = grammar;
+            this.reductionRules = new List<Tuple<IProductionRule<T>, ReductionRule<T>>>();
         }
 
         internal sealed class GotoSetTransition
@@ -157,11 +162,7 @@ namespace Piglet.Parser.Construction
         private LRParseTable<T> CreateParseTable(List<Lr1ItemSet<T>> itemSets, List<GotoSetTransition> gotoSetTransitions)
         {
             var table = new LRParseTable<T>();
-
-            // Holds the generated reduction rules, which we'll feed the table at the end of this method
-            // the second part at least, the other is for indexing them while making the table.
-            var reductionRules = new List<Tuple<IProductionRule<T>, ReductionRule<T>>>();
-
+            
             // Create a temporary uncompressed action table. This is what we will use to create
             // the compressed action table later on. This could probably be improved upon to save
             // memory if needed.
@@ -192,26 +193,13 @@ namespace Piglet.Parser.Construction
                             int transitionIndex = itemSets.IndexOf(transition.To);
                             int tokenNumber = ((Terminal<T>)lr1Item.SymbolRightOfDot).TokenNumber;
 
-                            try
-                            {
-                                SetActionTable(uncompressedActionTable, i, tokenNumber, LRParseTable<T>.Shift(transitionIndex));
-                            }
-                            catch (ShiftReduceConflictException<T> e)
-                            {
-                                // Since we wanted to shift, it will not be reduce reduce exceptions at this point
-
-                                // Grammar is ambiguous. Since we have the full grammar at hand and the state table hasn't we
-                                // can augment this exception for the benefit of the user.
-                                e.ShiftSymbol = lr1Item.SymbolRightOfDot;
-                                e.ReduceSymbol = reductionRules[-(1 + e.PreviousValue)].Item1.ResultSymbol;
-                                throw;
-                            }
+                            SetActionTable(uncompressedActionTable, i, tokenNumber, LRParseTable<T>.Shift(transitionIndex));
                         }
                     }
                     else
                     {
                         // The dot is at the end. Add reduce action to the parse table for
-                        // all FOLLOW for the resulting symbol
+                        // all lookaheads for the resulting symbol
                         // Do NOT do this if the resulting symbol is the start symbol
                         if (lr1Item.ProductionRule.ResultSymbol != grammar.AcceptSymbol)
                         {
@@ -249,16 +237,6 @@ namespace Piglet.Parser.Construction
                                     // Augment exception with correct symbols for the poor user
                                     e.PreviousReduceSymbol = reductionRules[-(1 + e.PreviousValue)].Item1.ResultSymbol;
                                     e.NewReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
-                                    throw;
-                                }
-                                catch (ShiftReduceConflictException<T> e)
-                                {
-                                    // We know we're the cause of the reduce part
-                                    e.ReduceSymbol = reductionRules[reductionRule].Item1.ResultSymbol;
-                                    // The old value is the shift
-                                    e.ShiftSymbol = e.PreviousValue == short.MaxValue
-                                        ? grammar.AcceptSymbol // Conflicting with the accept symbol
-                                        : grammar.AllSymbols.FirstOrDefault(f => ((Symbol<T>)f).TokenNumber == e.PreviousValue);
                                     throw;
                                 }
                             }
@@ -303,17 +281,98 @@ namespace Piglet.Parser.Construction
         private void SetActionTable(short[,] table, int state, int tokenNumber, short value)
         {
             // This is an error condition, find out what sort of exception it is
-            int oldValue = table[state, tokenNumber];
+            short oldValue = table[state, tokenNumber];
             if (oldValue != value && oldValue != short.MinValue)
             {
                 try
                 {
                     if (oldValue < 0 && value < 0)
                     {
-                        // Both values are reduce. Throw a reduce reduce conflict
+                        // Both values are reduce. Throw a reduce reduce conflict. This is not solveable
                         throw new ReduceReduceConflictException<T>("Grammar contains a reduce reduce conflict");
                     }
-                    throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict");
+
+                    int shiftTokenNumber = tokenNumber;
+                    int reduceRuleNumber;
+                    short shiftValue;
+                    short reduceValue;
+
+                    if (oldValue < 0)
+                    {
+                        // The old value was a reduce, the new must be a shift
+                        shiftValue = value;
+                        reduceValue = oldValue;
+
+                        reduceRuleNumber = -(oldValue + 1);
+                    }
+                    else
+                    {
+                        // TODO: Unsure if this is a real case. The only testcases 
+                        // TODO: that end up here are retarded tests which are cyclic in nature.
+                        // The old value was a shift
+                        // the new value must be a reduce
+                        shiftValue = oldValue;
+                        reduceValue = value;
+
+                        reduceRuleNumber = -(value + 1);
+                    }
+
+                    // Check if these tokens have declared precedences and associativity
+                    // If they do, we might be able to act on this.
+                    Terminal<T> shiftingTerminal =
+                        grammar.AllSymbols.OfType<Terminal<T>>().First(
+                            f => f.TokenNumber == shiftTokenNumber);
+                    var shiftPrecedence = grammar.GetPrecedence(shiftingTerminal);
+
+                    // The reduce precedence is the last terminal symbol in the production rules precedence                        
+                    var productionRule = reductionRules[reduceRuleNumber].Item1;                        
+                    
+                    var reducePrecedence = grammar.GetPrecedence(productionRule.Symbols.Reverse().OfType<ITerminal<T>>().FirstOrDefault());
+
+                    // If either rule has no precedence this is not a legal course of action.
+                    // TODO: In bison this is apparently cool, it prefers to shift in this case. I don't know why, but this
+                    // TODO: seems like a dangerous course of action to me.
+                    if (shiftPrecedence == null || reducePrecedence == null)
+                    {
+                        throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict")
+                        {
+                            ShiftSymbol = shiftingTerminal,
+                            ReduceSymbol = productionRule.ResultSymbol,
+                        };    
+                    }
+
+                    if (shiftPrecedence.Precedence < reducePrecedence.Precedence)
+                    {
+                        // Precedence of reduce is higher, choose to reduce
+                        table[state, tokenNumber] = reduceValue;
+                    }
+                    else if (shiftPrecedence.Precedence > reducePrecedence.Precedence)
+                    {
+                        // Shift precedence is higher. Shift
+                        table[state, tokenNumber] = shiftValue;
+                    }
+                    // Both tokens are in the same precedence group! It's now up to the associativity
+                    // The two tokens CANNOT have different associativity, due to how the configuration works
+                    // which throws up if you try to multiple-define the precedence
+                    else if (shiftPrecedence.Associativity == AssociativityDirection.Left)
+                    {
+                        // Prefer reducing
+                        table[state, tokenNumber] = reduceValue;
+                    }
+                    else if (shiftPrecedence.Associativity == AssociativityDirection.Right)
+                    {
+                        // Prefer shifting
+                        table[state, tokenNumber] = shiftValue;
+                    }
+                    else // if (shiftPrecedence.Associativity  == AssociativityDirection.NonAssociative) <- this is implied
+                    {
+                        // Unresolveable
+                        throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict (Nonassociative)")
+                              {
+                                  ShiftSymbol = shiftingTerminal,
+                                  ReduceSymbol = productionRule.ResultSymbol,
+                              };    
+                    }
                 }
                 catch (AmbiguousGrammarException ex)
                 {
@@ -325,8 +384,10 @@ namespace Piglet.Parser.Construction
                     throw;
                 }
             }
-
-            table[state, tokenNumber] = value;
+            else
+            {
+                table[state, tokenNumber] = value;                
+            }
         }
 
         private TerminalSet<T> CalculateFirst(ISet<NonTerminal<T>> nullable)

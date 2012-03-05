@@ -78,13 +78,36 @@ namespace Piglet.Parser.Configuration
             get { return lexerSettings; }
         }
 
+        public void NonAssociative(params ITerminal<T>[] symbols)
+        {
+            SetSymbolAssociativity(symbols, AssociativityDirection.NonAssociative);
+        }
+
+        public void RightAssociative(params ITerminal<T>[] symbols)
+        {
+            SetSymbolAssociativity(symbols, AssociativityDirection.Right);
+        }
+
         public void LeftAssociative(params ITerminal<T>[] symbols)
+        {
+            SetSymbolAssociativity(symbols, AssociativityDirection.Left);
+        }
+
+        private void SetSymbolAssociativity(IEnumerable<ITerminal<T>> symbols, AssociativityDirection associativityDirection)
         {
             foreach (var terminal in symbols.OfType<Terminal<T>>())
             {
+                if (tokenPrecedences.Any( f => f.Terminal == terminal))
+                {
+                    // This terminal is defined multiple times
+                    throw new ParserConfigurationException(
+                        string.Format("Terminal {0} has been declared to have a precedence multiple times",
+                                      terminal.DebugName));
+                }
+
                 tokenPrecedences.Add(new TokenPrecedence
                                          {
-                                             Associativity = AssociativityDirection.Left,
+                                             Associativity = associativityDirection,
                                              Terminal = terminal,
                                              Precedence = currentPrecedence
                                          });

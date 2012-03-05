@@ -37,7 +37,23 @@ namespace Piglet.Parser.Configuration
         /// to have the same precedence you must pass both at the same time to the precedence call. If you pass
         /// the same token to a precedence function more than once you will get a ParserConfigurationException.
         /// </summary>
-        /// <param name="symbols"></param>
+        /// <param name="symbols">Symbols to set associativity on</param>
         void LeftAssociative(params ITerminal<T>[] symbols);
+
+        /// <summary>
+        /// Makes a group of tokens right associative at a given precedence level. If you require two or more tokens
+        /// to have the same precedence you must pass both at the same time to the precedence call. If you pass
+        /// the same token to a precedence function more than once you will get a ParserConfigurationException.
+        /// </summary>
+        /// <param name="symbols">Symbols to set associativity on</param>
+        void RightAssociative(params ITerminal<T>[] symbols);
+
+        /// <summary>
+        /// Makes a group of tokens non-associative at a given precedence level. If you require two or more tokens
+        /// to have the same precedence you must pass both at the same time to the precedence call. If you pass
+        /// the same token to a precedence function more than once you will get a ParserConfigurationException.
+        /// </summary>
+        /// <param name="symbols">Symbols to set associativity on</param>
+        void NonAssociative(params ITerminal<T>[] symbols);
     }
 }

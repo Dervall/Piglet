@@ -1,4 +1,5 @@
 using System;
+using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
 {
@@ -14,5 +15,11 @@ namespace Piglet.Parser.Configuration
         /// <param name="action">Function that takes each of the elements in the given rule and returns a new element. Elements in
         /// input array are ordered the same way as in the production.</param>
         void SetReduceFunction(Func<T[], T> action);
+
+        /// <summary>
+        /// Sets context dependent precedence on this rule to make it the same precedence as the given level
+        /// </summary>
+        /// <param name="precedenceGroup">Precedence level to use</param>
+        void SetPrecedence(IPrecedenceGroup precedenceGroup);
     }
 }

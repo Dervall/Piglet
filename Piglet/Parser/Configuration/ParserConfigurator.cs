@@ -12,14 +12,12 @@ namespace Piglet.Parser.Configuration
         private readonly List<NonTerminal<T>> nonTerminals;
         private readonly List<Terminal<T>> terminals;
         private readonly ILexerSettings lexerSettings;
-        private readonly List<TokenPrecedence> tokenPrecedences;
+        private readonly List<TerminalPrecedence> terminalPrecedences;
         private int currentPrecedence;
 
-        private class TokenPrecedence : ITokenPrecedence
+        private class TerminalPrecedence : PrecedenceGroup
         {
-            public AssociativityDirection Associativity { get; set; }
             public Terminal<T> Terminal { get; set; }
-            public int Precedence { get; set; }
         }
 
         public ParserConfigurator()
@@ -27,7 +25,7 @@ namespace Piglet.Parser.Configuration
             nonTerminals = new List<NonTerminal<T>>();
             terminals = new List<Terminal<T>>();
             lexerSettings = new LexerSettingsImpl();
-            tokenPrecedences = new List<TokenPrecedence>();
+            terminalPrecedences = new List<TerminalPrecedence>();
             currentPrecedence = 0;
         
             // Set some default settings
@@ -78,26 +76,26 @@ namespace Piglet.Parser.Configuration
             get { return lexerSettings; }
         }
 
-        public void NonAssociative(params ITerminal<T>[] symbols)
+        public IPrecedenceGroup NonAssociative(params ITerminal<T>[] symbols)
         {
-            SetSymbolAssociativity(symbols, AssociativityDirection.NonAssociative);
+            return SetSymbolAssociativity(symbols, AssociativityDirection.NonAssociative);
         }
 
-        public void RightAssociative(params ITerminal<T>[] symbols)
+        public IPrecedenceGroup RightAssociative(params ITerminal<T>[] symbols)
         {
-            SetSymbolAssociativity(symbols, AssociativityDirection.Right);
+            return SetSymbolAssociativity(symbols, AssociativityDirection.Right);
         }
 
-        public void LeftAssociative(params ITerminal<T>[] symbols)
+        public IPrecedenceGroup LeftAssociative(params ITerminal<T>[] symbols)
         {
-            SetSymbolAssociativity(symbols, AssociativityDirection.Left);
+            return SetSymbolAssociativity(symbols, AssociativityDirection.Left);
         }
 
-        private void SetSymbolAssociativity(IEnumerable<ITerminal<T>> symbols, AssociativityDirection associativityDirection)
+        private IPrecedenceGroup SetSymbolAssociativity(IEnumerable<ITerminal<T>> symbols, AssociativityDirection associativityDirection)
         {
             foreach (var terminal in symbols.OfType<Terminal<T>>())
             {
-                if (tokenPrecedences.Any( f => f.Terminal == terminal))
+                if (terminalPrecedences.Any( f => f.Terminal == terminal))
                 {
                     // This terminal is defined multiple times
                     throw new ParserConfigurationException(
@@ -105,14 +103,18 @@ namespace Piglet.Parser.Configuration
                                       terminal.DebugName));
                 }
 
-                tokenPrecedences.Add(new TokenPrecedence
+                terminalPrecedences.Add(new TerminalPrecedence
                                          {
                                              Associativity = associativityDirection,
                                              Terminal = terminal,
                                              Precedence = currentPrecedence
                                          });
             }
+            var group = new PrecedenceGroup  { Precedence = currentPrecedence };
+
             ++currentPrecedence;
+
+            return group;
         }
 
         public void SetStartSymbol(INonTerminal<T> start)
@@ -228,9 +230,9 @@ namespace Piglet.Parser.Configuration
             get { return terminals.Single(f => f.RegExp == null); }
         }
 
-        public ITokenPrecedence GetPrecedence(ITerminal<T> terminal)
+        public Construction.IPrecedenceGroup GetPrecedence(ITerminal<T> terminal)
         {
-            return tokenPrecedences.FirstOrDefault(f => f.Terminal == terminal);
+            return terminalPrecedences.FirstOrDefault(f => f.Terminal == terminal);
         }
 
         private void AssignTokenNumbers()

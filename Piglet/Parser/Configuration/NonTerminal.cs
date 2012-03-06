@@ -37,13 +37,13 @@ namespace Piglet.Parser.Configuration
 
         private class NonTerminalProduction : IProduction<T>, IProductionRule<T>
         {
-            private Func<T[], T> reduceAction;
             private readonly ISymbol<T>[] symbols;
             private readonly INonTerminal<T> resultSymbol;
 
             public ISymbol<T>[] Symbols { get { return symbols; } }
             public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
-            public Func<T[], T> ReduceAction { get { return reduceAction; } }
+            public Func<T[], T> ReduceAction { get; private set; }
+            public IPrecedenceGroup ContextPrecedence { get; private set; }
 
             public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object[] symbols)
             {
@@ -75,7 +75,12 @@ namespace Piglet.Parser.Configuration
 
             public void SetReduceFunction(Func<T[], T> action)
             {
-                reduceAction = action;
+                ReduceAction = action;
+            }
+
+            public void SetPrecedence(IPrecedenceGroup precedenceGroup)
+            {
+                ContextPrecedence = precedenceGroup;
             }
         }
 

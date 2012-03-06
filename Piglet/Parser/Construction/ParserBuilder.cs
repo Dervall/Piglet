@@ -309,6 +309,7 @@ namespace Piglet.Parser.Construction
                     {
                         // TODO: Unsure if this is a real case. The only testcases 
                         // TODO: that end up here are retarded tests which are cyclic in nature.
+                        // TODO: These cases always fail later on anyway due to conflicts.
                         // The old value was a shift
                         // the new value must be a reduce
                         shiftValue = oldValue;
@@ -323,11 +324,13 @@ namespace Piglet.Parser.Construction
                         grammar.AllSymbols.OfType<Terminal<T>>().First(
                             f => f.TokenNumber == shiftTokenNumber);
                     var shiftPrecedence = grammar.GetPrecedence(shiftingTerminal);
-
-                    // The reduce precedence is the last terminal symbol in the production rules precedence                        
-                    var productionRule = reductionRules[reduceRuleNumber].Item1;                        
                     
-                    var reducePrecedence = grammar.GetPrecedence(productionRule.Symbols.Reverse().OfType<ITerminal<T>>().FirstOrDefault());
+                    var productionRule = reductionRules[reduceRuleNumber].Item1;
+
+                    // If the rule has a context dependent precedence, use that. Otherwise use
+                    // the reduce precedence of the last terminal symbol in the production rules precedence                        
+                    var reducePrecedence = productionRule.ContextPrecedence??
+                        grammar.GetPrecedence(productionRule.Symbols.Reverse().OfType<ITerminal<T>>().FirstOrDefault());
 
                     // If either rule has no precedence this is not a legal course of action.
                     // TODO: In bison this is apparently cool, it prefers to shift in this case. I don't know why, but this

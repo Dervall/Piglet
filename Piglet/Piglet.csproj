@@ -64,6 +64,7 @@
     <Compile Include="Parser\Configuration\IProduction.cs" />
     <Compile Include="Parser\Configuration\ILexerSettings.cs" />
     <Compile Include="Parser\Configuration\INonTerminal.cs" />
+    <Compile Include="Parser\Configuration\PrecedenceGroup.cs" />
     <Compile Include="Parser\Construction\AmbiguousGrammarException.cs" />
     <Compile Include="Parser\Construction\Debug\DotNotation.cs" />
     <Compile Include="Parser\Construction\Debug\ParseTableToString.cs" />

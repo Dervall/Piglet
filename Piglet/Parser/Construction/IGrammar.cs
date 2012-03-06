@@ -10,7 +10,7 @@ namespace Piglet.Parser.Construction
         IEnumerable<ISymbol<T>> AllSymbols { get; }
         NonTerminal<T> AcceptSymbol { get; }
         Terminal<T> EndOfInputTerminal { get; }
-        ITokenPrecedence GetPrecedence(ITerminal<T> terminal);
+        IPrecedenceGroup GetPrecedence(ITerminal<T> terminal);
     }
 
     public enum AssociativityDirection
@@ -20,7 +20,7 @@ namespace Piglet.Parser.Construction
         NonAssociative
     };
 
-    internal interface ITokenPrecedence
+    public interface IPrecedenceGroup
     {
         AssociativityDirection Associativity { get; }
         int Precedence { get; }

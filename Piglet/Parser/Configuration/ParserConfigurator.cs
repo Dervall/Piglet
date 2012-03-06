@@ -27,7 +27,12 @@ namespace Piglet.Parser.Configuration
             lexerSettings = new LexerSettingsImpl();
             terminalPrecedences = new List<TerminalPrecedence>();
             currentPrecedence = 0;
-        
+
+            // Create the Error token. This will create it as terminal 0, but in the end it will be the LAST terminal
+            // second last is EndOfInput. This is sort of hackish and mainly due to the way the lexer is configured.
+            ErrorToken = CreateTerminal(null, s => default(T));
+            ErrorToken.DebugName = "%ERROR%";
+
             // Set some default settings
             LexerSettings.CreateLexer = true;
             LexerSettings.EscapeLiterals = true;
@@ -44,7 +49,7 @@ namespace Piglet.Parser.Configuration
         public ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null)
         {
             Terminal<T> terminal = terminals.SingleOrDefault(f => f.RegExp == regExp);
-            if (terminal != null)
+            if (terminal != null && regExp != null)
             {
                 if (terminal.OnParse != (onParse??Terminal<T>.DefaultFunc))
                     throw new ParserConfigurationException(
@@ -75,6 +80,8 @@ namespace Piglet.Parser.Configuration
         {
             get { return lexerSettings; }
         }
+
+        public ITerminal<T> ErrorToken { get; set; }
 
         public IPrecedenceGroup NonAssociative(params ITerminal<T>[] symbols)
         {
@@ -160,8 +167,14 @@ namespace Piglet.Parser.Configuration
             }
 
             // Add the end of input symbol
-            var eoi = CreateTerminal(null, s => default(T));
-            eoi.DebugName = "$";
+            EndOfInputTerminal = (Terminal<T>) CreateTerminal(null, s => default(T));
+            EndOfInputTerminal.DebugName = "$";
+
+            // Move the error symbol to the end of the list
+            // Hackish I know, but it guarantees that the ErrorToken is always created and that 0 -> n-2 are reserved 
+            // for the REAL symbols in the grammar.
+            terminals.Remove((Terminal<T>) ErrorToken);
+            terminals.Add((Terminal<T>) ErrorToken);
 
             // Assign all tokens in the grammar token numbers!
             AssignTokenNumbers();
@@ -225,12 +238,9 @@ namespace Piglet.Parser.Configuration
             get { return (NonTerminal<T>)Start.ResultSymbol; }
         }
 
-        public Terminal<T> EndOfInputTerminal
-        {
-            get { return terminals.Single(f => f.RegExp == null); }
-        }
+        public Terminal<T> EndOfInputTerminal { get; set; }
 
-        public Construction.IPrecedenceGroup GetPrecedence(ITerminal<T> terminal)
+        public IPrecedenceGroup GetPrecedence(ITerminal<T> terminal)
         {
             return terminalPrecedences.FirstOrDefault(f => f.Terminal == terminal);
         }

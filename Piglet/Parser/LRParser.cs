@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Piglet.Lexer;
 using Piglet.Parser.Construction;
@@ -10,12 +11,16 @@ namespace Piglet.Parser
         private readonly IParseTable<T> parseTable;
         private readonly Stack<T> valueStack;
         private readonly Stack<int> parseStack;
+        private readonly int errorTokenNumber;
+        private readonly int endOfInputTokenNumber;
 
-        internal LRParser(IParseTable<T> parseTable)
+        internal LRParser(IParseTable<T> parseTable, int errorTokenNumber, int endOfInputTokenNumber)
         {
             this.parseTable = parseTable;
             valueStack = new Stack<T>();
             parseStack = new Stack<int>();
+            this.errorTokenNumber = errorTokenNumber;
+            this.endOfInputTokenNumber = endOfInputTokenNumber;
         }
 
         /// <summary>
@@ -35,6 +40,10 @@ namespace Piglet.Parser
             parseStack.Push(0);
 
             var input = Lexer.Next();
+
+            // This holds the last exception we found when parsing, since we
+            // will need to pass this to an error handler once the proper handler has been found
+            ParseException exception = null;
 
             while (true)
             {
@@ -62,31 +71,71 @@ namespace Piglet.Parser
                 {
                     if (action == short.MinValue)
                     {
-                        throw new ParseException(string.Format("Illegal token {0}", input.Item1)) { LexerState = Lexer.LexerState };
-                    }
+                        // Go for error recovery!
+                        exception = new ParseException(string.Format("Illegal token {0}", input.Item1)) { LexerState = Lexer.LexerState };
 
-                    // Get the right reduction rule to apply
-                    ReductionRule<T> reductionRule = parseTable.ReductionRules[-(action + 1)];
-                    for (int i = 0; i < reductionRule.NumTokensToPop * 2; ++i)
+                        while (parseTable.Action[parseStack.Peek(), errorTokenNumber] == short.MinValue)
+                        {
+                            // If we run out of stack while searching for the error handler, throw the exception
+                            // This is what happens when there is no error handler defined at all.
+                            if (parseStack.Count <= 2)
+                                throw exception;
+
+                            parseStack.Pop(); // Pop state
+                            parseStack.Pop(); // Pop token
+                            valueStack.Pop(); // Pop whatever value
+                        }
+
+                        // Shift the error token unto the stack
+                        state = parseStack.Peek();
+                        parseStack.Push(errorTokenNumber);
+                        parseStack.Push(parseTable.Action[state, errorTokenNumber]);
+                        valueStack.Push(default(T));
+                        state = parseStack.Peek();
+
+                        // We have now found a state where error recovery is enabled. This means that we 
+                        // continue to scan the input stream looking for something which is accepted.
+                        // End of input will cause the exception to be thrown
+                        for (; parseTable.Action[state, input.Item1] == short.MinValue && 
+                               input.Item1 != endOfInputTokenNumber; input = Lexer.Next())
+                            Console.WriteLine("Ate '{0}'", Lexer.LexerState.LastLexeme);// nom nom nom
+
+                        // Ran out of file looking for the end of the error rule
+                        if (input.Item1 == endOfInputTokenNumber)
+                            throw exception;
+                        
+                        // If we get here we are pretty cool, continue running the parser. The actual error recovery routine will be
+                        // called as soon as the error rule itself is reduced.
+                    }
+                    else
                     {
-                        parseStack.Pop();
+                        // Get the right reduction rule to apply
+                        ReductionRule<T> reductionRule = parseTable.ReductionRules[-(action + 1)];
+                        for (int i = 0; i < reductionRule.NumTokensToPop*2; ++i)
+                        {
+                            parseStack.Pop();
+                        }
+
+                        // Transfer to state found in goto table
+                        int stateOnTopOfStack = parseStack.Peek();
+                        parseStack.Push(reductionRule.TokenToPush);
+                        parseStack.Push(parseTable.Goto[stateOnTopOfStack, reductionRule.TokenToPush]);
+
+                        // Get tokens off the value stack for the OnReduce function to run on
+                        var onReduceParams = new T[reductionRule.NumTokensToPop];
+
+                        // Need to do it in reverse since thats how the stack is organized
+                        for (int i = reductionRule.NumTokensToPop - 1; i >= 0; --i)
+                        {
+                            onReduceParams[i] = valueStack.Pop();
+                        }
+
+                        // This calls the reduction function with the possible exception set. The exception could be cleared here, but
+                        // there is no real reason to do so, since all the normal rules will ignore it, and all the error rules are guaranteed
+                        // to have the exception set prior to entering the reduction function.
+                        var reduceFunc = reductionRule.OnReduce;
+                        valueStack.Push(reduceFunc == null ? default(T) : reduceFunc(exception, onReduceParams));
                     }
-
-                    // Transfer to state found in goto table
-                    int stateOnTopOfStack = parseStack.Peek();
-                    parseStack.Push(reductionRule.TokenToPush);
-                    parseStack.Push(parseTable.Goto[stateOnTopOfStack, reductionRule.TokenToPush]);
-
-                    // Get tokens off the value stack for the OnReduce function to run on
-                    var onReduceParams = new T[reductionRule.NumTokensToPop];
-
-                    // Need to do it in reverse since thats how the stack is organized
-                    for (int i = reductionRule.NumTokensToPop - 1; i >= 0; --i)
-                    {
-                        onReduceParams[i] = valueStack.Pop();
-                    }
-                    var reduceFunc = reductionRule.OnReduce;
-                    valueStack.Push(reduceFunc == null ? default(T) : reduceFunc(onReduceParams));
                 }
             }
         }

@@ -49,7 +49,7 @@ namespace Piglet.Lexer
                         c.Token(terminal.RegExp, terminal.OnParse);
                     }
                 }
-                c.EndOfInputTokenNumber = terminals.FindIndex(f => f.RegExp == null);
+                c.EndOfInputTokenNumber = terminals.FindIndex(f => f == grammar.EndOfInputTerminal);
                 
                 foreach (var ignored in lexerSettings.Ignore)
                 {

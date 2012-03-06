@@ -42,7 +42,7 @@ namespace Piglet.Parser.Configuration
 
             public ISymbol<T>[] Symbols { get { return symbols; } }
             public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
-            public Func<T[], T> ReduceAction { get; private set; }
+            public Func<ParseException, T[], T> ReduceAction { get; private set; }
             public IPrecedenceGroup ContextPrecedence { get; private set; }
 
             public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object[] symbols)
@@ -75,12 +75,18 @@ namespace Piglet.Parser.Configuration
 
             public void SetReduceFunction(Func<T[], T> action)
             {
-                ReduceAction = action;
+                // This creates a little lambda that ignores the exception
+                ReduceAction = (e, f) => action(f);
             }
 
             public void SetPrecedence(IPrecedenceGroup precedenceGroup)
             {
                 ContextPrecedence = precedenceGroup;
+            }
+
+            public void SetErrorFunction(Func<ParseException, T[], T> errorHandler)
+            {
+                ReduceAction = errorHandler;
             }
         }
 

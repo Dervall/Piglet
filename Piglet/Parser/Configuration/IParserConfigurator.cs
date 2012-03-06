@@ -33,6 +33,11 @@ namespace Piglet.Parser.Configuration
         ILexerSettings LexerSettings { get; }
 
         /// <summary>
+        /// The error token, used for catching errors in the parsing process.
+        /// </summary>
+        ITerminal<T> ErrorToken { get; }
+
+        /// <summary>
         /// Makes a group of tokens left associative at a given precedence level. If you require two or more tokens
         /// to have the same precedence you must pass both at the same time to the precedence call. If you pass
         /// the same token to a precedence function more than once you will get a ParserConfigurationException.

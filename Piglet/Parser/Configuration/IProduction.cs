@@ -21,5 +21,12 @@ namespace Piglet.Parser.Configuration
         /// </summary>
         /// <param name="precedenceGroup">Precedence level to use</param>
         void SetPrecedence(IPrecedenceGroup precedenceGroup);
+
+        /// <summary>
+        /// Set the error reporting function. This is only valid if the rule in question catches
+        /// the Error token as predefined by the configurator.
+        /// </summary>
+        /// <param name="errorHandler">Error handler function</param>
+        void SetErrorFunction(Func<ParseException, T[], T> errorHandler);
     }
 }

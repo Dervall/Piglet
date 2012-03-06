@@ -7,7 +7,7 @@ namespace Piglet.Parser.Construction
     {
         ISymbol<T>[] Symbols { get; }
         ISymbol<T> ResultSymbol { get; }
-        Func<T[], T> ReduceAction { get; }
+        Func<ParseException, T[], T> ReduceAction { get; }
         IPrecedenceGroup ContextPrecedence { get; }
     }
 }

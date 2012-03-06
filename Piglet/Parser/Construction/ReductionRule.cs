@@ -6,6 +6,6 @@ namespace Piglet.Parser.Construction
     {
         public int NumTokensToPop { get; set; }
         public int TokenToPush { get; set; }
-        public Func<T[], T> OnReduce { get; set; }
+        public Func<ParseException, T[], T> OnReduce { get; set; }
     }
 }

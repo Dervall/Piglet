@@ -117,7 +117,7 @@ namespace Piglet.Parser.Construction
 
             LRParseTable<T> parseTable = CreateParseTable(itemSets, gotoSetTransitions);
 
-            return new LRParser<T>(parseTable);
+            return new LRParser<T>(parseTable, ((Terminal<T>)grammar.ErrorToken).TokenNumber, grammar.EndOfInputTerminal.TokenNumber);
         }
 
         private ISet<NonTerminal<T>> CalculateNullable()

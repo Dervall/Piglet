@@ -10,6 +10,7 @@ namespace Piglet.Parser.Construction
         IEnumerable<ISymbol<T>> AllSymbols { get; }
         NonTerminal<T> AcceptSymbol { get; }
         Terminal<T> EndOfInputTerminal { get; }
+        ITerminal<T> ErrorToken { get; }
         IPrecedenceGroup GetPrecedence(ITerminal<T> terminal);
     }
 

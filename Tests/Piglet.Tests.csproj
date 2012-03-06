@@ -51,6 +51,7 @@
     <Compile Include="Parser\Construction\Debug\TestDebugStrings.cs" />
     <Compile Include="Common\TestParseTables.cs" />
     <Compile Include="Parser\ContextPrecedenceTests.cs" />
+    <Compile Include="Parser\ErrorRecoveryTests.cs" />
     <Compile Include="Parser\FluentConfigurationTest.cs" />
     <Compile Include="Parser\ParserConfigurationTest.cs" />
     <Compile Include="Parser\ParsingErrorTests.cs" />

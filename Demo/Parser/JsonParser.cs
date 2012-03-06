@@ -20,83 +20,70 @@ namespace Piglet.Demo.Parser
         {
             var configurator = ParserFactory.Configure<object>();
 
-            var quotedString = configurator.Terminal("\"(\\\\.|[^\"])*\"", f => f.Substring(1, f.Length - 2));
-            var doubleValue = configurator.Terminal(@"\d+\.\d+", f => double.Parse(f));
-            var integerValue = configurator.Terminal(@"\d+", f => int.Parse(f));
+            var quotedString = configurator.CreateTerminal("\"(\\\\.|[^\"])*\"", f => f.Substring(1, f.Length - 2));
+            var doubleValue = configurator.CreateTerminal(@"\d+\.\d+", f => double.Parse(f));
+            var integerValue = configurator.CreateTerminal(@"\d+", f => int.Parse(f));
 
-            var jsonObject = configurator.NonTerminal();
-            var optionalElementList = configurator.NonTerminal();
-            var elementList = configurator.NonTerminal();
-            var element = configurator.NonTerminal();
-            var value = configurator.NonTerminal();
-            var array = configurator.NonTerminal();
-            var optionalValueList = configurator.NonTerminal();
-            var valueList = configurator.NonTerminal();
+            var jsonObject = configurator.CreateNonTerminal();
+            var optionalElementList = configurator.CreateNonTerminal();
+            var elementList = configurator.CreateNonTerminal();
+            var element = configurator.CreateNonTerminal();
+            var value = configurator.CreateNonTerminal();
+            var array = configurator.CreateNonTerminal();
+            var optionalValueList = configurator.CreateNonTerminal();
+            var valueList = configurator.CreateNonTerminal();
 
-            jsonObject.Productions(p => p.AddProduction("{", optionalElementList, "}")
-                                         .SetReduceFunction(f => new JsonObject { Elements = (List<JsonElement>)f[1] }));
+            jsonObject.AddProduction("{", optionalElementList, "}")
+                                         .SetReduceFunction(f => new JsonObject { Elements = (List<JsonElement>)f[1] });
 
-            optionalElementList.Productions(p =>
-            {
-                p.AddProduction(elementList)
+            optionalElementList.AddProduction(elementList)
                  .SetReduceFunction(f => f[0]);
 
-                p.AddProduction()
-                 .SetReduceFunction(f => new List<JsonElement>());
-            });
+            optionalElementList.AddProduction()
+             .SetReduceFunction(f => new List<JsonElement>());
 
-            elementList.Productions(p =>
-            {
-                p.AddProduction(elementList, ",", element)
-                 .SetReduceFunction(f =>
-                 {
-                     var list = (List<JsonElement>)f[0];
-                     list.Add((JsonElement)f[2]);
-                     return list;
-                 });
+            elementList.AddProduction(elementList, ",", element)
+             .SetReduceFunction(f =>
+             {
+                 var list = (List<JsonElement>)f[0];
+                 list.Add((JsonElement)f[2]);
+                 return list;
+             });
 
-                p.AddProduction(element)
-                 .SetReduceFunction(f => new List<JsonElement> { (JsonElement)f[0] });
-            });
+            elementList.AddProduction(element)
+             .SetReduceFunction(f => new List<JsonElement> { (JsonElement)f[0] });
 
-            element.Productions(p => p.AddProduction(quotedString, ":", value)
-                                      .SetReduceFunction(f => new JsonElement { Name = (string)f[0], Value = f[2] }));
+            element.AddProduction(quotedString, ":", value)
+                                      .SetReduceFunction(f => new JsonElement { Name = (string)f[0], Value = f[2] });
 
-            value.Productions(p =>
-            {
-                p.AddProduction(quotedString).SetReduceFunction(f => f[0]);
-                p.AddProduction(integerValue).SetReduceFunction(f => f[0]);
-                p.AddProduction(doubleValue).SetReduceFunction(f => f[0]);
-                p.AddProduction(jsonObject).SetReduceFunction(f => f[0]);
-                p.AddProduction(array).SetReduceFunction(f => f[0]);
-                p.AddProduction("true").SetReduceFunction(f => true);
-                p.AddProduction("false").SetReduceFunction(f => false);
-                p.AddProduction("null").SetReduceFunction(f => null);
-            });
 
-            array.Productions(p => p.AddProduction("[", optionalValueList, "]")
-                                    .SetReduceFunction(f => ((List<object>)f[1]).ToArray()));
+            value.AddProduction(quotedString).SetReduceFunction(f => f[0]);
+            value.AddProduction(integerValue).SetReduceFunction(f => f[0]);
+            value.AddProduction(doubleValue).SetReduceFunction(f => f[0]);
+            value.AddProduction(jsonObject).SetReduceFunction(f => f[0]);
+            value.AddProduction(array).SetReduceFunction(f => f[0]);
+            value.AddProduction("true").SetReduceFunction(f => true);
+            value.AddProduction("false").SetReduceFunction(f => false);
+            value.AddProduction("null").SetReduceFunction(f => null);
 
-            optionalValueList.Productions(p =>
-            {
-                p.AddProduction(valueList)
+
+            array.AddProduction("[", optionalValueList, "]")
+                                    .SetReduceFunction(f => ((List<object>)f[1]).ToArray());
+
+            optionalValueList.AddProduction(valueList)
                  .SetReduceFunction(f => f[0]);
-                p.AddProduction()
-                 .SetReduceFunction(f => new List<object>());
-            });
+            optionalValueList.AddProduction()
+             .SetReduceFunction(f => new List<object>());
 
-            valueList.Productions(p =>
-            {
-                p.AddProduction(valueList, ",", value)
+            valueList.AddProduction(valueList, ",", value)
                  .SetReduceFunction(f =>
                  {
                      var list = (List<object>)f[0];
                      list.Add(f[2]);
                      return list;
                  });
-                p.AddProduction(value)
-                 .SetReduceFunction(f => new List<object> { f[0] });
-            });
+            valueList.AddProduction(value)
+             .SetReduceFunction(f => new List<object> { f[0] });
 
             configurator.LexerSettings.EscapeLiterals = true;
             configurator.LexerSettings.Ignore = new[] { @"\s+" };

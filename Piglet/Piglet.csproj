@@ -70,7 +70,6 @@
     <Compile Include="Parser\Construction\GotoTable.cs" />
     <Compile Include="Parser\Construction\IGrammar.cs" />
     <Compile Include="Parser\Configuration\IParserConfigurator.cs" />
-    <Compile Include="Parser\Configuration\IProductionConfigurator.cs" />
     <Compile Include="Parser\Construction\IParseTable.cs" />
     <Compile Include="Parser\Construction\IProductionRule.cs" />
     <Compile Include="Parser\Configuration\ISymbol.cs" />

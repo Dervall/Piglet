@@ -15,35 +15,26 @@ namespace Piglet.Tests.Parser
             // This is a full on integration test that builds a parser and performs a simple calculation.
             var configurator = ParserFactory.Configure<int>();
 
-            ITerminal<int> number = configurator.Terminal("\\d+", int.Parse);
+            ITerminal<int> number = configurator.CreateTerminal("\\d+", int.Parse);
             number.DebugName = "number";
 
-            INonTerminal<int> expr = configurator.NonTerminal();
+            INonTerminal<int> expr = configurator.CreateNonTerminal();
             expr.DebugName = "expr";
-            INonTerminal<int> term = configurator.NonTerminal();
+            INonTerminal<int> term = configurator.CreateNonTerminal();
             term.DebugName = "term";
-            INonTerminal<int> factor = configurator.NonTerminal();
+            INonTerminal<int> factor = configurator.CreateNonTerminal();
             factor.DebugName = "factor";
 
-            expr.Productions(p =>
-            {
-                p.AddProduction(expr, "+", term).SetReduceFunction(s => s[0] + s[2]);
-                p.AddProduction(expr, "-", term).SetReduceFunction(s => s[0] - s[2]);
-                p.AddProduction(term).SetReduceFunction(s => s[0]);
-            });
+            expr.AddProduction(expr, "+", term).SetReduceFunction(s => s[0] + s[2]);
+            expr.AddProduction(expr, "-", term).SetReduceFunction(s => s[0] - s[2]);
+            expr.AddProduction(term).SetReduceFunction(s => s[0]);
 
-            term.Productions(p =>
-            {
-                p.AddProduction(term, "*", factor).SetReduceFunction(s => s[0] * s[2]);
-                p.AddProduction(term, "/", factor).SetReduceFunction(s => s[0] / s[2]);
-                p.AddProduction(factor).SetReduceFunction(s => s[0]);
-            });
+            term.AddProduction(term, "*", factor).SetReduceFunction(s => s[0] * s[2]);
+            term.AddProduction(term, "/", factor).SetReduceFunction(s => s[0] / s[2]);
+            term.AddProduction(factor).SetReduceFunction(s => s[0]);
 
-            factor.Productions(p =>
-            {
-                p.AddProduction(number).SetReduceFunction(s => s[0]);
-                p.AddProduction("(", expr, ")").SetReduceFunction(s => s[1]);
-            });
+            factor.AddProduction(number).SetReduceFunction(s => s[0]);
+            factor.AddProduction("(", expr, ")").SetReduceFunction(s => s[1]);
 
             var parser = configurator.CreateParser();
             int result = parser.Parse(new StringReader("2-2-5"));
@@ -61,26 +52,20 @@ namespace Piglet.Tests.Parser
                 // This configuration is not a valid LR1 parser. It contains shift reduce conflicts
                 // clasical dangling else case
                 var configurator = ParserFactory.Configure<string>();
-                var ident = configurator.Terminal("[a-z]+");
+                var ident = configurator.CreateTerminal("[a-z]+");
                 ident.DebugName = "ident";
 
-                ifStatement = configurator.NonTerminal();
+                ifStatement = configurator.CreateNonTerminal();
                 ifStatement.DebugName = "ifStatement";
 
-                var statement = configurator.NonTerminal();
+                var statement = configurator.CreateNonTerminal();
                 statement.DebugName = "statement";
 
-                ifStatement.Productions(p =>
-                {
-                    p.AddProduction("if", "\\(", ident, "\\)", "then", statement);
-                    p.AddProduction("if", "\\(", ident, "\\)", "then", statement, "else", statement);
-                });
+                ifStatement.AddProduction("if", "\\(", ident, "\\)", "then", statement);
+                ifStatement.AddProduction("if", "\\(", ident, "\\)", "then", statement, "else", statement);
 
-                statement.Productions(p =>
-                {
-                    p.AddProduction(ifStatement);
-                    p.AddProduction(ident, "=", ident);
-                });
+                statement.AddProduction(ifStatement);
+                statement.AddProduction(ident, "=", ident);
 
                 configurator.LexerSettings.CreateLexer = false;
                 configurator.CreateParser();
@@ -98,13 +83,11 @@ namespace Piglet.Tests.Parser
         public void TestCanMultiplyDefineTerminalStringsInConfiguration()
         {
             var configurator = ParserFactory.Configure<int>();
-            INonTerminal<int> nonTerminal = configurator.NonTerminal();
+            INonTerminal<int> nonTerminal = configurator.CreateNonTerminal();
             nonTerminal.DebugName = "NonTerm";
-            nonTerminal.Productions(p =>
-                                        {
-                                            p.AddProduction("this", "is", "a", "string");
-                                            p.AddProduction("this", "is", "a", "test");
-                                        });
+            nonTerminal.AddProduction("this", "is", "a", "string");
+            nonTerminal.AddProduction("this", "is", "a", "test");
+
             var parser = configurator.CreateParser();
             Assert.IsNotNull(parser);
         }
@@ -122,22 +105,21 @@ namespace Piglet.Tests.Parser
             try
             {
                 var configurator = ParserFactory.Configure<object>();
-                INonTerminal<object> x = configurator.NonTerminal();
+                INonTerminal<object> x = configurator.CreateNonTerminal();
                 x.DebugName = "X";
 
-                t = configurator.NonTerminal();
+                t = configurator.CreateNonTerminal();
                 t.DebugName = "T";
 
-                y = configurator.NonTerminal();
+                y = configurator.CreateNonTerminal();
                 y.DebugName = "Y";
 
-                x.Productions(p =>
-                {
-                    p.AddProduction(t);
-                    p.AddProduction(y);
-                });
-                t.Productions(p => p.AddProduction("A"));
-                y.Productions(p => p.AddProduction("A"));
+                x.AddProduction(t);
+                x.AddProduction(y);
+
+                t.AddProduction("A");
+                y.AddProduction("A");
+
                 configurator.CreateParser();
                 Assert.Fail();
             }
@@ -154,8 +136,8 @@ namespace Piglet.Tests.Parser
             try
             {
                 var configurator = ParserFactory.Configure<byte>();
-                var t = configurator.NonTerminal();
-                t.Productions(f => f.AddProduction(t));
+                var t = configurator.CreateNonTerminal();
+                t.AddProduction(t);
                 configurator.CreateParser();
                 Assert.Fail();
             }
@@ -181,20 +163,21 @@ namespace Piglet.Tests.Parser
             try
             {
                 var configurator = ParserFactory.Configure<int>();
-                var a = configurator.NonTerminal();
+                var a = configurator.CreateNonTerminal();
                 a.DebugName = "a";
-                var b = configurator.NonTerminal();
+                var b = configurator.CreateNonTerminal();
                 b.DebugName = "b";
-                var c = configurator.NonTerminal();
+                var c = configurator.CreateNonTerminal();
                 c.DebugName = "c";
-                a.Productions(p =>
-                {
-                    p.AddProduction(a);
-                    p.AddProduction(b);
-                    p.AddProduction(c);
-                });
-                b.Productions(p => p.AddProduction("b"));
-                c.Productions(p => p.AddProduction("c"));
+
+                a.AddProduction(a);
+                a.AddProduction(b);
+                a.AddProduction(c);
+
+                b.AddProduction("b");
+
+                c.AddProduction("c");
+
                 configurator.CreateParser();
 
                 Assert.Fail();
@@ -213,15 +196,15 @@ namespace Piglet.Tests.Parser
             // This grammar will require the parser factory to perform an aggregated FOLLOW
             // which it doesn't do if there aren't two nonteminals in a row
             var configurator = ParserFactory.Configure<int>();
-            var a = configurator.NonTerminal();
-            var b = configurator.NonTerminal();
-            var c = configurator.NonTerminal();
-            var d = configurator.NonTerminal();
+            var a = configurator.CreateNonTerminal();
+            var b = configurator.CreateNonTerminal();
+            var c = configurator.CreateNonTerminal();
+            var d = configurator.CreateNonTerminal();
 
-            a.Productions(p => p.AddProduction(a, b, c, d));
-            b.Productions(p => p.AddProduction("b"));
-            c.Productions(p => p.AddProduction(b));
-            d.Productions(p => p.AddProduction("d"));
+            a.AddProduction(a, b, c, d);
+            b.AddProduction("b");
+            c.AddProduction(b);
+            d.AddProduction("d");
 
             configurator.CreateParser();
         }
@@ -230,25 +213,20 @@ namespace Piglet.Tests.Parser
         public void TestGrammarWithEpsilonTransitions()
         {
             var configurator = ParserFactory.Configure<int>();
-            var func = configurator.NonTerminal();
+            var func = configurator.CreateNonTerminal();
             func.DebugName = "FUNC";
-            var paramList = configurator.NonTerminal();
+            var paramList = configurator.CreateNonTerminal();
             paramList.DebugName = "PARAMLIST";
-            var optionalParamList = configurator.NonTerminal();
+            var optionalParamList = configurator.CreateNonTerminal();
             optionalParamList.DebugName = "OPTIONALPARAMLIST";
 
-            func.Productions(p => p.AddProduction("func", "(", optionalParamList, ")"));
-            paramList.Productions(p =>
-            {
-                p.AddProduction(paramList, ",", "ident");
-                p.AddProduction("ident");
-            });
+            func.AddProduction("func", "(", optionalParamList, ")");
+            paramList.AddProduction(paramList, ",", "ident");
+            paramList.AddProduction("ident");
 
-            optionalParamList.Productions(p =>
-            {
-                p.AddProduction(paramList);
-                p.AddProduction();
-            });
+            optionalParamList.AddProduction(paramList);
+            optionalParamList.AddProduction();
+
             var parser = configurator.CreateParser();
             parser.Parse("func(ident,ident,ident,ident)");
             parser.Parse("func()");
@@ -258,26 +236,22 @@ namespace Piglet.Tests.Parser
         public void TestDeepEpsilonChain()
         {
             var configurator = ParserFactory.Configure<int>();
-            var a = configurator.NonTerminal();
-            var b = configurator.NonTerminal();
-            var c = configurator.NonTerminal();
-            var d = configurator.NonTerminal();
-            var e = configurator.NonTerminal();
+            var a = configurator.CreateNonTerminal();
+            var b = configurator.CreateNonTerminal();
+            var c = configurator.CreateNonTerminal();
+            var d = configurator.CreateNonTerminal();
+            var e = configurator.CreateNonTerminal();
 
-            a.Productions(p => p.AddProduction("a", b));
-            b.Productions(p =>
-            {
-                p.AddProduction(c);
-                p.AddProduction();
+            a.AddProduction("a", b);
+            b.AddProduction(c);
+            b.AddProduction();
 
-            });
-            c.Productions(p => p.AddProduction("d", d));
-            d.Productions(p =>
-            {
-                p.AddProduction(e);
-                p.AddProduction();
-            });
-            e.Productions(p => p.AddProduction("e"));
+            c.AddProduction("d", d);
+
+            d.AddProduction(e);
+            d.AddProduction();
+
+            e.AddProduction("e");
 
             var parser = configurator.CreateParser();
             parser.Parse("ade");
@@ -292,26 +266,20 @@ namespace Piglet.Tests.Parser
             // 2. S ::= L = R  5. L ::= id
             // 3. S ::= R      6. R ::= L
             var configurator = ParserFactory.Configure<int>();
-            var s = configurator.NonTerminal();
+            var s = configurator.CreateNonTerminal();
             s.DebugName = "S";
-            var l = configurator.NonTerminal();
+            var l = configurator.CreateNonTerminal();
             l.DebugName = "L";
-            var r = configurator.NonTerminal();
+            var r = configurator.CreateNonTerminal();
             r.DebugName = "R";
 
-            s.Productions(p =>
-            {
-                p.AddProduction(l, "=", r);
-                p.AddProduction(r);
-            });
+            s.AddProduction(l, "=", r);
+            s.AddProduction(r);
 
-            l.Productions(p =>
-            {
-                p.AddProduction("*", r);
-                p.AddProduction("id");
-            });
+            l.AddProduction("*", r);
+            l.AddProduction("id");
 
-            r.Productions(p => p.AddProduction(l));
+            r.AddProduction(l);
             configurator.CreateParser();
         }
 
@@ -319,32 +287,23 @@ namespace Piglet.Tests.Parser
         public void TestMultipleEpsilonParametersInARow()
         {
             var configurator = ParserFactory.Configure<int>();
-            var a = configurator.NonTerminal();
+            var a = configurator.CreateNonTerminal();
             a.DebugName = "A";
-            var b = configurator.NonTerminal();
+            var b = configurator.CreateNonTerminal();
             b.DebugName = "B";
-            var c = configurator.NonTerminal();
+            var c = configurator.CreateNonTerminal();
             c.DebugName = "C";
-            var d = configurator.NonTerminal();
+            var d = configurator.CreateNonTerminal();
             d.DebugName = "D";
 
-            a.Productions(p => p.AddProduction("a", b, c, d, "a"));
-            b.Productions(p =>
-            {
-                p.AddProduction("b");
-                p.AddProduction();
-            });
+            a.AddProduction("a", b, c, d, "a");
+            b.AddProduction("b");
+            b.AddProduction();
 
-            c.Productions(p =>
-            {
-                p.AddProduction("c");
-                p.AddProduction();
-            });
-            d.Productions(p =>
-            {
-                p.AddProduction("d");
-                p.AddProduction();
-            });
+            c.AddProduction("c");
+            c.AddProduction();
+            d.AddProduction("d");
+            d.AddProduction();
 
             var parser = configurator.CreateParser();
             parser.Parse("aa");
@@ -364,14 +323,14 @@ namespace Piglet.Tests.Parser
             // S -> CC
             // C -> cC | d
             var configurator = ParserFactory.Configure<int>();
-            var s = configurator.NonTerminal();
+            var s = configurator.CreateNonTerminal();
             s.DebugName = "S";
-            var c = configurator.NonTerminal();
+            var c = configurator.CreateNonTerminal();
             c.DebugName = "C";
 
-            s.Productions(p => p.AddProduction(c, c));
-            c.Productions(p => p.AddProduction("c", c));
-            c.Productions(p => p.AddProduction("d"));
+            s.AddProduction(c, c);
+            c.AddProduction("c", c);
+            c.AddProduction("d");
 
             var parser = configurator.CreateParser();
             parser.Parse("ccccccccdd");
@@ -382,9 +341,9 @@ namespace Piglet.Tests.Parser
         public void TestSingleRuleTerminalGrammar()
         {
             var configurator = ParserFactory.Configure<int>();
-            var s = configurator.NonTerminal();
+            var s = configurator.CreateNonTerminal();
             s.DebugName = "S";
-            s.Productions(p => p.AddProduction("a", "b", "c", "d"));
+            s.AddProduction("a", "b", "c", "d");
             var parser = configurator.CreateParser();
             parser.Parse("abcd");
         }

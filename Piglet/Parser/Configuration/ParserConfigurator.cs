@@ -43,7 +43,7 @@ namespace Piglet.Parser.Configuration
             public string[] Ignore { get; set; }
         }
 
-        public ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null)
+        public ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null)
         {
             Terminal<T> terminal = terminals.SingleOrDefault(f => f.RegExp == regExp);
             if (terminal != null)
@@ -60,9 +60,9 @@ namespace Piglet.Parser.Configuration
             return terminal;
         }
 
-        public INonTerminal<T> NonTerminal(Action<IProductionConfigurator<T>> productionAction = null)
+        public INonTerminal<T> CreateNonTerminal()
         {
-            var nonTerminal = new NonTerminal<T>(this, productionAction);
+            var nonTerminal = new NonTerminal<T>(this);
             nonTerminals.Add(nonTerminal);
             
             if (startSymbol == null)
@@ -124,13 +124,13 @@ namespace Piglet.Parser.Configuration
         {
             // First we need to augment the grammar with a start rule and a new start symbol
             // Create the derived start symbol
-            var augmentedStart = (NonTerminal<T>)NonTerminal();  // Unfortunate cast...
+            var augmentedStart = (NonTerminal<T>)CreateNonTerminal();  // Unfortunate cast...
 
             // Use the start symbols debug name with a ' in front to indicate the augmented symbol.
             augmentedStart.DebugName = "'" + startSymbol.DebugName;
 
             // Create a single production 
-            augmentedStart.Productions(p => p.AddProduction(startSymbol)); // This production is never reduced, parser accepts when its about to reduce. No reduce action.
+            augmentedStart.AddProduction(startSymbol); // This production is never reduced, parser accepts when its about to reduce. No reduce action.
             Start = augmentedStart.ProductionRules.First(); // There's only one production.
 
             // Make sure all the terminals are registered.
@@ -158,7 +158,7 @@ namespace Piglet.Parser.Configuration
             }
 
             // Add the end of input symbol
-            var eoi = Terminal(null, s => default(T));
+            var eoi = CreateTerminal(null, s => default(T));
             eoi.DebugName = "$";
 
             // Assign all tokens in the grammar token numbers!

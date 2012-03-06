@@ -16,19 +16,18 @@ namespace Piglet.Tests.Parser.Construction.Debug
             // We are simply going to test that it doesn't break, not really what it contains.
             var configurator = ParserFactory.Configure<int>();
 
-            var a = configurator.NonTerminal();
+            var a = configurator.CreateNonTerminal();
             a.DebugName = "a";
-            var b = configurator.NonTerminal();
+            var b = configurator.CreateNonTerminal();
             b.DebugName = "b";
-            var c = configurator.NonTerminal();
+            var c = configurator.CreateNonTerminal();
             c.DebugName = "c";
-            a.Productions(p =>
-            {
-                p.AddProduction(b);
-                p.AddProduction(c);
-            });
-            b.Productions(p => p.AddProduction("b"));
-            c.Productions(p => p.AddProduction("c"));
+
+            a.AddProduction(b);
+            a.AddProduction(c);
+
+            b.AddProduction("b");
+            c.AddProduction("c");
 
             var grammar = (IGrammar<int>)configurator;
             var parser = (LRParser<int>)configurator.CreateParser();

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Parser;
 
 namespace Piglet.Tests.Parser
@@ -14,13 +10,12 @@ namespace Piglet.Tests.Parser
         public void TestBadToken()
         {
             var c = ParserFactory.Configure<int>();
-            var a = c.NonTerminal();
-            var b = c.Terminal("b");
-            a.Productions(p =>
-                            {
-                                p.AddProduction(a, "a");
-                                p.AddProduction("a");
-                            });
+            var a = c.CreateNonTerminal();
+            c.CreateTerminal("b");
+
+            a.AddProduction(a, "a");
+            a.AddProduction("a");
+
             var parser = c.CreateParser();
             try
             {

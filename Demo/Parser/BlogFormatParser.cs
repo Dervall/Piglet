@@ -44,45 +44,33 @@ namespace Piglet.Demo.Parser
         public static void RunTechnical()
         {
             var configurator = ParserFactory.Configure<bool>();
-                configurator.LexerSettings.Ignore = new[] {@"\s+"};
+            configurator.LexerSettings.Ignore = new[] { @"\s+" };
 
-                var name = configurator.Terminal("[a-z]+");
-                var quotedString = configurator.Terminal("\"[^\"]+\"");
+            var name = configurator.CreateTerminal("[a-z]+");
+            var quotedString = configurator.CreateTerminal("\"[^\"]+\"");
 
-                var obj = configurator.NonTerminal();
-                var optionalObjectList = configurator.NonTerminal();
-                var objectList = configurator.NonTerminal();
-                var optionalAttributeList = configurator.NonTerminal();
-                var attributeList = configurator.NonTerminal();
-                var attribute = configurator.NonTerminal();
+            var obj = configurator.CreateNonTerminal();
+            var optionalObjectList = configurator.CreateNonTerminal();
+            var objectList = configurator.CreateNonTerminal();
+            var optionalAttributeList = configurator.CreateNonTerminal();
+            var attributeList = configurator.CreateNonTerminal();
+            var attribute = configurator.CreateNonTerminal();
 
-                obj.Productions(p => p.AddProduction(name, "{", optionalObjectList, optionalAttributeList, "}"));
-                
-                optionalObjectList.Productions(p =>
-                {
-                    p.AddProduction(objectList);
-                    p.AddProduction();
-                });
+            obj.AddProduction(name, "{", optionalObjectList, optionalAttributeList, "}");
 
-                objectList.Productions(p =>
-                {
-                    p.AddProduction(objectList, obj);
-                    p.AddProduction(obj);
-                });
-                
-                optionalAttributeList.Productions(p =>
-                {
-                    p.AddProduction(attributeList);
-                    p.AddProduction();
-                });
+            optionalObjectList.AddProduction(objectList);
+            optionalObjectList.AddProduction();
 
-                attributeList.Productions(p => 
-                {
-                    p.AddProduction(attributeList, attribute);
-                    p.AddProduction(attribute);
-                });
+            objectList.AddProduction(objectList, obj);
+            objectList.AddProduction(obj);
 
-                attribute.Productions(p => p.AddProduction("[", name, "=", quotedString, "]"));
+            optionalAttributeList.AddProduction(attributeList);
+            optionalAttributeList.AddProduction();
+
+            attributeList.AddProduction(attributeList, attribute);
+            attributeList.AddProduction(attribute);
+
+            attribute.AddProduction("[", name, "=", quotedString, "]");
 
             var parser = configurator.CreateParser();
             parser.Parse("fruits {" +

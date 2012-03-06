@@ -21,8 +21,8 @@ namespace Piglet.Tests.Parser.Configuration
             try
             {
                 var configurator = new ParserConfigurator<string>();
-                configurator.Terminal("abc", f => "abc");
-                configurator.Terminal("abc", f => "ABC");
+                configurator.CreateTerminal("abc", f => "abc");
+                configurator.CreateTerminal("abc", f => "ABC");
                 Assert.Fail("No exception for multiple definition of terminal with different regex");
             }
             catch (ParserConfigurationException)

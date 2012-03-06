@@ -17,15 +17,14 @@ namespace Piglet.Parser.Configuration
         /// <param name="regExp">Regular expression to match</param>
         /// <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
         /// <returns>A terminal symbol</returns>
-        ITerminal<T> Terminal(string regExp, Func<string, T> onParse = null);
+        ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null);
         
         /// <summary>
         /// Create a new NonTerminal. Production actions may be specified directly, or deferred until later. The
         /// latter is more typical since rules are often recursive in their nature.
         /// </summary>
-        /// <param name="productionAction">Specifies a production action directly.</param>
         /// <returns></returns>
-        INonTerminal<T> NonTerminal(Action<IProductionConfigurator<T>> productionAction = null);
+        INonTerminal<T> CreateNonTerminal();
 
         /// <summary>
         /// Additional lexer settings in addition to the settings provided by the declared terminals.

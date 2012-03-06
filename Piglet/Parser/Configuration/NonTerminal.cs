@@ -11,11 +11,10 @@ namespace Piglet.Parser.Configuration
         private readonly IParserConfigurator<T> configurator;
         private readonly IList<NonTerminalProduction> productions;
 
-        public NonTerminal(IParserConfigurator<T> configurator, Action<IProductionConfigurator<T>> productionAction)
+        public NonTerminal(IParserConfigurator<T> configurator)
         {
             this.configurator = configurator;
             productions = new List<NonTerminalProduction>();
-            Productions(productionAction);
         }
 
         public IEnumerable<IProductionRule<T>> ProductionRules
@@ -23,37 +22,17 @@ namespace Piglet.Parser.Configuration
             get { return productions; }
         }
 
-        public void Productions(Action<IProductionConfigurator<T>> productionAction)
+        public IProduction<T> AddProduction(params object[] parts)
         {
-            if (productionAction != null)
+            if (parts.Any(part => !(part is string || part is ISymbol<T>)))
             {
-                productionAction(new NonTerminalProductionConfigurator(configurator, this));
-            }
-        }
-
-        private class NonTerminalProductionConfigurator : IProductionConfigurator<T>
-        {
-            private readonly IParserConfigurator<T> configurator;
-            private readonly NonTerminal<T> nonTerminal;
-
-            public NonTerminalProductionConfigurator(IParserConfigurator<T> configurator, NonTerminal<T> nonTerminal)
-            {
-                this.configurator = configurator;
-                this.nonTerminal = nonTerminal;
+                throw new ArgumentException("Only string and ISymbol are valid arguments.", "parts");
             }
 
-            public IProduction<T> AddProduction(params object[] parts)
-            {
-                if (parts.Any(part => !(part is string || part is ISymbol<T>)))
-                {
-                    throw new ArgumentException("Only string and ISymbol are valid arguments.", "parts");
-                }
+            var nonTerminalProduction = new NonTerminalProduction(configurator, this, parts);
+            productions.Add(nonTerminalProduction);
 
-                var nonTerminalProduction = new NonTerminalProduction(configurator, nonTerminal, parts);
-                nonTerminal.productions.Add(nonTerminalProduction);
-
-                return nonTerminalProduction;
-            }
+            return nonTerminalProduction;
         }
 
         private class NonTerminalProduction : IProduction<T>, IProductionRule<T>
@@ -64,7 +43,7 @@ namespace Piglet.Parser.Configuration
 
             public ISymbol<T>[] Symbols { get { return symbols; } }
             public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
-            public Func<T[], T> ReduceAction { get { return reduceAction; } } 
+            public Func<T[], T> ReduceAction { get { return reduceAction; } }
 
             public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object[] symbols)
             {
@@ -77,13 +56,13 @@ namespace Piglet.Parser.Configuration
                 {
                     if (part is string)
                     {
-                        var regex = (string) part;
+                        var regex = (string)part;
                         if (configurator.LexerSettings.EscapeLiterals)
                         {
                             regex = Regex.Escape(regex);
                         }
 
-                        this.symbols[i] = configurator.Terminal(regex, null);
+                        this.symbols[i] = configurator.CreateTerminal(regex, null);
                         this.symbols[i].DebugName = (string)part;   // Set debug name to unescaped string, so it's easy on the eyes.
                     }
                     else

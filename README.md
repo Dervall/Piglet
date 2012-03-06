@@ -138,35 +138,26 @@ Assert.AreEqual(23, result);
 If the fluent style configuration is too verbose for you, there is also the option of doing the configuration using a more "technical" API. This configuration is exactly the same as the configuration above.
 
 ```csharp
-var parser = ParserFactory.Configure<int>( configurator =>
-{
-    ITerminal<int> number = configurator.Terminal("\\d+", int.Parse);
+var configurator = ParserFactory.Configure<int>();
 
-    INonTerminal<int> expr = configurator.NonTerminal();
-    INonTerminal<int> term = configurator.NonTerminal();
-    INonTerminal<int> factor = configurator.NonTerminal();
+ITerminal<int> number = configurator.CreateTerminal("\\d+", int.Parse);
 
-    expr.Productions(p =>
-    {
-        p.Production(expr, "+", term).OnReduce(s => s[0] + s[2]);
-        p.Production(expr, "-", term).OnReduce(s => s[0] - s[2]);
-        p.Production(term).OnReduce(s => s[0]);
-    });
+INonTerminal<int> expr = configurator.CreateNonTerminal();
+INonTerminal<int> term = configurator.CreateNonTerminal();
+INonTerminal<int> factor = configurator.CreateNonTerminal();
 
-    term.Productions(p =>
-    {
-        p.Production(term, "*", factor).OnReduce(s => s[0] * s[2]);
-        p.Production(term, "/", factor).OnReduce(s => s[0] / s[2]);
-        p.Production(factor).OnReduce(s => s[0]);
-    });
+expr.AddProduction(expr, "+", term).SetReduceFunction(s => s[0] + s[2]);
+expr.AddProduction(expr, "-", term).SetReduceFunction(s => s[0] - s[2]);
+expr.AddProduction(term).SetReduceFunction(s => s[0]);
 
-    factor.Productions(p =>
-    {
-        p.Production(number).OnReduce(s => s[0]);
-        p.Production("(", expr, ")").OnReduce(s => s[1]);
-    });
-});
+term.AddProduction(term, "*", factor).SetReduceFunction(s => s[0] * s[2]);
+term.AddProduction(term, "/", factor).SetReduceFunction(s => s[0] / s[2]);
+term.AddProduction(factor).SetReduceFunction(s => s[0]);
 
+factor.AddProduction(number).SetReduceFunction(s => s[0]);
+factor.AddProduction("(", expr, ")").SetReduceFunction(s => s[1]);
+
+var parser = configurator.CreateParser();
 int result = parser.Parse(new StringReader("7+8*2-2+2"));
 
 Assert.AreEqual(23, result);

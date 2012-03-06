@@ -9,9 +9,13 @@ namespace Piglet.Parser.Configuration
     public interface INonTerminal<T> : ISymbol<T>
     {
         /// <summary>
-        /// Configure the productions of this nonterminal.
+        /// Creates a production on a given nonterminal. The parts parameter may contains either
+        /// previously declared symbols of the grammar or strings, which are interpreted as terminals
+        /// which may be given unescaped as per the lexer settings of the main configurator object.
+        /// If an empty rule is desired you may pass no parameters to the Production. Null must not be passed.
         /// </summary>
-        /// <param name="productionAction">Production configuration action provided with a production configurator for this nonterminal</param>
-        void Productions(Action<IProductionConfigurator<T>> productionAction);
+        /// <param name="parts">Parts of rule to configure the production</param>
+        /// <returns>A production configurator for the created production, for addition configuration.</returns>
+        IProduction<T> AddProduction(params object[] parts);
     }
 }

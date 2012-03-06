@@ -12,46 +12,44 @@ namespace Piglet.Tests.Parser
         public void TestLeftAssociative()
         {
             var configurator = ParserFactory.Configure<int>();
-            var number = configurator.Terminal(@"\d+", int.Parse);
-            var plus = configurator.Terminal("\\+");
-            var minus = configurator.Terminal("-");
-            var mul = configurator.Terminal("\\*");
-            var div = configurator.Terminal("/");
+            var number = configurator.CreateTerminal(@"\d+", int.Parse);
+            var plus = configurator.CreateTerminal("\\+");
+            var minus = configurator.CreateTerminal("-");
+            var mul = configurator.CreateTerminal("\\*");
+            var div = configurator.CreateTerminal("/");
 
             configurator.LeftAssociative(plus, minus);
             configurator.LeftAssociative(mul, div);
 
 
-            var exp = configurator.NonTerminal();
-            exp.Productions(p =>
+            var exp = configurator.CreateNonTerminal();
+
+            exp.AddProduction(exp, plus, exp).SetReduceFunction(s =>
             {
-                p.AddProduction(exp, plus, exp).SetReduceFunction(s =>
-                {
-                    Console.WriteLine("{0} + {1}", s[0], s[2]);
-                    return s[0] + s[2];
-                });
-                p.AddProduction(exp, minus, exp).SetReduceFunction(s =>
-                {
-                    Console.WriteLine("{0} - {1}", s[0], s[2]);
-                    return s[0] - s[2];
-                });
-                p.AddProduction(exp, mul, exp).SetReduceFunction(s =>
-                {
-                    Console.WriteLine("{0} * {1}", s[0], s[2]);
-                    return s[0] * s[2];
-                });
-                p.AddProduction(exp, div, exp).SetReduceFunction(s =>
-                {
-                    Console.WriteLine("{0} / {1}", s[0], s[2]);
-                    return s[0] / s[2];
-                });
-                p.AddProduction("(", exp, ")").SetReduceFunction(s =>
-                {
-                    Console.WriteLine("Paranthesis ({0})", s[1]);
-                    return s[1];
-                });
-                p.AddProduction(number).SetReduceFunction(s => s[0]);
+                Console.WriteLine("{0} + {1}", s[0], s[2]);
+                return s[0] + s[2];
             });
+            exp.AddProduction(exp, minus, exp).SetReduceFunction(s =>
+            {
+                Console.WriteLine("{0} - {1}", s[0], s[2]);
+                return s[0] - s[2];
+            });
+            exp.AddProduction(exp, mul, exp).SetReduceFunction(s =>
+            {
+                Console.WriteLine("{0} * {1}", s[0], s[2]);
+                return s[0] * s[2];
+            });
+            exp.AddProduction(exp, div, exp).SetReduceFunction(s =>
+            {
+                Console.WriteLine("{0} / {1}", s[0], s[2]);
+                return s[0] / s[2];
+            });
+            exp.AddProduction("(", exp, ")").SetReduceFunction(s =>
+            {
+                Console.WriteLine("Paranthesis ({0})", s[1]);
+                return s[1];
+            });
+            exp.AddProduction(number).SetReduceFunction(s => s[0]);
 
             var parser = configurator.CreateParser();
             Assert.AreEqual(-2, parser.Parse("1 - (1 + (1 * 2))"));
@@ -67,19 +65,16 @@ namespace Piglet.Tests.Parser
         public void TestRightAssociativity()
         {
             var configurator = ParserFactory.Configure<int>();
-            var number = configurator.Terminal(@"\d+",
+            var number = configurator.CreateTerminal(@"\d+",
                                                 int.Parse);
-            var minus = configurator.Terminal("-");
+            var minus = configurator.CreateTerminal("-");
 
             configurator.RightAssociative(minus);
 
-            var exp = configurator.NonTerminal();
+            var exp = configurator.CreateNonTerminal();
 
-            exp.Productions(p =>
-                                {
-                                    p.AddProduction(exp, minus, exp).SetReduceFunction(f => f[0] - f[2]);
-                                    p.AddProduction(number).SetReduceFunction(f => f[0]);
-                                });
+            exp.AddProduction(exp, minus, exp).SetReduceFunction(f => f[0] - f[2]);
+            exp.AddProduction(number).SetReduceFunction(f => f[0]);
 
             var parser = configurator.CreateParser();
             Assert.AreEqual(4 - (7 - 3), parser.Parse("4 - 7 - 3"));
@@ -94,22 +89,19 @@ namespace Piglet.Tests.Parser
                 // Configure an illegal rule
                 var configurator = ParserFactory.Configure<int>();
 
-                var number = configurator.Terminal(@"\d+",
+                var number = configurator.CreateTerminal(@"\d+",
                                                         int.Parse);
-                var equals = configurator.Terminal("=");
+                var equals = configurator.CreateTerminal("=");
 
                 configurator.NonAssociative(equals);
 
 
-                var exp = configurator.NonTerminal();
+                var exp = configurator.CreateNonTerminal();
 
-                exp.Productions(p =>
-                                    {
-                                        p.AddProduction(exp, equals, exp)
-                                            .SetReduceFunction(f => f[0] - f[2]);
-                                        p.AddProduction(number).SetReduceFunction(
-                                            f => f[0]);
-                                    });
+                exp.AddProduction(exp, equals, exp)
+                    .SetReduceFunction(f => f[0] - f[2]);
+                exp.AddProduction(number).SetReduceFunction(
+                    f => f[0]);
 
                 configurator.CreateParser();
                 Assert.Fail("You shall not parse!");

@@ -17,7 +17,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public Terminal<object> Terminal
         {
-            get { return terminal ?? (terminal = (Terminal<object>) configurator.Terminal(regex, func)); }
+            get { return terminal ?? (terminal = (Terminal<object>) configurator.CreateTerminal(regex, func)); }
         }
 
         public IExpressionReturnConfigurator ThatMatches<TExpressionType>()

@@ -10,7 +10,7 @@ namespace Piglet.Parser.Configuration.Fluent
         private readonly FluentParserConfigurator configurator;
         private readonly NonTerminal<object> nonTerminal;
         private readonly List<List<ProductionElement>> productionList;
-        private readonly List<Func<dynamic, object>> funcList; 
+        private readonly List<Func<dynamic, object>> funcList;
 
         private class ProductionElement
         {
@@ -52,7 +52,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public IOptionalAsConfigurator By(string literal)
         {
-            CurrentProduction.Add(new ProductionElement { Symbol = literal } );
+            CurrentProduction.Add(new ProductionElement { Symbol = literal });
             return this;
         }
 
@@ -64,13 +64,13 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public IOptionalAsConfigurator By(IExpressionConfigurator expression)
         {
-            CurrentProduction.Add(new ProductionElement { Symbol = expression } );
+            CurrentProduction.Add(new ProductionElement { Symbol = expression });
             return this;
         }
 
         public IOptionalAsConfigurator By(IRule rule)
         {
-            CurrentProduction.Add(new ProductionElement { Symbol = rule } );
+            CurrentProduction.Add(new ProductionElement { Symbol = rule });
             return this;
         }
 
@@ -157,78 +157,76 @@ namespace Piglet.Parser.Configuration.Fluent
             // This method prepares the list of objects to another list of objects
             // and sends that to the other configuration interface.
             // Use the nonterminal to configure the production
-            nonTerminal.Productions(p =>
+
+            for (var productionIndex = 0; productionIndex < productionList.Count; ++productionIndex)
             {
-                for (var productionIndex = 0; productionIndex < productionList.Count; ++productionIndex)
+                var production = productionList[productionIndex];
+
+                for (int i = 0; i < production.Count; ++i)
                 {
-                    var production = productionList[productionIndex];
-
-                    for (int i = 0; i < production.Count; ++i)
+                    var part = production[i];
+                    if (part is ListOfRule)
                     {
-                        var part = production[i];
-                        if (part is ListOfRule)
+                        // This will create new rules, we want to reduce production[i] 
+                        var listRule = (ListOfRule)part;
+                        var listNonTerminal = listRule.MakeListRule(configurator);
+
+                        if (listRule.Optional)
                         {
-                            // This will create new rules, we want to reduce production[i] 
-                            var listRule = (ListOfRule)part;
-                            var listNonTerminal = listRule.MakeListRule(configurator);
-                            
-                            if (listRule.Optional)
-                            {
-                                listNonTerminal = configurator.MakeOptionalRule(listNonTerminal);
-                            }
-                            production[i].Symbol = listNonTerminal;
+                            listNonTerminal = configurator.MakeOptionalRule(listNonTerminal);
                         }
-                        else if (part.Symbol is string)
-                        {
-                            // Pre-escaped literal
-                            // Do nothing, this is already handled.
-                        }
-                        else if (part.Symbol is FluentRule)
-                        {
-                            production[i].Symbol = ((FluentRule)part.Symbol).nonTerminal;
-                        }
-                        else if (part.Symbol is FluentExpression)
-                        {
-                            production[i].Symbol = ((FluentExpression)part.Symbol).Terminal;
-                        }
-                        else
-                        {
-                            throw new ParserConfigurationException(
-                                "Unknown entity found in production rule list. This should never happen");
-                        }
+                        production[i].Symbol = listNonTerminal;
                     }
-
-                    var configureProductionAction = p.AddProduction(production.Select(f => f.Symbol).ToArray());
-                    
-                    // If there is no specific rule specified.
-                    var func = funcList[productionIndex];
-                    if (func == null)
+                    else if (part.Symbol is string)
                     {
-                        if (production.Count == 1)
-                        {
-                            // Use default rule where all rules of length 1 will autoreduce to the
-                            // first propertys semantic value
-                            configureProductionAction.SetReduceFunction(f => f[0]);
-                        }
+                        // Pre-escaped literal
+                        // Do nothing, this is already handled.
+                    }
+                    else if (part.Symbol is FluentRule)
+                    {
+                        production[i].Symbol = ((FluentRule)part.Symbol).nonTerminal;
+                    }
+                    else if (part.Symbol is FluentExpression)
+                    {
+                        production[i].Symbol = ((FluentExpression)part.Symbol).Terminal;
                     }
                     else
                     {
-                        // Specific function found. This needs to be wrapped in another function
-                        // which translates the index parameters into a dynamic object by the property names
-                        var indexNames = production.Select((f, index) => new Tuple<int, string>(index, f.Name)).Where(f => f.Item2 != null).ToArray();
-
-                        configureProductionAction.SetReduceFunction(f =>
-                        {
-                            var expandoObject = new ExpandoObject();
-                            foreach (var indexName in indexNames)
-                            {
-                                ((IDictionary<string, object>)expandoObject).Add(indexName.Item2, f[indexName.Item1]);
-                            }
-                            return func(expandoObject);
-                        });
+                        throw new ParserConfigurationException(
+                            "Unknown entity found in production rule list. This should never happen");
                     }
                 }
-            });
+
+                var newProduction = nonTerminal.AddProduction(production.Select(f => f.Symbol).ToArray());
+
+                // If there is no specific rule specified.
+                var func = funcList[productionIndex];
+                if (func == null)
+                {
+                    if (production.Count == 1)
+                    {
+                        // Use default rule where all rules of length 1 will autoreduce to the
+                        // first propertys semantic value
+                        newProduction.SetReduceFunction(f => f[0]);
+                    }
+                }
+                else
+                {
+                    // Specific function found. This needs to be wrapped in another function
+                    // which translates the index parameters into a dynamic object by the property names
+                    var indexNames = production.Select((f, index) => new Tuple<int, string>(index, f.Name)).Where(f => f.Item2 != null).ToArray();
+
+                    newProduction.SetReduceFunction(f =>
+                    {
+                        var expandoObject = new ExpandoObject();
+                        foreach (var indexName in indexNames)
+                        {
+                            ((IDictionary<string, object>)expandoObject).Add(indexName.Item2, f[indexName.Item1]);
+                        }
+                        return func(expandoObject);
+                    });
+                }
+            }
         }
     }
 }

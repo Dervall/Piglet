@@ -42,7 +42,7 @@ namespace Piglet.Parser.Configuration
                 this.nonTerminal = nonTerminal;
             }
 
-            public IConfigureProductionAction<T> Production(params object[] parts)
+            public IProduction<T> AddProduction(params object[] parts)
             {
                 if (parts.Any(part => !(part is string || part is ISymbol<T>)))
                 {
@@ -56,7 +56,7 @@ namespace Piglet.Parser.Configuration
             }
         }
 
-        private class NonTerminalProduction : IConfigureProductionAction<T>, IProductionRule<T>
+        private class NonTerminalProduction : IProduction<T>, IProductionRule<T>
         {
             private Func<T[], T> reduceAction;
             private readonly ISymbol<T>[] symbols;
@@ -94,7 +94,7 @@ namespace Piglet.Parser.Configuration
                 }
             }
 
-            public void OnReduce(Func<T[], T> action)
+            public void SetReduceFunction(Func<T[], T> action)
             {
                 reduceAction = action;
             }

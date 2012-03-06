@@ -55,5 +55,11 @@ namespace Piglet.Parser.Configuration
         /// </summary>
         /// <param name="symbols">Symbols to set associativity on</param>
         void NonAssociative(params ITerminal<T>[] symbols);
+
+        /// <summary>
+        /// Creates a parser based on the inputted configuration. If a lexer has been desired as well, this method will also create the lexer.
+        /// </summary>
+        /// <returns>The created parser</returns>
+        IParser<T> CreateParser();
     }
 }

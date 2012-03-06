@@ -198,7 +198,7 @@ namespace Piglet.Parser.Configuration.Fluent
                         }
                     }
 
-                    var configureProductionAction = p.Production(production.Select(f => f.Symbol).ToArray());
+                    var configureProductionAction = p.AddProduction(production.Select(f => f.Symbol).ToArray());
                     
                     // If there is no specific rule specified.
                     var func = funcList[productionIndex];
@@ -208,7 +208,7 @@ namespace Piglet.Parser.Configuration.Fluent
                         {
                             // Use default rule where all rules of length 1 will autoreduce to the
                             // first propertys semantic value
-                            configureProductionAction.OnReduce(f => f[0]);
+                            configureProductionAction.SetReduceFunction(f => f[0]);
                         }
                     }
                     else
@@ -217,7 +217,7 @@ namespace Piglet.Parser.Configuration.Fluent
                         // which translates the index parameters into a dynamic object by the property names
                         var indexNames = production.Select((f, index) => new Tuple<int, string>(index, f.Name)).Where(f => f.Item2 != null).ToArray();
 
-                        configureProductionAction.OnReduce(f =>
+                        configureProductionAction.SetReduceFunction(f =>
                         {
                             var expandoObject = new ExpandoObject();
                             foreach (var indexName in indexNames)

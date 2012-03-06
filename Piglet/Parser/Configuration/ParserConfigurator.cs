@@ -130,7 +130,7 @@ namespace Piglet.Parser.Configuration
             augmentedStart.DebugName = "'" + startSymbol.DebugName;
 
             // Create a single production 
-            augmentedStart.Productions(p => p.Production(startSymbol)); // This production is never reduced, parser accepts when its about to reduce. No reduce action.
+            augmentedStart.Productions(p => p.AddProduction(startSymbol)); // This production is never reduced, parser accepts when its about to reduce. No reduce action.
             Start = augmentedStart.ProductionRules.First(); // There's only one production.
 
             // Make sure all the terminals are registered.
@@ -183,9 +183,16 @@ namespace Piglet.Parser.Configuration
                 AugmentGrammar();
             }
 
-            // Create a new parserfactory
-            // and pass this into it, for use.
-            return new ParserBuilder<T>(this).CreateParser();
+            var parser = new ParserBuilder<T>(this).CreateParser();
+
+            // If our lexer settings says that we are supposed to create a lexer, do so now and assign
+            // the lexer to the created parser.
+            if (LexerSettings.CreateLexer)
+            {
+                parser.Lexer = CreateLexer();
+            }
+
+            return parser;
         }
 
         public IProductionRule<T> Start { get; private set; }

@@ -14,6 +14,6 @@ namespace Piglet.Parser.Configuration
         /// </summary>
         /// <param name="parts">Parts of rule to configure the production</param>
         /// <returns>A production configurator for the created production, for addition configuration.</returns>
-        IConfigureProductionAction<T> Production(params object[] parts);
+        IProduction<T> AddProduction(params object[] parts);
     }
 }

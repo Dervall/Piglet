@@ -26,7 +26,7 @@ namespace Piglet.Tests.Parser.Configuration
             {
                 var configurator = new ParserConfigurator<string>();
                 var nt = configurator.NonTerminal();
-                nt.Productions(p => p.Production("abc", 123, 2.0, false));
+                nt.Productions(p => p.AddProduction("abc", 123, 2.0, false));
                 Assert.Fail("No exception for bad type in production rule list");
             }
             catch (ArgumentException)

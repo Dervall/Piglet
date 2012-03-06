@@ -74,7 +74,7 @@ namespace Piglet.Parser.Configuration.Fluent
             {
                 if (separator != null)
                 {
-                    p.Production(listRule, separator, ((FluentRule)rule).NonTerminal).OnReduce(f =>
+                    p.AddProduction(listRule, separator, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
                     {
                         var list = (List<TListType>)f[0];
                         list.Add((TListType)f[2]);
@@ -83,14 +83,14 @@ namespace Piglet.Parser.Configuration.Fluent
                 }
                 else
                 {
-                    p.Production(listRule, ((FluentRule)rule).NonTerminal).OnReduce( f =>
+                    p.AddProduction(listRule, ((FluentRule)rule).NonTerminal).SetReduceFunction( f =>
                     {
                         var list = (List<TListType>)f[0];
                         list.Add((TListType)f[1]);
                         return list;
                     } );                                             
                 }
-                p.Production(((FluentRule) rule).NonTerminal).OnReduce(f => new List<TListType> { (TListType) f[0] });
+                p.AddProduction(((FluentRule) rule).NonTerminal).SetReduceFunction(f => new List<TListType> { (TListType) f[0] });
             });
 
             listRules.Add(t, listRule);
@@ -106,8 +106,8 @@ namespace Piglet.Parser.Configuration.Fluent
             var optionalRule = (NonTerminal<object>) configurator.NonTerminal();
             optionalRule.Productions(p =>
                                          {
-                                             p.Production(nonTerminal).OnReduce(f => f[0]);
-                                             p.Production();
+                                             p.AddProduction(nonTerminal).SetReduceFunction(f => f[0]);
+                                             p.AddProduction();
                                          });
             optionalRules.Add(nonTerminal, optionalRule);
             return optionalRule;

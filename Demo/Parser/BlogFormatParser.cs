@@ -43,8 +43,7 @@ namespace Piglet.Demo.Parser
 
         public static void RunTechnical()
         {
-            var parser = ParserFactory.Configure<bool>(configurator =>
-            {
+            var configurator = ParserFactory.Configure<bool>();
                 configurator.LexerSettings.Ignore = new[] {@"\s+"};
 
                 var name = configurator.Terminal("[a-z]+");
@@ -57,35 +56,35 @@ namespace Piglet.Demo.Parser
                 var attributeList = configurator.NonTerminal();
                 var attribute = configurator.NonTerminal();
 
-                obj.Productions(p => p.Production(name, "{", optionalObjectList, optionalAttributeList, "}"));
+                obj.Productions(p => p.AddProduction(name, "{", optionalObjectList, optionalAttributeList, "}"));
                 
                 optionalObjectList.Productions(p =>
                 {
-                    p.Production(objectList);
-                    p.Production();
+                    p.AddProduction(objectList);
+                    p.AddProduction();
                 });
 
                 objectList.Productions(p =>
                 {
-                    p.Production(objectList, obj);
-                    p.Production(obj);
+                    p.AddProduction(objectList, obj);
+                    p.AddProduction(obj);
                 });
                 
                 optionalAttributeList.Productions(p =>
                 {
-                    p.Production(attributeList);
-                    p.Production();
+                    p.AddProduction(attributeList);
+                    p.AddProduction();
                 });
 
                 attributeList.Productions(p => 
                 {
-                    p.Production(attributeList, attribute);
-                    p.Production(attribute);
+                    p.AddProduction(attributeList, attribute);
+                    p.AddProduction(attribute);
                 });
 
-                attribute.Productions(p => p.Production("[", name, "=", quotedString, "]"));
-            });
+                attribute.Productions(p => p.AddProduction("[", name, "=", quotedString, "]"));
 
+            var parser = configurator.CreateParser();
             parser.Parse("fruits {" +
                          "    banana {" +
                          "        [tasty=\"true\"]" +

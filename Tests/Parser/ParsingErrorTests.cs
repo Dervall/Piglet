@@ -13,16 +13,15 @@ namespace Piglet.Tests.Parser
         [TestMethod]
         public void TestBadToken()
         {
-             var parser = ParserFactory.Configure<int>(c =>
-                                             {
-                                                 var a = c.NonTerminal();
-                                                 var b = c.Terminal("b");
-                                                 a.Productions(p =>
-                                                                   {
-                                                                       p.Production(a, "a");
-                                                                       p.Production("a");
-                                                                   });
-                                             });
+            var c = ParserFactory.Configure<int>();
+            var a = c.NonTerminal();
+            var b = c.Terminal("b");
+            a.Productions(p =>
+                            {
+                                p.AddProduction(a, "a");
+                                p.AddProduction("a");
+                            });
+            var parser = c.CreateParser();
             try
             {
                 parser.Parse("aa    aaa\naa a a a\na a a b");

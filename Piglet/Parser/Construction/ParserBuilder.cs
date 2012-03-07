@@ -117,7 +117,12 @@ namespace Piglet.Parser.Construction
 
             LRParseTable<T> parseTable = CreateParseTable(itemSets, gotoSetTransitions);
 
-            return new LRParser<T>(parseTable, ((Terminal<T>)grammar.ErrorToken).TokenNumber, grammar.EndOfInputTerminal.TokenNumber);
+            // Create a new parser using that parse table and some additional information that needs
+            // to be available for the runtime parsing to work.
+            return new LRParser<T>(parseTable, 
+                ((Terminal<T>)grammar.ErrorToken).TokenNumber, 
+                grammar.EndOfInputTerminal.TokenNumber,
+                grammar.AllSymbols.OfType<Terminal<T>>().Select(f => f.DebugName).ToArray());
         }
 
         private ISet<NonTerminal<T>> CalculateNullable()
@@ -271,10 +276,9 @@ namespace Piglet.Parser.Construction
             table.Action = new CompressedTable(uncompressedActionTable);
             table.Goto = new GotoTable(gotos);
 
-       //     string gotoGraph = gotoSetTransitions.AsDotNotation(itemSets);
-
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
-        //    string debugTable = table.ToDebugString(grammar, itemSets.Count);
+            //string gotoGraph = gotoSetTransitions.AsDotNotation(itemSets);
+            //string debugTable = table.ToDebugString(grammar, itemSets.Count);
             return table;
         }
 

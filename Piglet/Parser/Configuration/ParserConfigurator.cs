@@ -168,7 +168,7 @@ namespace Piglet.Parser.Configuration
 
             // Add the end of input symbol
             EndOfInputTerminal = (Terminal<T>) CreateTerminal(null, s => default(T));
-            EndOfInputTerminal.DebugName = "$";
+            EndOfInputTerminal.DebugName = "%EOF%";
 
             // Move the error symbol to the end of the list
             // Hackish I know, but it guarantees that the ErrorToken is always created and that 0 -> n-2 are reserved 

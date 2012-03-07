@@ -10,12 +10,33 @@ namespace Piglet.Parser
     public class ParseException : Exception
     {
         /// <summary>
-        /// Current state of the lexer
+        /// Current state of the lexer.
         /// </summary>
         public ILexerState LexerState { get; internal set; }
 
         /// <summary>
-        /// Construct a new Parseexception
+        /// This is a list of tokens that would have been valid given the current state
+        /// when the parsing failed. This contains the debug name of the tokens.
+        /// </summary>
+        public string[] ExpectedTokens { get; set; }
+
+        /// <summary>
+        /// The debug name of the token that was found instead.
+        /// </summary>
+        public string FoundToken { get; set; }
+
+        /// <summary>
+        /// The state number of the parser when it failed
+        /// </summary>
+        public int ParserState { get; set; }
+
+        /// <summary>
+        /// The token ID of the token that was found.
+        /// </summary>
+        public int FoundTokenId { get; set; }
+       
+        /// <summary>
+        /// Construct a new ParseException
         /// </summary>
         /// <param name="message"></param>
         public ParseException(string message)

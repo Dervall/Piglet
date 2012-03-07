@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Piglet.Lexer;
 using Piglet.Parser.Construction;
 
@@ -11,16 +12,21 @@ namespace Piglet.Parser
         private readonly IParseTable<T> parseTable;
         private readonly Stack<T> valueStack;
         private readonly Stack<int> parseStack;
+
         private readonly int errorTokenNumber;
         private readonly int endOfInputTokenNumber;
+        private readonly string[] terminalDebugNames;
 
-        internal LRParser(IParseTable<T> parseTable, int errorTokenNumber, int endOfInputTokenNumber)
+        internal LRParser(IParseTable<T> parseTable, int errorTokenNumber, int endOfInputTokenNumber, string[] terminalDebugNames)
         {
             this.parseTable = parseTable;
+            
             valueStack = new Stack<T>();
             parseStack = new Stack<int>();
+
             this.errorTokenNumber = errorTokenNumber;
             this.endOfInputTokenNumber = endOfInputTokenNumber;
+            this.terminalDebugNames = terminalDebugNames;
         }
 
         /// <summary>
@@ -71,9 +77,21 @@ namespace Piglet.Parser
                 {
                     if (action == short.MinValue)
                     {
-                        // Go for error recovery!
-                        exception = new ParseException(string.Format("Illegal token {0}", input.Item1)) { LexerState = Lexer.LexerState };
+                        // Get the expected tokens
+                        string[] expectedTokens = GetExpectedTokenNames(state).ToArray();
+                        
+                        // Create an exception that either might be thrown or may be handed to the error handling routine.
+                        exception = new ParseException(string.Format("Illegal token {0}. Expected {1}", 
+                            terminalDebugNames[input.Item1], string.Join(",", expectedTokens)))
+                                        {
+                                            LexerState = Lexer.LexerState,
+                                            FoundToken = terminalDebugNames[input.Item1],
+                                            ExpectedTokens = expectedTokens,
+                                            FoundTokenId = input.Item1,
+                                            ParserState = state
+                                        };
 
+                        // Go for error recovery!
                         while (parseTable.Action[parseStack.Peek(), errorTokenNumber] == short.MinValue)
                         {
                             // If we run out of stack while searching for the error handler, throw the exception
@@ -138,6 +156,11 @@ namespace Piglet.Parser
                     }
                 }
             }
+        }
+
+        private IEnumerable<string> GetExpectedTokenNames(int state)
+        {
+            return terminalDebugNames.Where((t, i) => parseTable.Action[state, i] != short.MinValue);
         }
 
         public T Parse(string input)

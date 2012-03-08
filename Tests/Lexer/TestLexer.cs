@@ -106,27 +106,21 @@ namespace Piglet.Tests.Lexer
         [TestMethod]
         public void TestCreateDFA()
         {
-            NFA nfa = NFA.Create("ab|*c&d&");
-
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a|b*cd"))));
             DFA dfa = DFA.Create(nfa);
-            Console.WriteLine("");
         }
 
         [TestMethod]
         public void TestCreateDFA2()
         {
-            DFA dfa = DFA.Create(NFA.Create("ab|c|"));
-            Console.WriteLine();
+            DFA dfa = DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a|b|c")))));
         }
-
-        
 
         [TestMethod]
         public void TestOneOrMoreDFA()
         {
-            NFA nfa = NFA.Create("a+");
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a+"))));
             DFA dfa = DFA.Create(nfa);
-            Console.WriteLine("tjim");
         }
     }
 }

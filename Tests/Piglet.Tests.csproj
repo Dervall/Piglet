@@ -60,7 +60,6 @@
     <Compile Include="Lexer\Construction\DotNotation\TestDotNotation.cs" />
     <Compile Include="Lexer\TestLexer.cs" />
     <Compile Include="Lexer\Construction\TestNFA.cs" />
-    <Compile Include="Lexer\Construction\TestPostFixConverter.cs" />
     <Compile Include="Lexer\Construction\TestRegEx.cs" />
   </ItemGroup>
   <ItemGroup>

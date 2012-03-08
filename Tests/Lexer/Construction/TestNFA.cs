@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Piglet.Lexer.Construction;
@@ -11,24 +12,20 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestConstructWithDigit()
         {
-            NFA nfa = NFA.Create("\\d+");
+            NFA nfa = NFACreate("\\d+");
             Assert.AreEqual(3, nfa.States.Count());
             Assert.AreEqual(3, nfa.Transitions.Count());
         }
 
-        [TestMethod]
-        public void TestAcceptRange()
+        private NFA NFACreate(string s)
         {
-            NFA nfa = NFA.AcceptRange('a', 'c');
-            Assert.AreEqual(2, nfa.States.Count);
-            Assert.AreEqual(1, nfa.Transitions.Count);
-            Assert.AreEqual(3, nfa.Transitions[0].ValidInput.Count());
+            return NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(s))));
         }
 
         [TestMethod]
         public void TestRepeat()
         {
-            NFA nfa = NFA.Create("a*");
+            NFA nfa = NFACreate("a*");
             Assert.AreEqual(4, nfa.States.Count());
             Assert.AreEqual(4, nfa.Transitions.Count());
         }
@@ -36,18 +33,26 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestOneOrMore()
         {
-            NFA nfa = NFA.Create("a+");
+            NFA nfa = NFACreate("a+");
             Assert.AreEqual(3, nfa.States.Count());
             Assert.AreEqual(3, nfa.Transitions.Count());
+        }
+
+        [TestMethod]
+        public void TestOneOrOnce()
+        {
+            NFA nfa = NFACreate("a?");
+            Assert.AreEqual(2, nfa.States.Count());
+            Assert.AreEqual(2, nfa.Transitions.Count());
         }
 
         [TestMethod]
         public void TestConnectThreeNFA()
         {
             // Dragon book example
-            NFA nfa = NFA.Create(PostFixConverter.ToPostFix("a+"));
-            NFA nfa2 = NFA.Create(PostFixConverter.ToPostFix("abb"));
-            NFA nfa3 = NFA.Create(PostFixConverter.ToPostFix("a*b+"));
+            NFA nfa = NFACreate("a+");
+            NFA nfa2 = NFACreate("abb");
+            NFA nfa3 = NFACreate("a*b+");
 
             int numStatesPreMerge = nfa.States.Count() + nfa2.States.Count() + nfa3.States.Count();
 
@@ -58,7 +63,7 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestAlternate()
         {
-            NFA nfa = NFA.Create("ab|");
+            NFA nfa = NFACreate("a|b");
 
             // This forms a little elongated diamond, tests the number of states
             Assert.AreEqual(6, nfa.States.Count());
@@ -68,7 +73,7 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestClosure()
         {
-            NFA nfa = NFA.Create("ab|*c&d&");
+            NFA nfa = NFACreate("(a|b)*cd");
             IList<NFA.State> s0Closure = nfa.Closure(new[] { nfa.StartState }).ToList();
 
             // In this sample 6 stats are reachable
@@ -81,7 +86,7 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestConcatenate()
         {
-            NFA nfa = NFA.Create("ab&c&");
+            NFA nfa = NFACreate("abc");
             Assert.AreEqual(4, nfa.States.Count());
             Assert.AreEqual(3, nfa.Transitions.Count());
         }
@@ -89,16 +94,16 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestComplex()
         {
-            NFA nfa = NFA.Create("ab|*a&b&a*&*ab|&ab|&");
-            Assert.AreEqual(25, nfa.States.Count());
-            Assert.AreEqual(30, nfa.Transitions.Count());
+            NFA nfa = NFACreate("a|b*a&b&a*&*ab|&ab|&");
+            Assert.AreEqual(30, nfa.States.Count());
+            Assert.AreEqual(35, nfa.Transitions.Count());
         }
 
         [TestMethod]
         public void TestOtherComplex()
         {
             //  (a|b)*a -> ab|*a&a&
-            NFA nfa = NFA.Create("ab|*c&d&");
+            NFA nfa = NFACreate("(a|b)*cd");
             Assert.AreEqual(10, nfa.States.Count());
             Assert.AreEqual(11, nfa.Transitions.Count());
         }

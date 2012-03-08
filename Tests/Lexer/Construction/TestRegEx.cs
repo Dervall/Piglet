@@ -22,7 +22,19 @@ namespace Piglet.Tests.Lexer.Construction
         [TestMethod]
         public void TestMatchingQuotesWithEscapes()
         {
-            CheckMatch("\" A quoted string with \\\" inside\"", "\"(\\.|[^\"])*\"");
+            CheckMatch("\" A quoted string with \\\" inside\"", @"""(\\.|[^""])*""");
+        }
+
+        [TestMethod]
+        public void TestStuff()
+        {
+            CheckMatch("absc", "a(bs|e)*c");
+        }
+
+        [TestMethod]
+        public void TestDeepNestedParenthesis()
+        {
+            CheckMatch("abcde", "(a(b)(c(de)))");
         }
 
         [TestMethod]
@@ -69,6 +81,25 @@ namespace Piglet.Tests.Lexer.Construction
         }
 
         [TestMethod]
+        public void TestParenthesis()
+        {
+            CheckMatch("a", "(a)");
+        }
+
+        [TestMethod]
+        public void TestParenthesisWithRepeat()
+        {
+            CheckMatch("a", "(a)+");
+        }
+
+        [TestMethod]
+        public void TestParenthesisWithAlternate()
+        {
+            CheckMatch("a", "(a|b)");
+            CheckMatch("b", "(a|b)");
+        }
+
+        [TestMethod]
         public void TestNegateCharacterClass()
         {
             CheckMatch("abcd", "[^ABCD]+");
@@ -112,6 +143,13 @@ namespace Piglet.Tests.Lexer.Construction
         }
 
         [TestMethod]
+        public void TestGreedyOr()
+        {
+            CheckMatch("heavy", "heavy|metal");
+            CheckMatch("metal", "heavy|metal");
+        }
+
+        [TestMethod]
         public void TestMatchNonAlphanumeric()
         {
             CheckMatch(" \n!@#", "\\W+");
@@ -137,6 +175,18 @@ namespace Piglet.Tests.Lexer.Construction
 
         [TestMethod]
         public void TestNumberedRepetition()
+        {
+            CheckMatch("aaa", "a{3}");
+        }
+
+        [TestMethod]
+        public void TestMultipleParenthesis()
+        {
+            CheckMatch("abcd", "(ab)(cd)");
+        }
+
+        [TestMethod]
+        public void TestNumberedRepetitionWithParenthesis()
         {
             CheckMatch("coolcoolcool", "(cool){3}");
         }

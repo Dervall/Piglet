@@ -49,7 +49,10 @@
     <Compile Include="Lexer\Construction\FiniteAutomata.cs" />
     <Compile Include="Lexer\Construction\LexerConstructionException.cs" />
     <Compile Include="Lexer\Construction\NFA.cs" />
-    <Compile Include="Lexer\Construction\PostFixConverter.cs" />
+    <Compile Include="Lexer\Construction\NfaBuilder.cs" />
+    <Compile Include="Lexer\Construction\RegExLexer.cs" />
+    <Compile Include="Lexer\Construction\RegExToken.cs" />
+    <Compile Include="Lexer\Construction\ShuntingYard.cs" />
     <Compile Include="Lexer\Construction\Transition.cs" />
     <Compile Include="Lexer\ILexer.cs" />
     <Compile Include="Lexer\ILexerState.cs" />

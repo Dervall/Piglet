@@ -81,6 +81,7 @@
     <Compile Include="Parser\Configuration\NonTerminal.cs" />
     <Compile Include="Parser\Configuration\ParserConfigurationException.cs" />
     <Compile Include="Parser\Configuration\ParserConfigurator.cs" />
+    <Compile Include="Parser\Construction\IReductionRule.cs" />
     <Compile Include="Parser\Construction\Lr1Item.cs" />
     <Compile Include="Parser\Construction\Lr1ItemSet.cs" />
     <Compile Include="Parser\Configuration\Fluent\IFluentParserConfigurator.cs" />

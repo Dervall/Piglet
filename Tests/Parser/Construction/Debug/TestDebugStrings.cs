@@ -30,9 +30,9 @@ namespace Piglet.Tests.Parser.Construction.Debug
             c.AddProduction("c");
 
             var grammar = (IGrammar<int>)configurator;
-            var parser = (LRParser<int>)configurator.CreateParser();
+            var parser = configurator.CreateParser();
 
-            string debugString = parser.Table.ToDebugString(grammar, 3);
+            string debugString = parser.ParseTable.ToDebugString(grammar, 3);
             Assert.IsNotNull(debugString);
         }
 

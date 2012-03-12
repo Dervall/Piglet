@@ -29,10 +29,7 @@ namespace Piglet.Parser
             this.terminalDebugNames = terminalDebugNames;
         }
 
-        /// <summary>
-        /// This is accessible for test and debug reasons
-        /// </summary>
-        internal IParseTable<T> Table { get { return parseTable; } }
+        public IParseTable<T> ParseTable { get { return parseTable; } }
 
         public ILexer<T> Lexer { get; set; }
 
@@ -128,7 +125,7 @@ namespace Piglet.Parser
                     else
                     {
                         // Get the right reduction rule to apply
-                        ReductionRule<T> reductionRule = parseTable.ReductionRules[-(action + 1)];
+                        var reductionRule = parseTable.ReductionRules[-(action + 1)];
                         for (int i = 0; i < reductionRule.NumTokensToPop*2; ++i)
                         {
                             parseStack.Pop();

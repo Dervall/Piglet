@@ -275,6 +275,7 @@ namespace Piglet.Parser.Construction
             table.ReductionRules = reductionRules.Select(f => f.Item2).ToArray();
             table.Action = new CompressedTable(uncompressedActionTable);
             table.Goto = new GotoTable(gotos);
+            table.StateCount = itemSets.Count;
 
             // Useful point to look at the table, and everything the builder has generated, since after this point the grammar is pretty much destroyed.
             //string gotoGraph = gotoSetTransitions.AsDotNotation(itemSets);

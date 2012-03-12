@@ -149,6 +149,7 @@ namespace Piglet.Lexer.Construction
                             case '\\':
                             case '{':
                             case '}':
+                            case ' ':
                                 return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = new[] { c } };
 
                             default:

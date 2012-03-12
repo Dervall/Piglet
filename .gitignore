@@ -7,3 +7,4 @@ obj
 TestResults
 *.vsmdi
 *.dotCover
+*.nupkg

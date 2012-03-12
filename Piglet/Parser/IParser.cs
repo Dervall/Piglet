@@ -1,5 +1,6 @@
 using System.IO;
 using Piglet.Lexer;
+using Piglet.Parser.Construction;
 
 namespace Piglet.Parser
 {
@@ -13,7 +14,9 @@ namespace Piglet.Parser
         /// Gets or sets the lexer associated with the parser.
         /// </summary>
         ILexer<T> Lexer { get; set; }
-        
+
+        IParseTable<T> ParseTable { get; }
+
         /// <summary>
         /// Parse an input string, returning the resulting semantic value type that is left on the parse
         /// stack.

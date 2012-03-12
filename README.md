@@ -22,10 +22,79 @@ How to use
 
 Piglet is composed of two parts, a lexer and a parser. 
 
+Parser
+------
+
+Parsing is inheritly a complex subject, and Piglet tries it's best to make it as accessible as possible by using a fluent format that actually tells you what is going to happen. 
+You declare rules, that themselves may contain other rules. The first rule that you define is what the entire thing must be reduced to using the other rules.
+
+The classic example is the calculator. Here it is, implemented in Piglet:
+
+```csharp
+var config = ParserFactory.Fluent();
+var expr = config.Rule();
+var term = config.Rule();
+var factor = config.Rule();
+var plusOrMinus = config.Rule();
+var mulOrDiv = config.Rule();
+
+plusOrMinus.IsMadeUp.By("+").WhenFound(f => '+')
+                    .Or.By("-").WhenFound(f => '-');
+
+expr.IsMadeUp.By(expr).As("Left").Followed.By(plusOrMinus).As("Operator").Followed.By(term).As("Right")
+    .WhenFound(f => f.Operator == '+' ? f.Left + f.Right : f.Left - f.Right)
+    .Or.By(term);
+
+mulOrDiv.IsMadeUp.By("*").WhenFound(f => '*')
+                .Or.By("/").WhenFound(f => '/');
+
+term.IsMadeUp.By(term).As("Left").Followed.By(mulOrDiv).As("Operator").Followed.By(factor).As("Right")
+    .WhenFound(f => f.Operator == '*' ? f.Left * f.Right : f.Left / f.Right)
+    .Or.By(factor);
+
+factor.IsMadeUp.By<int>()
+    .Or.By("(").Followed.By(expr).As("Expression").Followed.By(")")
+    .WhenFound(f => f.Expression);
+
+var parser = config.CreateParser();
+
+int result = (int)parser.Parse("7+8*2-2+2");
+
+Assert.AreEqual(23, result);
+```
+
+If the fluent style configuration is too verbose for you, there is also the option of doing the configuration using a more "technical" API. This configuration is exactly the same as the configuration above. This is more closely associated with the BNF form, that may be familiar to you if you have previous experience with parser generators.
+
+```csharp
+var configurator = ParserFactory.Configure<int>();
+
+ITerminal<int> number = configurator.CreateTerminal("\\d+", int.Parse);
+
+INonTerminal<int> expr = configurator.CreateNonTerminal();
+INonTerminal<int> term = configurator.CreateNonTerminal();
+INonTerminal<int> factor = configurator.CreateNonTerminal();
+
+expr.AddProduction(expr, "+", term).SetReduceFunction(s => s[0] + s[2]);
+expr.AddProduction(expr, "-", term).SetReduceFunction(s => s[0] - s[2]);
+expr.AddProduction(term).SetReduceFunction(s => s[0]);
+
+term.AddProduction(term, "*", factor).SetReduceFunction(s => s[0] * s[2]);
+term.AddProduction(term, "/", factor).SetReduceFunction(s => s[0] / s[2]);
+term.AddProduction(factor).SetReduceFunction(s => s[0]);
+
+factor.AddProduction(number).SetReduceFunction(s => s[0]);
+factor.AddProduction("(", expr, ")").SetReduceFunction(s => s[1]);
+
+var parser = configurator.CreateParser();
+int result = parser.Parse(new StringReader("7+8*2-2+2"));
+
+Assert.AreEqual(23, result);
+```
+
 Lexer
 -----
 
-A lexer is a tool for identifying tokens in a much more flexible way than parsing it yourself. An example:
+Sometimes you don't need a full parser, but only a tool to identify tokens. This the sort of work that you typically do using a series of regular expressions or perhaps a lot of tryParse. A lexer is a tool for identifying tokens in a much more flexible way than doing it yourself. It is also more efficient. An example:
 
 ```csharp
 // Create a lexer returning type object
@@ -97,72 +166,6 @@ for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
 }
 ```
 
-Parser
-------
-
-Parsing is inheritly a more complex subject, and Piglet tries it's best to make it as accessible as possible. The classic example is the calculator. Here it is, implemented in Piglet:
-
-```csharp
-var config = ParserFactory.Fluent();
-var expr = config.Rule();
-var term = config.Rule();
-var factor = config.Rule();
-var plusOrMinus = config.Rule();
-var mulOrDiv = config.Rule();
-
-plusOrMinus.IsMadeUp.By("+").WhenFound(f => '+')
-                    .Or.By("-").WhenFound(f => '-');
-
-expr.IsMadeUp.By(expr).As("Left").Followed.By(plusOrMinus).As("Operator").Followed.By(term).As("Right")
-    .WhenFound(f => f.Operator == '+' ? f.Left + f.Right : f.Left - f.Right)
-    .Or.By(term);
-
-mulOrDiv.IsMadeUp.By("*").WhenFound(f => '*')
-                .Or.By("/").WhenFound(f => '/');
-
-term.IsMadeUp.By(term).As("Left").Followed.By(mulOrDiv).As("Operator").Followed.By(factor).As("Right")
-    .WhenFound(f => f.Operator == '*' ? f.Left * f.Right : f.Left / f.Right)
-    .Or.By(factor);
-
-factor.IsMadeUp.By<int>()
-    .Or.By("(").Followed.By(expr).As("Expression").Followed.By(")")
-    .WhenFound(f => f.Expression);
-
-var parser = config.CreateParser();
-
-int result = (int)parser.Parse("7+8*2-2+2");
-
-Assert.AreEqual(23, result);
-```
-
-If the fluent style configuration is too verbose for you, there is also the option of doing the configuration using a more "technical" API. This configuration is exactly the same as the configuration above.
-
-```csharp
-var configurator = ParserFactory.Configure<int>();
-
-ITerminal<int> number = configurator.CreateTerminal("\\d+", int.Parse);
-
-INonTerminal<int> expr = configurator.CreateNonTerminal();
-INonTerminal<int> term = configurator.CreateNonTerminal();
-INonTerminal<int> factor = configurator.CreateNonTerminal();
-
-expr.AddProduction(expr, "+", term).SetReduceFunction(s => s[0] + s[2]);
-expr.AddProduction(expr, "-", term).SetReduceFunction(s => s[0] - s[2]);
-expr.AddProduction(term).SetReduceFunction(s => s[0]);
-
-term.AddProduction(term, "*", factor).SetReduceFunction(s => s[0] * s[2]);
-term.AddProduction(term, "/", factor).SetReduceFunction(s => s[0] / s[2]);
-term.AddProduction(factor).SetReduceFunction(s => s[0]);
-
-factor.AddProduction(number).SetReduceFunction(s => s[0]);
-factor.AddProduction("(", expr, ")").SetReduceFunction(s => s[1]);
-
-var parser = configurator.CreateParser();
-int result = parser.Parse(new StringReader("7+8*2-2+2"));
-
-Assert.AreEqual(23, result);
-```
-
 More samples and documentation
 ------------------------------
 
@@ -171,7 +174,9 @@ Piglet is quite extensively covered by integration type tests, that provides man
 Releases
 --------
 
-Piglet is quite early on in it's development, the main functionality is all there but who know how many bugs there are to fix. Consider the current version an alpha version. Once Piglet gets to a more stable state, expect this space to fill out :)
+Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
+
+* 1.0.0 First NuGet release
 
 Contributing
 ------------

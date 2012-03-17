@@ -5,8 +5,18 @@ using System.Text;
 
 namespace Piglet.Common
 {
+    /// <summary>
+    /// Extension methods for finding the index of a sublist
+    /// </summary>
     public static class SublistSearch
     {
+        /// <summary>
+        /// Get the index of the a sublist
+        /// </summary>
+        /// <typeparam name="T">Type of list</typeparam>
+        /// <param name="haystack">List to search</param>
+        /// <param name="needle">List to find</param>
+        /// <returns>Index of start of sublist, or -1 if not found</returns>
         public static int IndexOf<T>(this IList<T> haystack, IList<T> needle)
         {
             // Stupid implementation. This could probably benefit from 
@@ -29,7 +39,5 @@ namespace Piglet.Common
 
             return -1;
         }
-
-        
     }
 }

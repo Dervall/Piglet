@@ -176,6 +176,7 @@ Releases
 
 Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
 
+* 1.0.1 Added missing Piglet.XML file to the NuGet package. Documentation should now be available in intellisense.
 * 1.0.0 First NuGet release
 
 Contributing

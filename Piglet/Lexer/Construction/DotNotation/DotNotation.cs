@@ -1,11 +1,21 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace Piglet.Lexer.Construction.DotNotation
 {
-    internal static class DotNotation
+    public static class DotNotation
     {
+        public static void GetDfaAndNfaGraphs(string regex, out string nfaString, out string dfaString)
+        {
+            // Make sure it does not crash and does not return null.
+            var nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(regex))));
+            nfaString = nfa.AsDotNotation();
+            var dfa = DFA.Create(nfa);
+            dfaString = dfa.AsDotNotation();
+        }
+
         /// <summary>
         /// Print the state machine as DOT notation suitable for drawing graphs.
         /// This is a useful debug functionality!!
@@ -16,7 +26,7 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <param name="automata">Automata to generate graph for</param>
         /// <param name="graphName">Graph name as specified in notation</param>
         /// <returns></returns>
-        public static string AsDotNotation<TState>(this FiniteAutomata<TState> automata, string graphName = "automata") where TState : FiniteAutomata<TState>.BaseState
+        internal static string AsDotNotation<TState>(this FiniteAutomata<TState> automata, string graphName = "automata") where TState : FiniteAutomata<TState>.BaseState
         {
             // Draw the *FA as a directed graph with the state numbers in circles
             // Use a double circle for accepting states
@@ -58,7 +68,7 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <typeparam name="T"></typeparam>
         /// <param name="transition"></param>
         /// <returns></returns>
-        public static string TransitionLabel<T>(this Transition<T> transition )
+        internal static string TransitionLabel<T>(this Transition<T> transition )
         {
             if ( !transition.ValidInput.Any()) return "ε";
 

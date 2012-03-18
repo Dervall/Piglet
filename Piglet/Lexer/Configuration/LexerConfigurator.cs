@@ -26,6 +26,9 @@ namespace Piglet.Lexer.Configuration
             // Convert the NFA to a DFA
             DFA dfa = DFA.Create(mergedNfa);
 
+            // Minimize the DFA if required
+            dfa.Minimize();
+
             // Convert the dfa to table form
             var transitionTable = new TransitionTable<T>(dfa, nfas, tokens);
 
@@ -37,6 +40,7 @@ namespace Piglet.Lexer.Configuration
             tokens = new List<Tuple<string, Func<string, T>>>();
             ignore = new List<string>();
             EndOfInputTokenNumber = -1;
+            MinimizeDfa = true;
         }
 
         public void Token(string regEx, Func<string, T> action)
@@ -50,5 +54,6 @@ namespace Piglet.Lexer.Configuration
         }
 
         public int EndOfInputTokenNumber { get; set; }
+        public bool MinimizeDfa { get; set; }
     }
 }

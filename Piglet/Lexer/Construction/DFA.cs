@@ -144,13 +144,40 @@ namespace Piglet.Lexer.Construction
             // and the other one is not set the distinct 
             distinctStatePairs((p, q) =>
             {
-                if (p.AcceptState ^ q.AcceptState)
+                var pIsAcceptState = p.AcceptState;
+                var bIsAcceptState = q.AcceptState;
+                if (bIsAcceptState && pIsAcceptState)
+                {
+                    // If both are accepting states, then we might have an issue merging them.
+                    // this is because we use multiple regular expressions with different endings when
+                    // constructing lexers.
+                    var pAcceptStates = p.NfaStates.Where(f => f.AcceptState).ToList();
+                    var qAcceptStates = q.NfaStates.Where(f => f.AcceptState).ToList();
+
+                    if (pAcceptStates.Count() == qAcceptStates.Count())
+                    {
+                        foreach (var pAcceptState in pAcceptStates)
+                        {
+                            if (!qAcceptStates.Contains(pAcceptState))
+                            {
+                                // Since the accepting states differ, its not cool to merge
+                                // these two states.
+                                distinct[p, q] = int.MaxValue;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Not the same number of states, not cool to merge
+                        distinct[p, q] = int.MaxValue;
+                    }
+                }
+
+                if (pIsAcceptState ^ bIsAcceptState)
                 {
                     distinct[p, q] = int.MaxValue;
                 }
             });
-
-            string tjo = distinct.ToString();
 
             // Start iterating
             bool changes;
@@ -170,17 +197,27 @@ namespace Piglet.Lexer.Construction
                         foreach (var a in allValidInputs)
                         {
                             var qa = targetState(q, a);
-                            if (qa == null) continue; // TODO: ?
-
                             var pa = targetState(p, a);
-                            if (pa == null) continue; // TODO: ???
 
-                            if (qa == pa) continue;
+                            if (pa == null ^ qa == null)
+                            {
+                                // If one of them has a transition on this character but the other one doesn't then
+                                // they are separate.
+                                distinct[p, q] = a;
+                                changes = true;
+
+                                break;
+                            }
+                            
+                            // If both are null, then we carry on.
+                            // The other one is null implictly since we have XOR checked it earlier
+                            if (qa == null) continue;
 
                             if (distinct[qa, pa] != -1)
                             {
                                 distinct[p, q] = a;
                                 changes = true;
+                                break;
                             }
                         }                           
                     }
@@ -194,43 +231,43 @@ namespace Piglet.Lexer.Construction
 
             distinctStatePairs((p, q) =>
             {
-                if (distinct[p, q] == -1)
-                {
-                    // These two states are supposed to merge!
-                    // See if p or q is already part of a merge list!
-                    var pMergeSet = findMergeList(p);
-                    var qMergeSet = findMergeList(q);
+                // No need to check those that we have already determined to be distinct
+                if (distinct[p, q] != -1) return;
 
-                    if (pMergeSet == null && qMergeSet == null)
+                // These two states are supposed to merge!
+                // See if p or q is already part of a merge list!
+                var pMergeSet = findMergeList(p);
+                var qMergeSet = findMergeList(q);
+
+                if (pMergeSet == null && qMergeSet == null)
+                {
+                    // No previous set for either
+                    // Add a new merge set
+                    mergeSets.Add(new HashSet<State> { p, q });
+                }
+                else if (pMergeSet != null && qMergeSet == null)
+                {
+                    // Add q to pMergeSet
+                    pMergeSet.Add(q);
+                }
+                else if (pMergeSet == null)
+                {
+                    // Add p to qMergeSet
+                    qMergeSet.Add(p);
+                }
+                else
+                {
+                    // Both previously have merge sets
+                    // If its not the same set (which it shoudln't be) then add their union
+                    if (pMergeSet != qMergeSet)
                     {
-                        // No previous set for either
-                        // Add a new merge set
-                        mergeSets.Add(new HashSet<State> { p, q });
-                    }
-                    else if (pMergeSet != null && qMergeSet == null)
-                    {
-                        // Add q to pMergeSet
-                        pMergeSet.Add(q);
-                    }
-                    else if (pMergeSet == null)
-                    {
-                        // Add p to qMergeSet
-                        qMergeSet.Add(p);
-                    }
-                    else
-                    {
-                        // Both previously have merge sets
-                        // If its not the same set (which it shoudln't be) then add their union
-                        if (pMergeSet != qMergeSet)
-                        {
-                            // Union everything into the pMergeSet
-                            pMergeSet.UnionWith(qMergeSet);
+                        // Union everything into the pMergeSet
+                        pMergeSet.UnionWith(qMergeSet);
                             
-                            // Remove the qMergeSet
-                            mergeSets.Remove(qMergeSet);
-                        }
+                        // Remove the qMergeSet
+                        mergeSets.Remove(qMergeSet);
                     }
-                } 
+                }
             });
 
             // Armed with the merge sets, we can now do the actual merge
@@ -289,9 +326,16 @@ namespace Piglet.Lexer.Construction
                         }
                     }
 
+                    // Since before removing this state, we need to merge the list of NFA states that created both of these states
+                    foreach (var nfaState in toRemove.NfaStates)
+                    {
+                        if (!outputState.NfaStates.Contains(nfaState))
+                        {
+                            outputState.NfaStates.Add(nfaState);
+                        }
+                    }
+
                     // There should be no more references to this state. It can thus be removed.
-                    // TODO: Do we need to check the starting state and the accepting flags here as well?
-                    // TODO: Can non accepting and accepting states ever be merged together?
                     States.Remove(toRemove);
                 }
             }

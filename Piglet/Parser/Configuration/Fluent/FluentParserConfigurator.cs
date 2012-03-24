@@ -6,21 +6,21 @@ namespace Piglet.Parser.Configuration.Fluent
     internal class FluentParserConfigurator : IFluentParserConfigurator
     {
         private readonly ParserConfigurator<object> configurator;
-        private readonly List<FluentRule> rules;
+        private readonly List<RuleBuilder> rules;
         private readonly Dictionary<Tuple<IRule, string>, NonTerminal<object>> listRules;
         private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> optionalRules;
 
         public FluentParserConfigurator(ParserConfigurator<object> configurator)
         {
             this.configurator = configurator;
-            rules = new List<FluentRule>();
+            rules = new List<RuleBuilder>();
             listRules = new Dictionary<Tuple<IRule, string>, NonTerminal<object>>();
             optionalRules = new Dictionary<NonTerminal<object>, NonTerminal<object>>();
         }
 
         public IRule Rule()
         {
-            var rule = new FluentRule(this, configurator.CreateNonTerminal());
+            var rule = new RuleBuilder(this, configurator.CreateNonTerminal());
             rules.Add(rule);
             return rule;
         }
@@ -72,7 +72,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
             if (separator != null)
             {
-                listRule.AddProduction(listRule, separator, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
+                listRule.AddProduction(listRule, separator, ((RuleBuilder)rule).NonTerminal).SetReduceFunction(f =>
                 {
                     var list = (List<TListType>)f[0];
                     list.Add((TListType)f[2]);
@@ -81,14 +81,14 @@ namespace Piglet.Parser.Configuration.Fluent
             }
             else
             {
-                listRule.AddProduction(listRule, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
+                listRule.AddProduction(listRule, ((RuleBuilder)rule).NonTerminal).SetReduceFunction(f =>
                 {
                     var list = (List<TListType>)f[0];
                     list.Add((TListType)f[1]);
                     return list;
                 });
             }
-            listRule.AddProduction(((FluentRule)rule).NonTerminal).SetReduceFunction(f => new List<TListType> { (TListType)f[0] });
+            listRule.AddProduction(((RuleBuilder)rule).NonTerminal).SetReduceFunction(f => new List<TListType> { (TListType)f[0] });
 
             listRules.Add(t, listRule);
             return listRule;

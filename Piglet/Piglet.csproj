@@ -61,11 +61,11 @@
     <Compile Include="Lexer\LexerException.cs" />
     <Compile Include="Lexer\LexerFactory.cs" />
     <Compile Include="Lexer\TransitionTable.cs" />
-    <Compile Include="Parser\Configuration\Fluent\DslBuilder.cs" />
+    <Compile Include="Parser\Configuration\Fluent\RuleBuilder.cs" />
     <Compile Include="Parser\Configuration\Fluent\FluentExpression.cs" />
     <Compile Include="Parser\Configuration\Fluent\FluentParserConfigurator.cs" />
-    <Compile Include="Parser\Configuration\Fluent\FluentRule.cs" />
     <Compile Include="Parser\Configuration\Fluent\IHideObjectMembers.cs" />
+    <Compile Include="Parser\Configuration\Fluent\RuleSyntaxState.cs" />
     <Compile Include="Parser\Configuration\IProduction.cs" />
     <Compile Include="Parser\Configuration\ILexerSettings.cs" />
     <Compile Include="Parser\Configuration\INonTerminal.cs" />

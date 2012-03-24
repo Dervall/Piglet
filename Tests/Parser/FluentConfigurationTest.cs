@@ -29,7 +29,7 @@ namespace Piglet.Tests.Parser
             var jsonArray = config.Rule();
 
             jsonObject.IsMadeUp.By("{")
-                      .Followed.ByListOf<JsonElement>(jsonElement).As("ElementList").ThatIs.SeparatedBy(",").Optional
+                      .Followed.ByListOf<JsonElement>(jsonElement).As("ElementList").ThatIs.SeparatedBy(",").And.Optional
                       .Followed.By("}")
                 .WhenFound( o => new JsonObject { Elements = o.ElementList } );
 
@@ -47,7 +47,7 @@ namespace Piglet.Tests.Parser
                 .Or.By("null").WhenFound(o => null);
 
             jsonArray.IsMadeUp.By("[")
-                     .Followed.ByListOf(jsonValue).As("Values").ThatIs.SeparatedBy(",").Optional
+                     .Followed.ByListOf(jsonValue).As("Values").ThatIs.SeparatedBy(",").And.Optional
                      .Followed.By("]")
                    .WhenFound(o => o.Values);
 

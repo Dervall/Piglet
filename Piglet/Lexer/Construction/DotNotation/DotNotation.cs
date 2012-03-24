@@ -7,12 +7,16 @@ namespace Piglet.Lexer.Construction.DotNotation
 {
     public static class DotNotation
     {
-        public static void GetDfaAndNfaGraphs(string regex, out string nfaString, out string dfaString)
+        public static void GetDfaAndNfaGraphs(string regex, bool minimize, out string nfaString, out string dfaString)
         {
             // Make sure it does not crash and does not return null.
             var nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(regex))));
             nfaString = nfa.AsDotNotation();
             var dfa = DFA.Create(nfa);
+            if (minimize)
+            {
+                dfa.Minimize();
+            }
             dfaString = dfa.AsDotNotation();
         }
 

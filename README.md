@@ -174,6 +174,14 @@ Piglet is quite extensively covered by integration type tests, that provides man
 Releases
 --------
 
+Releases are numbered in major, minor and revision number. 
+
+* Major number are updated on major changes which are not backwards compatible. 
+* Minor versions add features and might in some cases distrupt some backwards compatibility
+* Revisions are fully-backwards compatible fixes on a previous versions.
+
+All releases are available from both NuGet, and are always represented as tags on github.
+
 Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
 
 * 1.0.1 Added missing Piglet.XML file to the NuGet package. Documentation should now be available in intellisense.

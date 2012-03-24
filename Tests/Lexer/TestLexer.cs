@@ -25,6 +25,24 @@ namespace Piglet.Tests.Lexer
         }
 
         [TestMethod]
+        public void TestMinimizationWontMessUpLexing()
+        {
+            var lexer = LexerFactory<string>.Configure(c =>
+                                                           {
+                                                               c.MinimizeDfa = true;
+                                                               c.Token("aa", f=> "aa");
+                                                               c.Token("a+", f => "a+");
+                                                               c.Ignore(" ");
+                                                           });
+            lexer.SetSource("aa aaaaaaa aa aaaa aa");
+            Assert.AreEqual("aa", lexer.Next().Item2);
+            Assert.AreEqual("a+", lexer.Next().Item2);
+            Assert.AreEqual("aa", lexer.Next().Item2);
+            Assert.AreEqual("a+", lexer.Next().Item2);
+            Assert.AreEqual("aa", lexer.Next().Item2);
+        }
+
+        [TestMethod]
         public void TestLexerConstructionWithWhitespaceIgnore()
         {
             ILexer<string> lexer = LexerFactory<string>.Configure(c =>

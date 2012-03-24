@@ -30,5 +30,11 @@ namespace Piglet.Lexer.Configuration
         /// Default is -1
         /// </summary>
         int EndOfInputTokenNumber { get; set; }
+
+        /// <summary>
+        /// Should the resulting DFA be minimized?
+        /// The default is true, and it should normally be kept that way
+        /// </summary>
+        bool MinimizeDfa { get; set; }
     }
 }

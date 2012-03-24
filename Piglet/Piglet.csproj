@@ -55,6 +55,7 @@
     <Compile Include="Lexer\Construction\RegExToken.cs" />
     <Compile Include="Lexer\Construction\ShuntingYard.cs" />
     <Compile Include="Lexer\Construction\Transition.cs" />
+    <Compile Include="Lexer\Construction\TriangularTable.cs" />
     <Compile Include="Lexer\ILexer.cs" />
     <Compile Include="Lexer\ILexerState.cs" />
     <Compile Include="Lexer\Lexer.cs" />

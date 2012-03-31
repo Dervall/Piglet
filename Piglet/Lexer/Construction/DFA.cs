@@ -343,5 +343,10 @@ namespace Piglet.Lexer.Construction
             // The states now need to be renumbered
             AssignStateNumbers();
         }
+
+        public override IEnumerable<State> Closure(State[] states, ISet<State> visitedStates = null)
+        {
+            return states;
+        }
     }
 }

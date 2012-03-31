@@ -54,26 +54,23 @@ namespace Piglet.Lexer.Construction.DotNotation
             sb.Append("\t[node shape=\"circle\"]\n");
             sb.Append("\tgraph [rankdir=\"LR\"]\n");
 
-            IEnumerable<TState> currentStates = new TState[] { automata.States[0]};
+            IEnumerable<TState> currentStates = Enumerable.Empty<TState>();
 
-            if (input != null)
+            bool matchSuccessful = false; 
+
+            if (!string.IsNullOrEmpty(input))
             {
-                // Stimulate the automata using the input.
-         //       IEnumerable<TState> currentState = automata.Stimulate(input);
-          //      foreach (var state in currentState)
-            //    {
-             //       sb.AppendFormat("\t{0} [color=\"gree\"]");
-             //   }
+                var stimulateResult = automata.Stimulate(input);
+
+                matchSuccessful = (input == stimulateResult.Matched);
+                
+                sb.AppendFormat("\tlabel=\"Matched: {0}\"\n", stimulateResult.Matched.Replace("\"", "\\\""));
+                sb.Append("\tlabelloc=top;\n");
+                sb.Append("\tlabeljust=center;\n");
+
+                currentStates = stimulateResult.ActiveStates;
             }
 
-            foreach (var state in automata.States.Where(f=>f.AcceptState || currentStates.Contains(f)))
-            {
-                sb.AppendFormat("\t{0} [{1}{2}]\n", 
-                    state.StateNumber,
-                    state.AcceptState ? "shape=\"doublecircle\"" : "",
-                    currentStates.Contains(state) ? " fillcolor=\"green\" style=\"filled\"" : "");
-            }
-            
             foreach (var transition in automata.Transitions)
             {
                 sb.Append(string.Format("\t{0} -> {1} [label=\"{2}\"]\n", 
@@ -82,7 +79,15 @@ namespace Piglet.Lexer.Construction.DotNotation
                     transition.TransitionLabel().Replace("\\", "\\\\").Replace("\"", "\\\"")));
             }
 
-            
+            foreach (var state in automata.States.Where(f => f.AcceptState || currentStates.Contains(f)))
+            {
+                sb.AppendFormat("\t{0} [{1}{2}]\n",
+                    state.StateNumber,
+                    state.AcceptState ? "shape=\"doublecircle\"" : "",
+                    currentStates.Contains(state) ?
+                    string.Format(" fillcolor=\"{0}\" style=\"filled\"", matchSuccessful ? "green" : "red")
+                    : "");
+            }
 
             sb.Append("}");
 

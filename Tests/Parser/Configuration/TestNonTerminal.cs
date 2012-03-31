@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Parser.Configuration;
 
 namespace Piglet.Tests.Parser.Configuration
 {
-    [TestClass]
+    [TestFixture]
     public class TestNonTerminal
     {
-        [TestMethod]
+        [Test]
         public void TestToString()
         {
             var configurator = new ParserConfigurator<string>();
@@ -16,7 +16,7 @@ namespace Piglet.Tests.Parser.Configuration
             Assert.IsNotNull(nt.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void TestBadProduction()
         {
             try

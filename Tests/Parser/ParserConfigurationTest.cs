@@ -1,15 +1,15 @@
 ﻿using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Parser;
 using Piglet.Parser.Configuration;
 using Piglet.Parser.Construction;
 
 namespace Piglet.Tests.Parser
 {
-    [TestClass]
+    [TestFixture]
     public class ParserIntegrationTest
     {
-        [TestMethod]
+        [Test]
         public void TestACalculator()
         {
             // This is a full on integration test that builds a parser and performs a simple calculation.
@@ -42,7 +42,7 @@ namespace Piglet.Tests.Parser
             Assert.AreEqual(-5, result);
         }
 
-        [TestMethod]
+        [Test]
         public void TestShiftReduceError()
         {
             INonTerminal<string> ifStatement = null;
@@ -79,7 +79,7 @@ namespace Piglet.Tests.Parser
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCanMultiplyDefineTerminalStringsInConfiguration()
         {
             var configurator = ParserFactory.Configure<int>();
@@ -92,7 +92,7 @@ namespace Piglet.Tests.Parser
             Assert.IsNotNull(parser);
         }
 
-        [TestMethod]
+        [Test]
         public void TestReduceReduceConflict()
         {
             // Represents the grammar
@@ -130,7 +130,7 @@ namespace Piglet.Tests.Parser
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestRetardedCyclicGrammar()
         {
             try
@@ -149,7 +149,7 @@ namespace Piglet.Tests.Parser
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestShiftReduceConflictWithAccept()
         {
             // For certain grammars you can produce this stuff. It is not a real world case
@@ -190,7 +190,7 @@ namespace Piglet.Tests.Parser
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestNonTerminalFollow()
         {
             // This grammar will require the parser factory to perform an aggregated FOLLOW
@@ -209,7 +209,7 @@ namespace Piglet.Tests.Parser
             configurator.CreateParser();
         }
 
-        [TestMethod]
+        [Test]
         public void TestGrammarWithEpsilonTransitions()
         {
             var configurator = ParserFactory.Configure<int>();
@@ -232,7 +232,7 @@ namespace Piglet.Tests.Parser
             parser.Parse("func()");
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeepEpsilonChain()
         {
             var configurator = ParserFactory.Configure<int>();
@@ -259,7 +259,7 @@ namespace Piglet.Tests.Parser
             parser.Parse("ad");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNonSLRGrammar()
         {
             // 1. S’ ::= S     4. L ::= * R
@@ -283,7 +283,7 @@ namespace Piglet.Tests.Parser
             configurator.CreateParser();
         }
 
-        [TestMethod]
+        [Test]
         public void TestMultipleEpsilonParametersInARow()
         {
             var configurator = ParserFactory.Configure<int>();
@@ -315,7 +315,7 @@ namespace Piglet.Tests.Parser
             parser.Parse("abda");
         }
 
-        [TestMethod]
+        [Test]
         public void TestLr1Harness()
         {
             // Duplicate grammar from dragon book, for comparison
@@ -337,7 +337,7 @@ namespace Piglet.Tests.Parser
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSingleRuleTerminalGrammar()
         {
             var configurator = ParserFactory.Configure<int>();

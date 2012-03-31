@@ -1,13 +1,13 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Parser;
 
 namespace Piglet.Tests.Parser
 {
-    [TestClass]
+    [TestFixture]
     public class ContextPrecedenceTests
     {
-        [TestMethod]
+        [Test]
         public void TestUnaryMinus()
         {
             var configurator = ParserFactory.Configure<int>();

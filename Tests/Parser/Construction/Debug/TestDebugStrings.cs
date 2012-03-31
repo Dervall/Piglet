@@ -1,14 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using Piglet.Parser;
 using Piglet.Parser.Construction;
 using Piglet.Parser.Construction.Debug;
 
 namespace Piglet.Tests.Parser.Construction.Debug
 {
-    [TestClass]
+    [TestFixture]
     public class TestDebugStrings
     {
-        [TestMethod]
+        [Test]
         public void TestParseTableToString()
         {
             // Need to get our hands on a parse table, which isn't the easiest thing for a normal user

@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using Piglet.Parser;
 
 namespace Piglet.Tests.Parser
 {
-    [TestClass]
+    [TestFixture]
     public class ParsingErrorTests
     {
-        [TestMethod]
+        [Test]
         public void TestBadToken()
         {
             var c = ParserFactory.Configure<int>();

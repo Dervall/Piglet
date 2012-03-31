@@ -9,15 +9,20 @@ namespace Piglet.Lexer.Construction.DotNotation
     {
         public static void GetDfaAndNfaGraphs(string regex, bool minimize, out string nfaString, out string dfaString)
         {
+            GetDfaAndNfaGraphs(regex, null, minimize, out nfaString, out dfaString);
+        }
+
+        public static void GetDfaAndNfaGraphs(string regex, string input, bool minimize, out string nfaString, out string dfaString)
+        {
             // Make sure it does not crash and does not return null.
             var nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(regex))));
-            nfaString = nfa.AsDotNotation();
+            nfaString = nfa.AsDotNotation(input, "NFA");
             var dfa = DFA.Create(nfa);
             if (minimize)
             {
                 dfa.Minimize();
             }
-            dfaString = dfa.AsDotNotation();
+            dfaString = dfa.AsDotNotation(input, "DFA");
         }
 
         /// <summary>
@@ -28,9 +33,10 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// 
         /// </summary>
         /// <param name="automata">Automata to generate graph for</param>
+        /// <param name="input">Input to highlight the current state with</param>
         /// <param name="graphName">Graph name as specified in notation</param>
         /// <returns></returns>
-        internal static string AsDotNotation<TState>(this FiniteAutomata<TState> automata, string graphName = "automata") where TState : FiniteAutomata<TState>.BaseState
+        internal static string AsDotNotation<TState>(this FiniteAutomata<TState> automata, string input, string graphName = "automata") where TState : FiniteAutomata<TState>.BaseState
         {
             // Draw the *FA as a directed graph with the state numbers in circles
             // Use a double circle for accepting states
@@ -48,9 +54,24 @@ namespace Piglet.Lexer.Construction.DotNotation
             sb.Append("\t[node shape=\"circle\"]\n");
             sb.Append("\tgraph [rankdir=\"LR\"]\n");
 
-            foreach (var state in automata.States.Where(f=>f.AcceptState))
+            IEnumerable<TState> currentStates = new TState[] { automata.States[0]};
+
+            if (input != null)
             {
-                sb.Append(string.Format("\t{0} [shape=\"doublecircle\"]\n", state.StateNumber));
+                // Stimulate the automata using the input.
+         //       IEnumerable<TState> currentState = automata.Stimulate(input);
+          //      foreach (var state in currentState)
+            //    {
+             //       sb.AppendFormat("\t{0} [color=\"gree\"]");
+             //   }
+            }
+
+            foreach (var state in automata.States.Where(f=>f.AcceptState || currentStates.Contains(f)))
+            {
+                sb.AppendFormat("\t{0} [{1}{2}]\n", 
+                    state.StateNumber,
+                    state.AcceptState ? "shape=\"doublecircle\"" : "",
+                    currentStates.Contains(state) ? " fillcolor=\"green\" style=\"filled\"" : "");
             }
             
             foreach (var transition in automata.Transitions)
@@ -60,6 +81,9 @@ namespace Piglet.Lexer.Construction.DotNotation
                     transition.To.StateNumber,
                     transition.TransitionLabel().Replace("\\", "\\\\").Replace("\"", "\\\"")));
             }
+
+            
+
             sb.Append("}");
 
             return sb.ToString();

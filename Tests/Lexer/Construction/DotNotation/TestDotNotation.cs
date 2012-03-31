@@ -59,7 +59,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
         [TestMethod]
         public void Should_only_return_successfully_matched_string()
         {
-            // Make sure it does not crash and does not return null.
+            // Make sure it will only return part of the string.
             var nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("(a|b)+bcd"))));
             var result = nfa.Stimulate("bbcxxxx");
 

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Parser;
 
 namespace Piglet.Tests.Parser
 {
-    [TestClass]
+    [TestFixture]
     public class FluentConfigurationTest
     {
         public class JsonElement
@@ -18,7 +18,7 @@ namespace Piglet.Tests.Parser
             public IList<JsonElement> Elements { get; set; }
         };
 
-        [TestMethod]
+        [Test]
         public void TestFluentJsonParserConfiguration()
         {
             var config = ParserFactory.Fluent();
@@ -68,7 +68,7 @@ namespace Piglet.Tests.Parser
             Assert.AreEqual(5, jObject.Elements.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestFluentCalculator()
         {
             var config = ParserFactory.Fluent();

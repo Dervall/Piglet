@@ -1,14 +1,14 @@
 ﻿using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Lexer.Construction;
 using Piglet.Lexer.Construction.DotNotation;
 
 namespace Piglet.Tests.Lexer.Construction.DotNotation
 {
-    [TestClass]
+    [TestFixture]
     public class TestDotNotation
     {
-        [TestMethod]
+        [Test]
         public void TestDotForNFA()
         {
             // Make sure it does not crash and does not return null.
@@ -17,7 +17,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
             Assert.IsNotNull(dotString);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDotForDFA()
         {
             // Make sure it does not crash and does not return null.

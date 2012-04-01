@@ -41,6 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Common\CompressedTable.cs" />
     <Compile Include="Common\SublistSearch.cs" />
     <Compile Include="Lexer\Configuration\ILexerConfigurator.cs" />

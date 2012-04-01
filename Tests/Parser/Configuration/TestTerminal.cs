@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using Piglet.Parser.Configuration;
 
 namespace Piglet.Tests.Parser.Configuration
 {
-    [TestClass]
+    [TestFixture]
     public class TestTerminal
     {
-        [TestMethod]
+        [Test]
         public void TestToString()
         {
             // Create a terminal and call tostring on it
@@ -15,7 +15,7 @@ namespace Piglet.Tests.Parser.Configuration
             Assert.IsNotNull(stringValue);
         }
 
-        [TestMethod]
+        [Test]
         public void TestMultipleDefinedTerminalWithDifferentRegEx()
         {
             try

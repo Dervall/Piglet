@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using Piglet.Common;
 
 namespace Piglet.Tests.Common
 {
-    [TestClass]
+    [TestFixture]
     public class TestParseTables
     {
-        [TestMethod]
+        [Test]
         public void TestCompressedActionTable()
         {
             var uncompressedTable = new short[,]

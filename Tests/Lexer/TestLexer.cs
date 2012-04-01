@@ -1,15 +1,15 @@
 ﻿using System;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Lexer;
 using Piglet.Lexer.Construction;
 
 namespace Piglet.Tests.Lexer
 {
-    [TestClass]
+    [TestFixture]
     public class TestLexer
     {
-        [TestMethod]
+        [Test]
         public void TestLexerConstruction()
         {
             ILexer<string> lexer = LexerFactory<string>.Configure(c =>
@@ -24,7 +24,25 @@ namespace Piglet.Tests.Lexer
             Assert.AreEqual("ABB", tuple.Item2);
         }
 
-        [TestMethod]
+        [Test]
+        public void TestMinimizationWontMessUpLexing()
+        {
+            var lexer = LexerFactory<string>.Configure(c =>
+                                                           {
+                                                               c.MinimizeDfa = true;
+                                                               c.Token("aa", f=> "aa");
+                                                               c.Token("a+", f => "a+");
+                                                               c.Ignore(" ");
+                                                           });
+            lexer.SetSource("aa aaaaaaa aa aaaa aa");
+            Assert.AreEqual("aa", lexer.Next().Item2);
+            Assert.AreEqual("a+", lexer.Next().Item2);
+            Assert.AreEqual("aa", lexer.Next().Item2);
+            Assert.AreEqual("a+", lexer.Next().Item2);
+            Assert.AreEqual("aa", lexer.Next().Item2);
+        }
+
+        [Test]
         public void TestLexerConstructionWithWhitespaceIgnore()
         {
             ILexer<string> lexer = LexerFactory<string>.Configure(c =>
@@ -42,7 +60,7 @@ namespace Piglet.Tests.Lexer
             Assert.AreEqual("A*B+", tuple.Item2);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetsEndOfInputTokenIfIgnoredStuffAtEnd()
         {
             ILexer<string> lexer = LexerFactory<string>.Configure(c =>
@@ -63,7 +81,7 @@ namespace Piglet.Tests.Lexer
             Assert.AreEqual(null, lexVal.Item2);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLexDigits()
         {
             ILexer<int> lexer = LexerFactory<int>.Configure(c =>
@@ -79,7 +97,7 @@ namespace Piglet.Tests.Lexer
             Assert.AreEqual(42, tuple.Item2);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLexErrorOnThirdLine()
         {
             ILexer<string> lexer = LexerFactory<string>.Configure(c =>
@@ -103,20 +121,20 @@ namespace Piglet.Tests.Lexer
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDFA()
         {
             NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a|b*cd"))));
             DFA dfa = DFA.Create(nfa);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDFA2()
         {
             DFA dfa = DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a|b|c")))));
         }
 
-        [TestMethod]
+        [Test]
         public void TestOneOrMoreDFA()
         {
             NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a+"))));

@@ -26,7 +26,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
             Assert.IsNotNull(dotString);
         }
         
-        [TestMethod]
+        [Test]
         public void Should_be_able_to_mark_the_last_step_as_active_for_DFA()
         {
             // Make sure it does not crash and does not return null.
@@ -36,7 +36,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
             Assert.IsTrue(dotString.Contains("4 [ fillcolor=\"green\" style=\"filled\"]"));
         }
         
-        [TestMethod]
+        [Test]
         public void Should_be_able_to_mark_active_state_for_NFA()
         {
             // Make sure it does not crash and does not return null.
@@ -46,7 +46,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
             Assert.IsTrue(dotString.Contains("8 [ fillcolor=\"green\" style=\"filled\"]"));
         }
 
-        [TestMethod]
+        [Test]
         public void Should_return_matched_string_when_successful()
         {
             // Make sure it does not crash and does not return null.
@@ -56,7 +56,7 @@ namespace Piglet.Tests.Lexer.Construction.DotNotation
             Assert.AreEqual("bbc", result.Matched);
         }
         
-        [TestMethod]
+        [Test]
         public void Should_only_return_successfully_matched_string()
         {
             // Make sure it will only return part of the string.

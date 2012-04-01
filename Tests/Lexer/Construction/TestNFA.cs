@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Lexer.Construction;
 
 namespace Piglet.Tests.Lexer.Construction
 {
-    [TestClass]
+    [TestFixture]
     public class TestNFA
     {
-        [TestMethod]
+        [Test]
         public void TestConstructWithDigit()
         {
             NFA nfa = NFACreate("\\d+");
@@ -22,7 +22,7 @@ namespace Piglet.Tests.Lexer.Construction
             return NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(s))));
         }
 
-        [TestMethod]
+        [Test]
         public void TestRepeat()
         {
             NFA nfa = NFACreate("a*");
@@ -30,7 +30,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(4, nfa.Transitions.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestOneOrMore()
         {
             NFA nfa = NFACreate("a+");
@@ -38,7 +38,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(3, nfa.Transitions.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestOneOrOnce()
         {
             NFA nfa = NFACreate("a?");
@@ -46,7 +46,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(2, nfa.Transitions.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestConnectThreeNFA()
         {
             // Dragon book example
@@ -60,7 +60,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(numStatesPreMerge + 1, final.States.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestAlternate()
         {
             NFA nfa = NFACreate("a|b");
@@ -70,7 +70,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(6, nfa.Transitions.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestClosure()
         {
             NFA nfa = NFACreate("(a|b)*cd");
@@ -83,7 +83,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(6, s0Closure.Select(f => f.StateNumber).Distinct().Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestConcatenate()
         {
             NFA nfa = NFACreate("abc");
@@ -91,7 +91,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(3, nfa.Transitions.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestComplex()
         {
             NFA nfa = NFACreate("a|b*a&b&a*&*ab|&ab|&");
@@ -99,7 +99,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(35, nfa.Transitions.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestOtherComplex()
         {
             //  (a|b)*a -> ab|*a&a&

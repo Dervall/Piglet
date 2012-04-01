@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Parser;
 using Piglet.Parser.Construction;
 
 namespace Piglet.Tests.Parser
 {
-    [TestClass]
+    [TestFixture]
     public class TokenPrecedenceTest
     {
-        [TestMethod]
+        [Test]
         public void TestLeftAssociative()
         {
             var configurator = ParserFactory.Configure<int>();
@@ -61,7 +61,7 @@ namespace Piglet.Tests.Parser
             Assert.AreEqual(1 + 2 - 3 * 4 / 5 + 124 * 8, parser.Parse("1 + 2 - 3 * 4 / 5 + 124 * 8"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestRightAssociativity()
         {
             var configurator = ParserFactory.Configure<int>();
@@ -80,7 +80,7 @@ namespace Piglet.Tests.Parser
             Assert.AreEqual(4 - (7 - 3), parser.Parse("4 - 7 - 3"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestNonAssociativity()
         {
             try

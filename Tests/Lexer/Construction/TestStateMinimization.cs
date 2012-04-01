@@ -3,12 +3,12 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Lexer.Construction;
 
 namespace Piglet.Tests.Lexer.Construction
 {
-    [TestClass]
+    [TestFixture]
     public class TestStateMinimization
     {
         private static DFA CreateDfa(string expression)
@@ -16,7 +16,7 @@ namespace Piglet.Tests.Lexer.Construction
             return DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(expression)))));
         }
 
-        [TestMethod]
+        [Test]
         public void TestSimpleMinimization()
         {
             var dfa = CreateDfa("a+|a");
@@ -26,7 +26,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(2, dfa.States.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSemiComplexMinimization()
         {
             var dfa = CreateDfa("(a|b)+|ab");
@@ -36,7 +36,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(2, dfa.States.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void Test2ComplexMinimization()
         {
             var dfa = CreateDfa("ac|bc|ef");
@@ -46,7 +46,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(4, dfa.States.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestMoreComplexMinimization()
         {
             var dfa = CreateDfa("a+b+c+|abc|aabbcc");

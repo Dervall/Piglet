@@ -2,15 +2,15 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Parser;
 
 namespace Piglet.Tests.Parser
 {
-    [TestClass]
+    [TestFixture]
     public class ErrorRecoveryTests
     {
-        [TestMethod]
+        [Test]
         public void TestRecoverFromErrors()
         {
             // Valid inputs are long lists of "a" followed by a ;.
@@ -54,7 +54,7 @@ namespace Piglet.Tests.Parser
             Assert.AreEqual(1, caughtErrors);
         }
 
-        [TestMethod]
+        [Test]
         public void TestExpectedInput()
         {
             var configurator = ParserFactory.Configure<int>();

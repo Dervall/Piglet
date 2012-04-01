@@ -1,10 +1,10 @@
 ﻿using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Piglet.Lexer;
 
 namespace Piglet.Tests.Lexer.Construction
 {
-    [TestClass]
+    [TestFixture]
     public class TestRegEx
     {
         private ILexer<string> CreateLexer(string regEx)
@@ -19,179 +19,179 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(regEx, lexer.Next().Item2);
         }
 
-        [TestMethod]
+        [Test]
         public void TestMatchingQuotesWithEscapes()
         {
             CheckMatch("\" A quoted string with \\\" inside\"", @"""(\\.|[^""])*""");
         }
 
-        [TestMethod]
+        [Test]
         public void TestStuff()
         {
             CheckMatch("absc", "a(bs|e)*c");
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeepNestedParenthesis()
         {
             CheckMatch("abcde", "(a(b)(c(de)))");
         }
 
-        [TestMethod]
+        [Test]
         public void TestEscapedCharacters()
         {
             CheckMatch("++++", "\\++");
         }
 
-        [TestMethod]
+        [Test]
         public void TestDigit()
         {
             CheckMatch("123", "\\d+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestRange()
         {
             CheckMatch("abcde", "[a-e]+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestMultipleRanges()
         {
             CheckMatch("abcdePOPP", "[a-eA-Z]+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestAnyCharacter()
         {
             CheckMatch("XHXas!!a.A", "X.X.*\\.A");
         }
 
-        [TestMethod]
+        [Test]
         public void TestZeroOrOnce()
         {
             CheckMatch("Color", "Colou?r");
             CheckMatch("Colour", "Colou?r");
         }
 
-        [TestMethod]
+        [Test]
         public void TestEscapedParenthesis()
         {
             CheckMatch("(b)", "\\((a|b)\\)");
         }
 
-        [TestMethod]
+        [Test]
         public void TestParenthesis()
         {
             CheckMatch("a", "(a)");
         }
 
-        [TestMethod]
+        [Test]
         public void TestParenthesisWithRepeat()
         {
             CheckMatch("a", "(a)+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestParenthesisWithAlternate()
         {
             CheckMatch("a", "(a|b)");
             CheckMatch("b", "(a|b)");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNegateCharacterClass()
         {
             CheckMatch("abcd", "[^ABCD]+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNegateInWrongPosition()
         {
             CheckMatch("^", "[x^]");
         }
 
-        [TestMethod]
+        [Test]
         public void SpecialCharactersAreNotThatSpecialInsideAClass()
         {
             CheckMatch("+", "[+]");
             CheckMatch("*", "[*]");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNonDigitEscaped()
         {
             CheckMatch("abcde", "\\D+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestMatchWhitespace()
         {
             CheckMatch(" \t\n\r", "\\s+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestMatchNonWhitespace()
         {
             CheckMatch("jfsdhsd", "\\S+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestMatchAlphanumeric()
         {
             CheckMatch("abcdef90210", "\\w+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestGreedyOr()
         {
             CheckMatch("heavy", "heavy|metal");
             CheckMatch("metal", "heavy|metal");
         }
 
-        [TestMethod]
+        [Test]
         public void TestMatchNonAlphanumeric()
         {
             CheckMatch(" \n!@#", "\\W+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestMatchLiteral()
         {
             CheckMatch("ABC", "ABC");
         }
 
-        [TestMethod]
+        [Test]
         public void TestEscapedSlash()
         {
             CheckMatch("\\\\", "\\\\+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestBracketInCharacterClass()
         {
             CheckMatch("[][][]", "[][ab]+");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNumberedRepetition()
         {
             CheckMatch("aaa", "a{3}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestMultipleParenthesis()
         {
             CheckMatch("abcd", "(ab)(cd)");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNumberedRepetitionWithParenthesis()
         {
             CheckMatch("coolcoolcool", "(cool){3}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNumberedRepetitionWithMaxValue()
         {
             CheckMatch("coolcoolcoolcoolcool", "(cool){3:5}");

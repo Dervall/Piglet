@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Piglet.Lexer.Construction.DotNotation
 {
+    /// <summary>
+    /// This is a debug class for obtaining dot notation graphviz graphs for lexer components.
+    /// </summary>
     public static class DotNotation
     {
         public static void GetDfaAndNfaGraphs(string regex, bool minimize, out string nfaString, out string dfaString)

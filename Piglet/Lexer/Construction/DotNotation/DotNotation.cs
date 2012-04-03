@@ -10,14 +10,29 @@ namespace Piglet.Lexer.Construction.DotNotation
     /// </summary>
     public static class DotNotation
     {
+        /// <summary>
+        /// Get the DFA and NFA graphs for a given regular expression
+        /// </summary>
+        /// <param name="regex">Regular expression</param>
+        /// <param name="minimize">Minimize the resulting DFA</param>
+        /// <param name="nfaString">Dot notation NFA graph</param>
+        /// <param name="dfaString">Dot notation DFA graph</param>
         public static void GetDfaAndNfaGraphs(string regex, bool minimize, out string nfaString, out string dfaString)
         {
             GetDfaAndNfaGraphs(regex, null, minimize, out nfaString, out dfaString);
         }
 
+        /// <summary>
+        /// Get the DFA and NFA graphs for a given regular expression and highlight active
+        /// states for a given input string
+        /// </summary>
+        /// <param name="regex">Regular expression</param>
+        /// <param name="input">Input string</param>
+        /// <param name="minimize">Minimize the resulting DFA</param>
+        /// <param name="nfaString">Dot notation NFA graph</param>
+        /// <param name="dfaString">Dot notation DFA graph</param>
         public static void GetDfaAndNfaGraphs(string regex, string input, bool minimize, out string nfaString, out string dfaString)
         {
-            // Make sure it does not crash and does not return null.
             var nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(regex))));
             nfaString = nfa.AsDotNotation(input, "NFA");
             var dfa = DFA.Create(nfa);
@@ -31,9 +46,6 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <summary>
         /// Print the state machine as DOT notation suitable for drawing graphs.
         /// This is a useful debug functionality!!
-        /// 
-        /// http://hughesbennett.co.uk/Graphviz copy and paste your text to view graph
-        /// 
         /// </summary>
         /// <param name="automata">Automata to generate graph for</param>
         /// <param name="input">Input to highlight the current state with</param>

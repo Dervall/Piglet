@@ -15,6 +15,9 @@ namespace Piglet.Parser
         /// </summary>
         ILexer<T> Lexer { get; set; }
 
+        /// <summary>
+        /// Get the internal parse table for this parser.
+        /// </summary>
         IParseTable<T> ParseTable { get; }
 
         /// <summary>

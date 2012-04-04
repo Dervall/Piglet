@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Piglet.Parser.Construction.Debug
 {
-    public static class DotNotation
+    internal static class DotNotation
     {
         internal static string AsDotNotation<T>(this IEnumerable<ParserBuilder<T>.GotoSetTransition> transitions, List<Lr1ItemSet<T>> itemSets)
         {

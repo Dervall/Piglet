@@ -42,21 +42,42 @@ namespace Piglet.Parser.Configuration.Fluent
         IRuleByConfigurator IsMadeUp { get; }
     }
 
+    /// <summary>
+    /// An expression is a terminal token, and this is the configurator object for setting what the expression should match
+    /// </summary>
     public interface IExpressionConfigurator : IHideObjectMembers
     {
+        /// <summary>
+        /// Match a type
+        /// </summary>
+        /// <typeparam name="TExpressionType">Type to match, most built-in primitive types are supported.</typeparam>
+        /// <returns>Next part of the configuration</returns>
         IExpressionReturnConfigurator ThatMatches<TExpressionType>();
+
+        /// <summary>
+        /// Match a regular expression
+        /// </summary>
+        /// <param name="regex">Regular expression to match</param>
+        /// <returns>Next part of the configuration</returns>
         IExpressionReturnConfigurator ThatMatches(string regex);
     }
 
+    /// <summary>
+    /// Allows you to specify the return of the expression
+    /// </summary>
     public interface IExpressionReturnConfigurator : IHideObjectMembers
     {
+        /// <summary>
+        /// Specify what the expression, when matched should return.
+        /// </summary>
+        /// <param name="func">Function to apply when matched. Input is the matched string, output is an object which
+        /// will be available as the result of the rule part.</param>
         void AndReturns(Func<string, object> func);
     }
 
-    /// <summary>
-    /// Specify what the rule part is made by
-    /// </summary>
+#pragma warning disable 1591
     public interface IRuleByConfigurator : IHideObjectMembers
+#pragma warning restore 1591
     {
         /// <summary>
         /// By a literal
@@ -88,14 +109,27 @@ namespace Piglet.Parser.Configuration.Fluent
         /// <returns>Next</returns>
         IOptionalAsConfigurator By(IRule rule);
 
+        /// <summary>
+        /// By a list of another rule.
+        /// </summary>
+        /// <typeparam name="TListType">The type that the rule used to build the list returns. This will enable
+        /// getting a correctly typed IList</typeparam>
+        /// <param name="listElement">Element that should be repeated</param>
+        /// <returns>Next configurator</returns>
         IMaybeListNamed ByListOf<TListType>(IRule listElement);
+
+        /// <summary>
+        /// By a list of another rule. Return type of this element will be a List&lt;object&gt;
+        /// </summary>
+        /// <param name="listElement">Element that should be repeated</param>
+        /// <returns>Next configurator</returns>
         IMaybeListNamed ByListOf(IRule listElement);
     }
 
-    /// <summary>
-    /// Fluent interface
-    /// </summary>
+
+#pragma warning disable 1591
     public interface IOptionalAsConfigurator : IRuleSequenceConfigurator
+#pragma warning restore 1591
     {
         /// <summary>
         /// Specify a rule part name, which makes it accessible for 
@@ -105,30 +139,72 @@ namespace Piglet.Parser.Configuration.Fluent
         IRuleSequenceConfigurator As(string name);
     }
 
+#pragma warning disable 1591
     public interface IMaybeNewRuleConfigurator : IHideObjectMembers
+#pragma warning restore 1591
     {
+        /// <summary>
+        /// Begin the configuration of an alternate rule
+        /// </summary>
         IRuleByConfigurator Or { get; }        
     }
 
+#pragma warning disable 1591
     public interface IRuleSequenceConfigurator : IMaybeNewRuleConfigurator
+#pragma warning restore 1591
     {
+        /// <summary>
+        /// State what the rule is followed by
+        /// </summary>
         IRuleByConfigurator Followed { get; }
+
+        /// <summary>
+        /// Specify what should happen when this rule is matched this way
+        /// </summary>
+        /// <param name="func">Function that will be called. The dynamic 
+        /// parameter will contain the named parameters of the preceeding rule. Return an object
+        /// that will be available as a result to whoever uses this rule</param>
+        /// <returns>Next configurator</returns>
         IMaybeNewRuleConfigurator WhenFound(Func<dynamic, object> func);
     }
 
+#pragma warning disable 1591
     public interface IMaybeListNamed : IListRuleSequenceConfigurator
+#pragma warning restore 1591
     {
+        /// <summary>
+        /// Set the name of the element, which will add it to the dynamic parameter of the
+        /// WhenFound function
+        /// </summary>
+        /// <param name="name">Name of member. This should be a valid C# property name</param>
+        /// <returns>Next configurator</returns>
         IListRuleSequenceConfigurator As(string name);
     }
 
+#pragma warning disable 1591
     public interface IListRuleSequenceConfigurator : IRuleSequenceConfigurator
+#pragma warning restore 1591
     {
+        /// <summary>
+        /// Specify additional options on the rule element
+        /// </summary>
         IListItemConfigurator ThatIs { get; }
     }
 
+#pragma warning disable 1591
     public interface IListItemConfigurator : IRuleSequenceConfigurator
+#pragma warning restore 1591
     {
+        /// <summary>
+        /// Specify a list separator
+        /// </summary>
+        /// <param name="separator">Separator, interpreted as a string literal</param>
+        /// <returns>Next configurator</returns>
         IListItemConfigurator SeparatedBy(string separator);
+
+        /// <summary>
+        /// Specify that the preceeding element may be missing
+        /// </summary>
         IListItemConfigurator Optional { get; }
     }
 }

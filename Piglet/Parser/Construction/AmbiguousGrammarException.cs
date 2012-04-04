@@ -7,7 +7,7 @@ namespace Piglet.Parser.Construction
     /// </summary>
     public class AmbiguousGrammarException : ParserConfigurationException
     {
-        protected AmbiguousGrammarException(string message)
+        internal AmbiguousGrammarException(string message)
             : base (message)
         {
         }

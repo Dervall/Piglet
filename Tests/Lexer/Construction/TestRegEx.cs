@@ -14,9 +14,26 @@ namespace Piglet.Tests.Lexer.Construction
 
         private void CheckMatch(string input, string regEx)
         {
+            IsMatch(input, regEx, true);
+        }
+
+        private void IsMatch(string input, string regEx, bool shouldMatch)
+        {
             ILexer<string> lexer = CreateLexer(regEx);
             lexer.SetSource(new StringReader(input));
-            Assert.AreEqual(regEx, lexer.Next().Item2);
+            try
+            {
+                Assert.AreEqual(regEx, lexer.Next().Item2);
+            }
+            catch (LexerException)
+            {
+                Assert.False(shouldMatch);
+            }
+        }
+
+        private void CheckMatchFail(string input, string regEx)
+        {
+            IsMatch(input, regEx, false);
         }
 
         [Test]
@@ -174,9 +191,27 @@ namespace Piglet.Tests.Lexer.Construction
         }
 
         [Test]
-        public void TestNumberedRepetition()
+        public void TestExactNumberedRepetition()
         {
             CheckMatch("aaa", "a{3}");
+            CheckMatchFail("aaaa", "a{3}");
+            CheckMatchFail("aa", "a{3}");
+        }
+
+        [Test]
+        public void TestAtLeastNumberedRepetition()
+        {
+            CheckMatch("aaa", "a{3,}");
+            CheckMatch("aaaaaaaaaaaaaaaaaaaaaaaaa", "a{3,}");
+            CheckMatchFail("aa", "a{3,}");
+        }
+
+        [Test]
+        public void TestAtLeastComplexRepetition()
+        {
+            CheckMatch("coolcoolcool", "(cool){3,}");
+            CheckMatch("coolcoolcoolcoolcoolcoolcoolcoolcoolcoolcoolcoolcoolcool", "(cool){3,}");
+            CheckMatchFail("coolcool", "cool{3,}");
         }
 
         [Test]
@@ -194,9 +229,11 @@ namespace Piglet.Tests.Lexer.Construction
         [Test]
         public void TestNumberedRepetitionWithMaxValue()
         {
+            CheckMatchFail("coolcoolcoolcoolcoolcool", "(cool){3:5}");
             CheckMatch("coolcoolcoolcoolcool", "(cool){3:5}");
             CheckMatch("coolcoolcoolcool", "(cool){3:5}");
             CheckMatch("coolcoolcool", "(cool){3:5}");
+            CheckMatchFail("coolcool", "(cool){3:5}");
         }
     }
 }

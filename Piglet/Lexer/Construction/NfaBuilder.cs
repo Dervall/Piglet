@@ -175,7 +175,15 @@ namespace Piglet.Lexer.Construction
 
         private static NFA NumberedRepeat(NFA nfa, int minRepetitions, int maxRepetitions)
         {
-            if (maxRepetitions < minRepetitions)
+            // To create a suitable expression, the special case of infinite max repetitions
+            // must be separately handled.
+            bool infiniteMax = false;
+            if (maxRepetitions == int.MaxValue)
+            {
+                infiniteMax = true;
+                maxRepetitions = minRepetitions;
+            }
+            else if (maxRepetitions < minRepetitions)
             {
                 maxRepetitions = minRepetitions;
             }
@@ -186,20 +194,32 @@ namespace Piglet.Lexer.Construction
             for (int i = 1; i < maxRepetitions; ++i)
             {
                 NFA newNfa = nfa.Copy();
-                if (i >= minRepetitions)
+                if (i >= minRepetitions || (infiniteMax && i == maxRepetitions - 1 ))
                 {
                     epsilonLinkStates.Push(newNfa.StartState);
                 }
                 output = And(output, newNfa);
             }
 
-            // Add epsilon transitions from accept to beginning states of NFAs in the chain
-            var acceptState = output.States.Single(f => f.AcceptState);
-            while (epsilonLinkStates.Any())
+            if (infiniteMax)
             {
-                output.Transitions.Add(new Transition<NFA.State>(epsilonLinkStates.Pop(),
-                                                                 acceptState));
+                // Use Single to force an exception if this has gone astray
+                var finalState = epsilonLinkStates.Single();
+
+                // Make a little epsilon loop from the final accept state to the start state of the final state
+                output.Transitions.Add(new Transition<NFA.State>(output.States.Single(f => f.AcceptState), finalState));
             }
+            else
+            {
+                // Add epsilon transitions from accept to beginning states of NFAs in the chain
+                var acceptState = output.States.Single(f => f.AcceptState);
+                while (epsilonLinkStates.Any())
+                {
+                    output.Transitions.Add(new Transition<NFA.State>(epsilonLinkStates.Pop(),
+                                                                     acceptState));
+                }    
+            }
+            
 
             return output;
         }

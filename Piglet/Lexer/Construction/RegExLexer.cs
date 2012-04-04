@@ -75,7 +75,6 @@ namespace Piglet.Lexer.Construction
                                 break;
                             case '{':
                                 state = State.NumberedRepetition;
-                               // numberedRepetitionState = new NumberedRepetitionState();
                                 break;
 
                             case '(':   return new RegExToken { Type = RegExToken.TokenType.OperatorOpenParanthesis };
@@ -250,11 +249,23 @@ namespace Piglet.Lexer.Construction
                                 break;
                             case '}':
                             case ':':
+                            case ',':
                                 // Parse whatever is in Chars
-                                int reps;
-                                if (!int.TryParse(new string(numberedRepetitionState.Chars.ToArray()), out reps))
+                                int reps = -1;
+
+                                // Number is required in FIRST part but OPTIONAL in the second
+                                if (numberedRepetitionState.Chars.Any() || numberedRepetitionState.CurrentPart == 0)
                                 {
-                                    throw new LexerConstructionException("Numbered repetition operator contains operand that is not a number");
+                                    if (!int.TryParse(new string(numberedRepetitionState.Chars.ToArray()), out reps))
+                                    {
+                                        throw new LexerConstructionException("Numbered repetition operator contains operand that is not a number");
+                                    }
+                                }
+                                else
+                                {
+                                    // End up here when nothing specified in the last part.
+                                    // Use the max value to say that it can be infinite numbers.
+                                    reps = int.MaxValue;
                                 }
                                 numberedRepetitionState.Chars.Clear();
 
@@ -268,11 +279,11 @@ namespace Piglet.Lexer.Construction
                                     numberedRepetitionState.MaxRepetitions = reps;
                                 }
 
-                                if (c == ':')
+                                if (c == ':' || c == ',')
                                 {
                                     ++numberedRepetitionState.CurrentPart;
                                     if (numberedRepetitionState.CurrentPart > 1)
-                                        throw new LexerConstructionException("More than one : in numbered repetition.");
+                                        throw new LexerConstructionException("More than one , in numbered repetition.");
                                 }
                                 else
                                 {

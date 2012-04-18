@@ -8,7 +8,6 @@ namespace Piglet.Parser.Configuration.Fluent
         private readonly ParserConfigurator<object> configurator;
         private Terminal<object> terminal;
         private string regex;
-        private Func<string, object> func;
 
         public FluentExpression(ParserConfigurator<object> configurator)
         {
@@ -17,28 +16,39 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public Terminal<object> Terminal
         {
-            get { return terminal ?? (terminal = (Terminal<object>) configurator.CreateTerminal(regex, func)); }
+            get
+            {
+                if (terminal == null)
+                {
+                    throw new ParserConfigurationException("An expression must be fully configured before use!");
+                }
+                return terminal;
+            }
         }
 
-        public IExpressionReturnConfigurator ThatMatches<TExpressionType>()
+        public void ThatMatches<TExpressionType>()
         {
             var type = typeof (TExpressionType);
             if (type == typeof(int))
             {
-                func = f => int.Parse(f);
-                return ThatMatches(@"\d+");
+                ThatMatches(@"\d+").AndReturns(f => int.Parse(f));
             }
-            if (type == typeof(double))
+            else if (type == typeof(double))
             {
-                func = f => double.Parse(f, CultureInfo.InvariantCulture);
-                return ThatMatches(@"\d+(\.\d+)?");
+                ThatMatches(@"\d+(\.\d+)?").AndReturns(f => double.Parse(f, CultureInfo.InvariantCulture));
             }
-            if (type == typeof(bool))
+            else if (type == typeof(float))
             {
-                func = f => bool.Parse(f);
-                return ThatMatches(@"((true)|(false))");
+                ThatMatches(@"\d+(\.\d+)?").AndReturns(f => float.Parse(f));
             }
-            throw new ParserConfigurationException("Unknown type passed to ThatMatches.");
+            else if (type == typeof(bool))
+            {
+                ThatMatches(@"((true)|(false))").AndReturns(f => bool.Parse(f));
+            }
+            else
+            {
+                throw new ParserConfigurationException("Unknown type passed to ThatMatches.");
+            }
         }
 
         public IExpressionReturnConfigurator ThatMatches(string regex)
@@ -49,7 +59,8 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public void AndReturns(Func<string, object> func)
         {
-            this.func = func;
+            // Create the terminal now to ensure that the tokens will be created in the right order
+            terminal = (Terminal<object>) configurator.CreateTerminal(regex, func);
         }
     }
 }

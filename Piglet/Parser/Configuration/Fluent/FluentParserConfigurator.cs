@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
@@ -59,6 +61,27 @@ namespace Piglet.Parser.Configuration.Fluent
             parser.Lexer = configurator.CreateLexer();
 
             return parser;
+        }
+
+        private ITerminal<object>[] ParamsToTerminalArray(object[] p)
+        {
+            return p.OfType<string>().Select(f => configurator.CreateTerminal(Regex.Escape(f)))
+                .Concat(p.OfType<FluentExpression>().Select(f => f.Terminal)).ToArray();
+        }
+
+        public void LeftAssociative(params object[] p)
+        {
+            configurator.LeftAssociative(ParamsToTerminalArray(p));
+        }
+
+        public void RightAssociative(params object[] p)
+        {
+            configurator.RightAssociative(ParamsToTerminalArray(p));
+        }
+
+        public void NonAssociative(params object[] p)
+        {
+            configurator.NonAssociative(ParamsToTerminalArray(p));
         }
 
         public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)

@@ -29,6 +29,24 @@ namespace Piglet.Parser.Configuration.Fluent
         /// </summary>
         /// <returns></returns>
         IParser<object> CreateParser();
+
+        /// <summary>
+        /// Group a selection of expressions as left associative
+        /// </summary>
+        /// <param name="p">expressions</param>
+        void LeftAssociative(params object[] p);
+
+        /// <summary>
+        /// Group a selection of expressions as right associative
+        /// </summary>
+        /// <param name="p">expressions</param>
+        void RightAssociative(params object[] p);
+
+        /// <summary>
+        /// Group a selection of expressions as non associative
+        /// </summary>
+        /// <param name="p">expressions</param>
+        void NonAssociative(params object[] p);
     }
 
     /// <summary>
@@ -51,8 +69,7 @@ namespace Piglet.Parser.Configuration.Fluent
         /// Match a type
         /// </summary>
         /// <typeparam name="TExpressionType">Type to match, most built-in primitive types are supported.</typeparam>
-        /// <returns>Next part of the configuration</returns>
-        IExpressionReturnConfigurator ThatMatches<TExpressionType>();
+        void ThatMatches<TExpressionType>();
 
         /// <summary>
         /// Match a regular expression

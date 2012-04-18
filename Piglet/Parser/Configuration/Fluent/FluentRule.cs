@@ -58,7 +58,9 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public IOptionalAsConfigurator By<TExpressionType>()
         {
-            CurrentProduction.Add(new ProductionElement { Symbol = configurator.Expression().ThatMatches<TExpressionType>() });
+            var e = configurator.Expression();
+            e.ThatMatches<TExpressionType>();
+            CurrentProduction.Add(new ProductionElement { Symbol = e });
             return this;
         }
 
@@ -230,13 +232,3 @@ namespace Piglet.Parser.Configuration.Fluent
         }
     }
 }
-
-/*
-        public void baj()
-        {
-            var expandoObject = new ExpandoObject();
-            ((IDictionary<string, object>)expandoObject).Add("asdasd", null);
-            dynamic tjoff = expandoObject;
-            tjoff.sdfs = "hej";
-            var s  = new String(tjoff.sdfaff);
-        }*/

@@ -102,5 +102,24 @@ namespace Piglet.Tests.Parser
 
             Assert.AreEqual(23, result);
         }
+
+        [Test]
+        public void TestTokenAssociativity()
+        {
+            var config = ParserFactory.Fluent();
+
+            config.LeftAssociative("+", "-");
+            config.LeftAssociative("*", "/");
+
+            var expr = config.Rule();
+            expr.IsMadeUp.By(expr).Followed.By("+").Followed.By(expr)
+                .Or.By(expr).Followed.By("-").Followed.By(expr)
+                .Or.By(expr).Followed.By("*").Followed.By(expr)
+                .Or.By(expr).Followed.By("/").Followed.By(expr)
+                .Or.By("(").Followed.By("-").Followed.By(")")
+                .Or.By<int>();
+
+
+        }
     }
 }

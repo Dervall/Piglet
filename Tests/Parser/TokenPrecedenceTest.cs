@@ -21,7 +21,6 @@ namespace Piglet.Tests.Parser
             configurator.LeftAssociative(plus, minus);
             configurator.LeftAssociative(mul, div);
 
-
             var exp = configurator.CreateNonTerminal();
 
             exp.AddProduction(exp, plus, exp).SetReduceFunction(s =>

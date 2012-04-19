@@ -11,7 +11,7 @@ namespace Piglet.Demo.Parser
         {
             var config = ParserFactory.Fluent();
             var name = config.Expression();
-            name.ThatMatches("[a-z]+");
+            name.ThatMatches("[a-z]+").AndReturns(f => f);
 
             var obj = config.Rule();
             var attribute = config.Rule();

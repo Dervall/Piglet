@@ -184,9 +184,25 @@ All releases are available from both NuGet, and are always represented as tags o
 
 Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
 
-* 1.1.0 Added DFA minimization to the lexer generation algorithm. Added public dotnotation functionality for getting debug graphs for lexers. Unit test framework changed to NUnit.
-* 1.0.1 Added missing Piglet.XML file to the NuGet package. Documentation should now be available in intellisense.
-* 1.0.0 First NuGet release
+# 1.2.0 
+* Added error recovery and reporting to fluent parser configuration
+* Added token precedence to fluent configuration
+* Completed XML documentation to include every method
+* Fixed bug with escaped ?
+* Fixed bug with numbered repetition
+* Fixed bug with possible wrong order of defined expressions for fluent configuration
+* Automated the NuGet package management
+
+# 1.1.0 
+* Added DFA minimization to the lexer generation algorithm. 
+* Added public dotnotation functionality for getting debug graphs for lexers.
+* Unit test framework changed to NUnit.
+
+# 1.0.1 
+* Added missing Piglet.XML file to the NuGet package. Documentation should now be available in intellisense.
+
+# 1.0.0 
+*First NuGet release
 
 Contributing
 ------------

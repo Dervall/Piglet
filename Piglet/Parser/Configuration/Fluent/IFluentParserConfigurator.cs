@@ -25,6 +25,11 @@ namespace Piglet.Parser.Configuration.Fluent
         IExpressionConfigurator QuotedString { get; }
 
         /// <summary>
+        /// The error token, use in a rule to signal an error accepting rule.
+        /// </summary>
+        IExpressionConfigurator Error { get; }
+
+        /// <summary>
         /// Create the parser based on the configuration used
         /// </summary>
         /// <returns></returns>

@@ -163,6 +163,7 @@ namespace Piglet.Parser.Configuration.Fluent
             for (var productionIndex = 0; productionIndex < productionList.Count; ++productionIndex)
             {
                 var production = productionList[productionIndex];
+                bool isErrorRule = false;
 
                 for (int i = 0; i < production.Count; ++i)
                 {
@@ -190,6 +191,7 @@ namespace Piglet.Parser.Configuration.Fluent
                     }
                     else if (part.Symbol is FluentExpression)
                     {
+                        isErrorRule |= part.Symbol == configurator.Error;
                         production[i].Symbol = ((FluentExpression)part.Symbol).Terminal;
                     }
                     else
@@ -218,17 +220,33 @@ namespace Piglet.Parser.Configuration.Fluent
                     // which translates the index parameters into a dynamic object by the property names
                     var indexNames = production.Select((f, index) => new Tuple<int, string>(index, f.Name)).Where(f => f.Item2 != null).ToArray();
 
-                    newProduction.SetReduceFunction(f =>
+                    if (isErrorRule)
                     {
-                        var expandoObject = new ExpandoObject();
-                        foreach (var indexName in indexNames)
-                        {
-                            ((IDictionary<string, object>)expandoObject).Add(indexName.Item2, f[indexName.Item1]);
-                        }
-                        return func(expandoObject);
-                    });
+                        newProduction.SetErrorFunction((e, f) => func(CreateExpandoObject(f, e, indexNames)));
+                    }
+                    else
+                    {
+                        newProduction.SetReduceFunction(f => func(CreateExpandoObject(f, null, indexNames)));
+                    }
                 }
             }
+        }
+
+        private static ExpandoObject CreateExpandoObject(object[] f, object error, Tuple<int, string>[] indexNames)
+        {
+            var expandoObject = new ExpandoObject();
+            var dictionary = ((IDictionary<string, object>)expandoObject);
+
+            foreach (var indexName in indexNames)
+            {
+                dictionary.Add(indexName.Item2, f[indexName.Item1]);
+            }
+
+            if (error != null)
+            {
+                dictionary["Error"] = error;
+            }
+            return expandoObject;
         }
     }
 }

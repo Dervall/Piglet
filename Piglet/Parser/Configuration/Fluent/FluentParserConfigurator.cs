@@ -11,6 +11,8 @@ namespace Piglet.Parser.Configuration.Fluent
         private readonly List<FluentRule> rules;
         private readonly Dictionary<Tuple<IRule, string>, NonTerminal<object>> listRules;
         private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> optionalRules;
+        private IExpressionConfigurator quotedString;
+        private IExpressionConfigurator errorToken;
 
         public FluentParserConfigurator(ParserConfigurator<object> configurator)
         {
@@ -36,11 +38,18 @@ namespace Piglet.Parser.Configuration.Fluent
         {
             get
             {
-                var expr = Expression();
-                expr.ThatMatches("\"(\\\\.|[^\"])*\"").AndReturns(f => f.Substring(1, f.Length - 2));
-
-                return expr;
+                if (quotedString == null)
+                {
+                    quotedString = Expression();
+                    quotedString.ThatMatches("\"(\\\\.|[^\"])*\"").AndReturns(f => f.Substring(1, f.Length - 2));
+                }
+                return quotedString;
             }
+        }
+
+        public IExpressionConfigurator Error
+        {
+            get { return errorToken ?? (errorToken = new FluentExpression(configurator.ErrorToken)); }
         }
 
         public IParser<object> CreateParser()

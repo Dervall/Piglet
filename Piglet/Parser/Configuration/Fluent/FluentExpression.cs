@@ -14,6 +14,11 @@ namespace Piglet.Parser.Configuration.Fluent
             this.configurator = configurator;
         }
 
+        public FluentExpression(ITerminal<object> terminal)
+        {
+            this.terminal = (Terminal<object>) terminal;
+        }
+
         public Terminal<object> Terminal
         {
             get

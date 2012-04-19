@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Piglet.Parser;
@@ -50,6 +48,47 @@ namespace Piglet.Tests.Parser
 
             const string withErrors = "aaaaaaa;aaaaaabaaa;aaa;aa;a;aaaaa;aaaaaaaa;";
             legalAs = parser.Parse(withErrors);
+            Assert.AreEqual("aaaaaaa;THESEAREEATEN;aaa;aa;a;aaaaa;aaaaaaaa;".Aggregate(0, (i, c) => c == 'a' ? i + 1 : i), legalAs);
+            Assert.AreEqual(1, caughtErrors);
+        }
+
+        [Test]
+        public void TestErrorRecoveryInFluentConfiguration()
+        {
+            int caughtErrors = 0;
+            var configurator = ParserFactory.Fluent();
+
+            var listOfA = configurator.Rule();
+            var a = configurator.Rule();
+            var terminatedA = configurator.Rule();
+
+            a.IsMadeUp.By(a).As("Init").Followed.By("a").WhenFound(f => f.Init + 1)
+                   .Or.By("a").WhenFound( f => 1);
+
+            terminatedA.IsMadeUp.By(a).As("A").Followed.By(";").WhenFound(f => f.A)
+                .Or.By(configurator.Error).Followed.By(";").WhenFound(f =>
+                                                                          {
+                                                                              Console.WriteLine(f.Error);
+                                                                              ++caughtErrors;
+                                                                              return 0;
+                                                                          });
+            
+            listOfA.IsMadeUp.By(terminatedA).As("A").WhenFound(f => f.A)
+                .Or.By(listOfA).As("A").Followed.By(terminatedA).As("TA").WhenFound(f => f.A + f.TA);
+
+            // Bogus terminal that isn't in any sort of use
+            var b = configurator.Expression();
+            b.ThatMatches("b").AndReturns(f => null);
+
+            var parser = configurator.CreateParser();
+
+            const string legal = "aaaaaaa;aaaaaaaaaa;aaa;aa;a;aaaaa;aaaaaaaa;";
+            var legalAs = (int)parser.Parse(legal);
+            Assert.AreEqual(legal.Aggregate(0, (i, c) => c == 'a' ? i + 1 : i), legalAs);
+            Assert.AreEqual(0, caughtErrors);
+
+            const string withErrors = "aaaaaaa;aaaaaabaaa;aaa;aa;a;aaaaa;aaaaaaaa;";
+            legalAs = (int)parser.Parse(withErrors);
             Assert.AreEqual("aaaaaaa;THESEAREEATEN;aaa;aa;a;aaaaa;aaaaaaaa;".Aggregate(0, (i, c) => c == 'a' ? i + 1 : i), legalAs);
             Assert.AreEqual(1, caughtErrors);
         }

@@ -98,6 +98,7 @@ function generateNuspec($version)
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration</summary>
     <description>Piglet is a library for lexing and parsing text, in the spirit of those big parser and lexer genererators such as bison, antlr and flex. While not as feature packed as those, it is also a whole lot leaner and much easier to understand.</description>
+    <tags>parser generator parser lexer fluent</tags>
   </metadata>
   <files>
     <file src=""${build_dir}Piglet.dll"" target=""lib\net40"" />

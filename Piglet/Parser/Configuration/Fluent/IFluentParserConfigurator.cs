@@ -52,6 +52,13 @@ namespace Piglet.Parser.Configuration.Fluent
         /// </summary>
         /// <param name="p">expressions</param>
         void NonAssociative(params object[] p);
+
+        /// <summary>
+        /// Ignores an expression. Text matching this regular expression will never be reported. This is suitable
+        /// for comments and stripping text.
+        /// </summary>
+        /// <param name="ignoreExpression">Regular expression to ignore</param>
+        void Ignore(string ignoreExpression);
     }
 
     /// <summary>

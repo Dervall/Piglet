@@ -121,5 +121,20 @@ namespace Piglet.Tests.Parser
 
 
         }
+
+        [Test]
+        public void TestIgnoreExpression()
+        {
+            var config = ParserFactory.Fluent();
+
+            var rule = config.Rule();
+            rule.IsMadeUp.By("a").Followed.By("b");
+
+            config.Ignore("c");
+
+            var parser = config.CreateParser();
+
+            parser.Parse("acccccccccccccccbccccccccccccccccc");
+        }
     }
 }

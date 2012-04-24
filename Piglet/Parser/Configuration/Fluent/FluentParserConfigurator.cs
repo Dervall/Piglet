@@ -11,15 +11,19 @@ namespace Piglet.Parser.Configuration.Fluent
         private readonly List<FluentRule> rules;
         private readonly Dictionary<Tuple<IRule, string>, NonTerminal<object>> listRules;
         private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> optionalRules;
+        private readonly List<string> ignored;
+        
         private IExpressionConfigurator quotedString;
         private IExpressionConfigurator errorToken;
 
         public FluentParserConfigurator(ParserConfigurator<object> configurator)
         {
             this.configurator = configurator;
+
             rules = new List<FluentRule>();
             listRules = new Dictionary<Tuple<IRule, string>, NonTerminal<object>>();
             optionalRules = new Dictionary<NonTerminal<object>, NonTerminal<object>>();
+            ignored = new List<string>();
         }
 
         public IRule Rule()
@@ -64,7 +68,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
             configurator.LexerSettings.CreateLexer = true;
             configurator.LexerSettings.EscapeLiterals = true;
-            configurator.LexerSettings.Ignore = new[] { @"\s+" };
+            configurator.LexerSettings.Ignore = new[] { @"\s+" }.Concat(ignored).ToArray();
 
             var parser = configurator.CreateParser();
             parser.Lexer = configurator.CreateLexer();
@@ -91,6 +95,11 @@ namespace Piglet.Parser.Configuration.Fluent
         public void NonAssociative(params object[] p)
         {
             configurator.NonAssociative(ParamsToTerminalArray(p));
+        }
+
+        public void Ignore(string ignoreExpression)
+        {
+            ignored.Add(ignoreExpression);
         }
 
         public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)

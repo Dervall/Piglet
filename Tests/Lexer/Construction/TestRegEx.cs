@@ -136,6 +136,22 @@ namespace Piglet.Tests.Lexer.Construction
         }
 
         [Test]
+        public void TestCommentRegex()
+        {
+            var lexer = LexerFactory<string>.Configure(
+                f =>
+                    {
+                        f.Token(@";[^\n]*\n", a => a);
+                        f.Token("nextLine", a => a + "%" );
+                    });
+
+            lexer.SetSource(@"; this is a comment
+nextLine");
+            Assert.AreEqual("; this is a comment\r\n", lexer.Next().Item2);
+            Assert.AreEqual("nextLine%", lexer.Next().Item2);
+        }
+
+        [Test]
         public void TestNonDigitEscaped()
         {
             CheckMatch("abcde", "\\D+");

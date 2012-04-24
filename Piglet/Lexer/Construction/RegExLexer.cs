@@ -16,17 +16,18 @@ namespace Piglet.Lexer.Construction
             BeginCharacterClass,
             InsideCharacterClass,
             RangeEnd,
-            NumberedRepetition
+            NumberedRepetition,
+            InsideCharacterClassEscaped
         }
 
         private class CharacterClassState
         {
             public CharacterClassState()
             {
-                ClassChars = new List<char>();
+                ClassChars = new HashSet<char>();
             }
 
-            public IList<char> ClassChars { get; private set; }
+            public ISet<char> ClassChars { get; private set; }
             public bool Negated { get; set; }
         }
 
@@ -49,6 +50,61 @@ namespace Piglet.Lexer.Construction
         {
             this.input = input;
             state = State.Normal;
+        }
+
+        private IEnumerable<char> EscapedCharToAcceptChars(char c)
+        {
+            switch (c)
+            {
+                // Shorthand for [0-9]
+                case 'd':
+                    return CharRange('0', '9');
+                // Shorthand for [^0-9]
+                case 'D':
+                    return AllCharactersExceptNull.Except(CharRange('0', '9'));
+                case 's':
+                    return AllWhitespaceCharacters;
+                case 'S':
+                    return AllCharactersExceptNull.Except(AllWhitespaceCharacters);
+                case 'w':
+                    return CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'));
+                case 'W':
+                    return AllCharactersExceptNull.Except(
+                        CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')));
+                case 'n':
+                    return new [] {'\n'};
+                case 'r':
+                    return new []  {'\r'};
+                case '.':
+                case '*':
+                case '|':
+                case '[':
+                case ']':
+                case '+':
+                case '(':
+                case ')':
+                case '\\':
+                case '{':
+                case '}':
+                case ' ':
+                case '?':
+                    return new [] {c};
+                default:
+                    return new char[] {};
+            }
+        }
+
+        private IEnumerable<char> EscapedCharToAcceptCharsInClass(char c)
+        {
+            // There are some additional escapeable characters for a character class
+            switch (c)
+            {
+                case '-':
+                case '^':
+                    return new[] {c};
+
+            }
+            return EscapedCharToAcceptChars(c);
         }
 
         public RegExToken NextToken()
@@ -89,71 +145,13 @@ namespace Piglet.Lexer.Construction
                         break;
 
                     case State.NormalEscaped:
-                        switch (c)
                         {
-                            // Shorthand for [0-9]
-                            case 'd':   
-                                return new RegExToken {Type = RegExToken.TokenType.Accept, Characters = CharRange('0', '9')};
-                            // Shorthand for [^0-9]
-                            case 'D':
-                                return new RegExToken
-                                           {
-                                               Type = RegExToken.TokenType.Accept,
-                                               Characters = AllCharactersExceptNull.Except(CharRange('0', '9'))
-                                           };
-
-                            case 's':
-                                return new RegExToken
-                                {
-                                    Type = RegExToken.TokenType.Accept,
-                                    Characters = AllWhitespaceCharacters
-                                };
-
-                            case 'S':
-                                return new RegExToken
-                                {
-                                    Type = RegExToken.TokenType.Accept,
-                                    Characters = AllCharactersExceptNull.Except(AllWhitespaceCharacters)
-                                };
-
-                            case 'w':
-                                return new RegExToken
-                                {
-                                    Type = RegExToken.TokenType.Accept,
-                                    Characters = CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'))
-                                };
-
-                            case 'W':
-                                return new RegExToken
-                                {
-                                    Type = RegExToken.TokenType.Accept,
-                                    Characters = AllCharactersExceptNull.Except(
-                                        CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')))
-                                };
-
-                            case 'n':
-                                return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = new[] { '\n' } };
-
-                            case 'r':
-                                return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = new[] { '\r' } };
-
-                            case '.':
-                            case '*':
-                            case '|':
-                            case '[':
-                            case ']':
-                            case '+':
-                            case '(':
-                            case ')':
-                            case '\\':
-                            case '{':
-                            case '}':
-                            case ' ':
-                            case '?':
-                                return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = new[] { c } };
-
-                            default:
+                            var characters = EscapedCharToAcceptChars(c).ToArray();
+                            if (!characters.Any())
+                            {
                                 throw new LexerConstructionException(string.Format("Unknown escaped character '{0}'", c));
+                            }
+                            return new RegExToken {Characters = characters, Type = RegExToken.TokenType.Accept};
                         }
 
                     case State.BeginCharacterClass:
@@ -174,6 +172,9 @@ namespace Piglet.Lexer.Construction
                             case '-':
                                 // This does not break the character class TODO: I THINK!!!
                                 classState.ClassChars.Add(c);
+                                break;
+                            case '\\':
+                                state = State.InsideCharacterClassEscaped;
                                 break;
                             default:
                                 classState.ClassChars.Add(c);
@@ -199,11 +200,27 @@ namespace Piglet.Lexer.Construction
                                                                 ? AllCharactersExceptNull.Except(classState.ClassChars)
                                                                 : classState.ClassChars.Distinct()
                                            };
+                            case '\\':
+                                state = State.InsideCharacterClassEscaped;
+                                break;
                             default:
                                 classState.ClassChars.Add(c);
                                 break;
                         }
                         break;
+
+                    case State.InsideCharacterClassEscaped:
+                        {
+                            var characters = EscapedCharToAcceptCharsInClass(c).ToArray();
+                            if (!characters.Any())
+                            {
+                                throw new LexerConstructionException(string.Format("Unknown escaped character '{0}' in character class", c));
+                            }
+                            classState.ClassChars.UnionWith(characters);
+                            state = State.InsideCharacterClass;
+                        }
+                        break;
+
 
                     case State.RangeEnd:
                         switch (c)
@@ -251,7 +268,7 @@ namespace Piglet.Lexer.Construction
                             case ':':
                             case ',':
                                 // Parse whatever is in Chars
-                                int reps = -1;
+                                int reps;
 
                                 // Number is required in FIRST part but OPTIONAL in the second
                                 if (numberedRepetitionState.Chars.Any() || numberedRepetitionState.CurrentPart == 0)

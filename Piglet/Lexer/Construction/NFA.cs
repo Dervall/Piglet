@@ -51,7 +51,6 @@ namespace Piglet.Lexer.Construction
 
             return newNFA;
         }
-        
 
         public override IEnumerable<State> Closure(State[] states, ISet<State> visitedStates = null)
         {

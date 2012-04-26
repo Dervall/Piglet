@@ -61,14 +61,12 @@ namespace Piglet.Lexer.Construction
                 }
             }
 
-            return new StimulateResult<TState>()
+            return new StimulateResult<TState>
                        {
                            Matched = matchedString.ToString(),
                            ActiveStates = activeStates
                        };
         }
-
-
     }
 
     internal class StimulateResult<TState> where TState : FiniteAutomata<TState>.BaseState

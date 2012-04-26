@@ -1,26 +1,22 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
-namespace Piglet.Lexer
+namespace Piglet.Lexer.Runtime
 {
-    internal class Lexer<T> : ILexer<T>
+    internal abstract class LexerBase<T, TState> : ILexer<T>
     {
         private TextReader Source { get; set; }
-
-        private readonly TransitionTable<T> transitionTable;
         private readonly int endOfInputTokenNumber;
-        private int state;
-        
+        protected TState State;
 
         // This is for error reporting purposes
         private int lineNumber = 1;
         private StringBuilder currentLine = new StringBuilder();
         private StringBuilder lexeme = new StringBuilder();
 
-        public Lexer(TransitionTable<T> transitionTable, int endOfInputTokenNumber)
+        protected LexerBase(int endOfInputTokenNumber)
         {
-            this.transitionTable = transitionTable;
             this.endOfInputTokenNumber = endOfInputTokenNumber;
         }
 
@@ -47,16 +43,26 @@ namespace Piglet.Lexer
             public string LastLexeme { get { return lastLexeme; } }
         }
 
+        public void SetSource(TextReader reader)
+        {
+            Source = reader;
+        }
+
+        public void SetSource(string source)
+        {
+            Source = new StringReader(source);
+        }
+
         public Tuple<int, T> Next()
         {
-            // Reset state
-            state = 0;
+            ResetState();
 
             lexeme = new StringBuilder();
 
-            while(true)
+            while (true)
             {
                 int peek = Source.Peek();
+
                 // Replace EOF with 0, or we will read outside of the table.
                 if (peek == -1)
                 {
@@ -64,28 +70,30 @@ namespace Piglet.Lexer
                     // If the lexeme isn't empty, it must try to find out whatever it is in the lexeme.
                     if (lexeme.Length == 0)
                     {
-                        return new Tuple<int, T>(endOfInputTokenNumber, default(T));                        
+                        return new Tuple<int, T>(endOfInputTokenNumber, default(T));
                     }
                     peek = 0;
                 }
 
                 var c = (char)peek;
-                int nextState = transitionTable[state, c];
-                if (nextState == -1)
+                TState nextState = GetNextState(c);
+                var reachedTermination = ReachedTermination(nextState);
+
+                if (reachedTermination)
                 {
                     // We have reached termination
                     // Two possibilities, current state accepts, if so return token ID
                     // else there is an error
-                    var action = transitionTable.GetAction(state);
-                    if (action != null)
+                    var action = GetAction();
+                    if (action != null && lexeme.Length > 0)
                     {
                         // If tokennumber is int.MinValue it is an ignored token, like typically whitespace.
                         // In that case, dont return, continue lexing with the reset parser to get the next token.
                         if (action.Item1 == int.MinValue)
                         {
                             // Reset state
-                            state = 0;
-                            
+                            ResetState();
+
                             // Clear lexeme
                             lexeme = new StringBuilder();
                         }
@@ -103,11 +111,11 @@ namespace Piglet.Lexer
                         var lexerException =
                             new LexerException(string.Format("Invalid character '{0}'",
                                                              c == '\0' ? "NULL" : c.ToString()))
-                                {
-                                    LineContents = currentLine.ToString(), 
-                                    LineNumber = lineNumber
-                                };
-                        
+                            {
+                                LineContents = currentLine.ToString(),
+                                LineNumber = lineNumber
+                            };
+
                         throw lexerException;
                     }
                 }
@@ -119,7 +127,7 @@ namespace Piglet.Lexer
                     {
                         lineNumber++;
                         currentLine = new StringBuilder();
-                    } 
+                    }
                     else
                     {
                         currentLine.Append(c);
@@ -127,21 +135,19 @@ namespace Piglet.Lexer
 
                     // Machine has not terminated.
                     // Switch states, append character to lexeme.
-                    state = nextState;
+                    State = nextState;
                     lexeme.Append(c);
                     Source.Read();
                 }
             }
         }
 
-        public void SetSource(TextReader reader)
-        {
-            Source = reader;
-        }
+        protected abstract Tuple<int, Func<string, T>> GetAction();
 
-        public void SetSource(string source)
-        {
-            Source = new StringReader(source);
-        }
+        protected abstract bool ReachedTermination(TState nextState);
+
+        protected abstract TState GetNextState(char input);
+
+        protected abstract void ResetState();
     }
 }

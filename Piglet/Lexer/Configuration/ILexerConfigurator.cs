@@ -36,5 +36,10 @@ namespace Piglet.Lexer.Configuration
         /// The default is true, and it should normally be kept that way
         /// </summary>
         bool MinimizeDfa { get; set; }
+
+        /// <summary>
+        /// Gets and sets the lexer runtime, which is the method that the resulting lexer will be constructed with.
+        /// </summary>
+        LexerRuntime Runtime { get; set; }
     }
 }

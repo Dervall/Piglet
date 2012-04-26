@@ -4,7 +4,7 @@ using System.Linq;
 using Piglet.Common;
 using Piglet.Lexer.Construction;
 
-namespace Piglet.Lexer
+namespace Piglet.Lexer.Runtime
 {
     internal class TransitionTable<T>
     {

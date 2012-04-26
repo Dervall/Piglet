@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Piglet.Lexer.Construction;
+using Piglet.Lexer.Runtime;
 
 namespace Piglet.Lexer.Configuration
 {
@@ -10,6 +11,15 @@ namespace Piglet.Lexer.Configuration
     {
         private readonly List<Tuple<string, Func<string, T>>> tokens;
         private readonly List<string> ignore;
+
+        public LexerConfigurator()
+        {
+            tokens = new List<Tuple<string, Func<string, T>>>();
+            ignore = new List<string>();
+            EndOfInputTokenNumber = -1;
+            MinimizeDfa = true;
+            Runtime = LexerRuntime.Tabular;
+        }
 
         public ILexer<T> CreateLexer()
         {
@@ -23,25 +33,29 @@ namespace Piglet.Lexer.Configuration
             // Create a merged NFA
             NFA mergedNfa = NFA.Merge(nfas);
 
+            // If we desire a NFA based lexer, stop now
+            if (Runtime == LexerRuntime.Nfa)
+            {
+                return new NfaLexer<T>(mergedNfa, nfas, tokens, EndOfInputTokenNumber);
+            }
+
             // Convert the NFA to a DFA
             DFA dfa = DFA.Create(mergedNfa);
 
             // Minimize the DFA if required
             dfa.Minimize();
 
+            // If we desire a DFA based lexer, stop
+            if (Runtime == LexerRuntime.Dfa)
+            {
+                return new DfaLexer<T>(dfa, nfas, tokens, EndOfInputTokenNumber);
+            }
+
             // Convert the dfa to table form
             var transitionTable = new TransitionTable<T>(dfa, nfas, tokens);
 
-            return new Lexer<T>(transitionTable, EndOfInputTokenNumber);
-        }
-
-        public LexerConfigurator()
-        {
-            tokens = new List<Tuple<string, Func<string, T>>>();
-            ignore = new List<string>();
-            EndOfInputTokenNumber = -1;
-            MinimizeDfa = true;
-        }
+            return new TabularLexer<T>(transitionTable, EndOfInputTokenNumber);
+        }        
 
         public void Token(string regEx, Func<string, T> action)
         {
@@ -55,5 +69,6 @@ namespace Piglet.Lexer.Configuration
 
         public int EndOfInputTokenNumber { get; set; }
         public bool MinimizeDfa { get; set; }
+        public LexerRuntime Runtime { get; set; }
     }
 }

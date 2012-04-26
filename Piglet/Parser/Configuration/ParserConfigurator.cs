@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Piglet.Lexer;
+using Piglet.Lexer.Configuration;
 using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
@@ -41,9 +42,15 @@ namespace Piglet.Parser.Configuration
 
         private class LexerSettingsImpl : ILexerSettings
         {
+            public LexerSettingsImpl()
+            {
+                Runtime = LexerRuntime.Tabular;
+            }
+
             public bool CreateLexer { get; set; }
             public bool EscapeLiterals { get; set; }
             public string[] Ignore { get; set; }
+            public LexerRuntime Runtime { get; set; }
         }
 
         public ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null)

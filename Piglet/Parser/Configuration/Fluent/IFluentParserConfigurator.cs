@@ -1,4 +1,5 @@
 using System;
+using Piglet.Lexer.Configuration;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
@@ -59,6 +60,12 @@ namespace Piglet.Parser.Configuration.Fluent
         /// </summary>
         /// <param name="ignoreExpression">Regular expression to ignore</param>
         void Ignore(string ignoreExpression);
+
+        /// <summary>
+        /// Gets and sets the runtime of the constructed lexer. See the enumeration LexerRuntime for an
+        /// explanation of the valid values.
+        /// </summary>
+        LexerRuntime Runtime { get; set; }
     }
 
     /// <summary>

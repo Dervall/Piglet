@@ -1,3 +1,5 @@
+using Piglet.Lexer.Configuration;
+
 namespace Piglet.Parser.Configuration
 {
     /// <summary>
@@ -19,5 +21,11 @@ namespace Piglet.Parser.Configuration
         /// Set the list of regular expressions to ignore. The default is to ignore all kinds of whitespace.
         /// </summary>
         string[] Ignore { get; set; }
+
+        /// <summary>
+        /// Gets and sets the runtime of the constructed lexer. See the enumeration LexerRuntime for an
+        /// explanation of the valid values.
+        /// </summary>
+        LexerRuntime Runtime { get; set; }
     }
 }

@@ -41,6 +41,8 @@ namespace Piglet.Lexer
             // own lexer for Piglet.
             return Configure(c =>
             {
+                c.Runtime = lexerSettings.Runtime;
+
                 var terminals = grammar.AllSymbols.OfType<ITerminal<T>>().ToList();
                 foreach (var terminal in terminals)
                 {

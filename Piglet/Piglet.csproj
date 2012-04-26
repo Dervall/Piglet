@@ -46,8 +46,12 @@
     </Compile>
     <Compile Include="Common\CompressedTable.cs" />
     <Compile Include="Common\SublistSearch.cs" />
+    <Compile Include="Lexer\Runtime\DfaLexer.cs" />
     <Compile Include="Lexer\Configuration\ILexerConfigurator.cs" />
     <Compile Include="Lexer\Configuration\LexerConfigurator.cs" />
+    <Compile Include="Lexer\Configuration\LexerRuntime.cs" />
+    <Compile Include="Lexer\Runtime\LexerBase.cs" />
+    <Compile Include="Lexer\Runtime\NfaLexer.cs" />
     <Compile Include="Lexer\Construction\DFA.cs" />
     <Compile Include="Lexer\Construction\DotNotation\DotNotation.cs" />
     <Compile Include="Lexer\Construction\FiniteAutomata.cs" />
@@ -61,10 +65,10 @@
     <Compile Include="Lexer\Construction\TriangularTable.cs" />
     <Compile Include="Lexer\ILexer.cs" />
     <Compile Include="Lexer\ILexerState.cs" />
-    <Compile Include="Lexer\Lexer.cs" />
+    <Compile Include="Lexer\Runtime\TabularLexer.cs" />
     <Compile Include="Lexer\LexerException.cs" />
     <Compile Include="Lexer\LexerFactory.cs" />
-    <Compile Include="Lexer\TransitionTable.cs" />
+    <Compile Include="Lexer\Runtime\TransitionTable.cs" />
     <Compile Include="Parser\Configuration\Fluent\FluentExpression.cs" />
     <Compile Include="Parser\Configuration\Fluent\FluentParserConfigurator.cs" />
     <Compile Include="Parser\Configuration\Fluent\FluentRule.cs" />

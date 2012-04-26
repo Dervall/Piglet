@@ -2,6 +2,7 @@
 using System.IO;
 using NUnit.Framework;
 using Piglet.Lexer;
+using Piglet.Lexer.Configuration;
 using Piglet.Lexer.Construction;
 
 namespace Piglet.Tests.Lexer
@@ -18,6 +19,38 @@ namespace Piglet.Tests.Lexer
                                                    c.Token("abb", f => "ABB");
                                                    c.Token("a*b+", f => "A*B+");
                                                });
+            lexer.SetSource(new StringReader("abb"));
+            Tuple<int, string> tuple = lexer.Next();
+            Assert.AreEqual(1, tuple.Item1);
+            Assert.AreEqual("ABB", tuple.Item2);
+        }
+
+        [Test]
+        public void TestLexerConstructionUsingDfaEngine()
+        {
+            ILexer<string> lexer = LexerFactory<string>.Configure(c =>
+            {
+                c.Token("a+", f => "A+");
+                c.Token("abb", f => "ABB");
+                c.Token("a*b+", f => "A*B+");
+                c.Runtime = LexerRuntime.Dfa;
+            });
+            lexer.SetSource(new StringReader("abb"));
+            Tuple<int, string> tuple = lexer.Next();
+            Assert.AreEqual(1, tuple.Item1);
+            Assert.AreEqual("ABB", tuple.Item2);
+        }
+
+        [Test]
+        public void TestLexerConstructionUsingNfaEngine()
+        {
+            ILexer<string> lexer = LexerFactory<string>.Configure(c =>
+            {
+                c.Token("a+", f => "A+");
+                c.Token("abb", f => "ABB");
+                c.Token("a*b+", f => "A*B+");
+                c.Runtime = LexerRuntime.Nfa;
+            });
             lexer.SetSource(new StringReader("abb"));
             Tuple<int, string> tuple = lexer.Next();
             Assert.AreEqual(1, tuple.Item1);

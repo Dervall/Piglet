@@ -48,6 +48,9 @@ namespace Piglet.Lexer.Configuration
             // If we desire a DFA based lexer, stop
             if (Runtime == LexerRuntime.Dfa)
             {
+                // The input ranges which will have been previously split into the smallest distinct
+                // units will need to be recombined in order for this to work as fast as possible.
+             //   dfa.CombineInputRanges();
                 return new DfaLexer<T>(dfa, nfas, tokens, EndOfInputTokenNumber);
             }
 

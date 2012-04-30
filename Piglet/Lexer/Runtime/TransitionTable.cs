@@ -33,9 +33,13 @@ namespace Piglet.Lexer.Runtime
                 foreach (var transition in dfa.Transitions.Where(f => f.From == state1))
                 {
                     // Set the table entry
-                    foreach (var input in transition.ValidInput)
+                    for (int i = 0; i < 256; ++i )
                     {
-                        uncompressed[state.StateNumber, input] = (short)transition.To.StateNumber;
+                        // TODO: Here is the place to support unicode lexing using a tabular lexer.
+                        if (transition.ValidInput.ContainsChar((char)i))
+                        {
+                            uncompressed[state.StateNumber, i] = (short) transition.To.StateNumber;
+                        }
                     }
                 }
 

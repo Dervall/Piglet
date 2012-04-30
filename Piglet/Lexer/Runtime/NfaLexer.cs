@@ -15,7 +15,8 @@ namespace Piglet.Lexer.Runtime
             : base(endOfInputTokenNumber)
         {
             this.nfa = nfa;
-            actions = nfas.Select((n, i) => new Tuple<NFA.State, Tuple<int, Func<string, T>>>(n.States.Single(f => f.AcceptState), new Tuple<int, Func<string, T>>( i,tokens[i].Item2))).ToArray();
+            actions = nfas.Select((n, i) => new Tuple<NFA.State, Tuple<int, Func<string, T>>>(n.States.Single(f => f.AcceptState), new Tuple<int, Func<string, T>>( i,
+                i < tokens.Count ? tokens[i].Item2 : null))).ToArray();
         }
 
         protected override Tuple<int, Func<string, T>> GetAction()
@@ -30,7 +31,7 @@ namespace Piglet.Lexer.Runtime
             // Get the first applicable action. This returns null of there is no action defined but there are accepting
             // states. This is fine, this means an ignored token.
             var action = actions.FirstOrDefault(f => State.Contains(f.Item1));
-            return action != null ? action.Item2 : new Tuple<int, Func<string, T>>(int.MinValue, null);
+            return action != null && action.Item2.Item2 != null ? action.Item2 : new Tuple<int, Func<string, T>>(int.MinValue, null);
         }
 
         protected override bool ReachedTermination(HashSet<NFA.State> nextState)
@@ -42,7 +43,7 @@ namespace Piglet.Lexer.Runtime
         {
             var nextState = new HashSet<NFA.State>();
             nextState.UnionWith(nfa.Closure(
-                nfa.Transitions.Where(t => t.ValidInput.Contains(input) && State.Contains(t.From)).Select(f => f.To).
+                nfa.Transitions.Where(t => t.ValidInput.ContainsChar(input) && State.Contains(t.From)).Select(f => f.To).
                     ToArray()));
             return nextState;
         }

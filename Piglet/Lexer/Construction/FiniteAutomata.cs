@@ -37,6 +37,26 @@ namespace Piglet.Lexer.Construction
             StartState.StateNumber = 0;
         }
 
+        public void DistinguishValidInputs()
+        {
+            // For each transition which has valid inputs, if any other state has a valid input range which in any way 
+            // intersects with the valid inputs of this range, create two ranges instead.
+            bool changes;
+            do
+            {
+                changes = false;
+                foreach (var t1 in Transitions)
+                {
+                    Transition<TState> t = t1;
+                    foreach (var t2 in Transitions.Where(f => f != t))
+                    {
+                        changes |= t.ValidInput.DistinguishRanges(t2.ValidInput);
+                    }
+                }
+            } while (changes);
+
+        }
+
         public StimulateResult<TState> Stimulate(string input)
         {
             var activeStates = Closure(new[] {StartState}).ToList();
@@ -46,7 +66,7 @@ namespace Piglet.Lexer.Construction
                 var toStates = new HashSet<TState>();
                 foreach (var activeState in activeStates)
                 {
-                    var nextStates = Transitions.Where(t => t.From == activeState && t.ValidInput.Contains(c)).Select(t=>t.To);
+                    var nextStates = Transitions.Where(t => t.From == activeState && t.ValidInput.ContainsChar(c)).Select(t=>t.To);
                     toStates.UnionWith(nextStates);
                 }
 

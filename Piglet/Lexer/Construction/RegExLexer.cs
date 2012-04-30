@@ -24,11 +24,12 @@ namespace Piglet.Lexer.Construction
         {
             public CharacterClassState()
             {
-                ClassChars = new HashSet<char>();
+                CharsSet = new CharSet();
             }
 
-            public ISet<char> ClassChars { get; private set; }
+            public CharSet CharsSet { get; private set; }
             public bool Negated { get; set; }
+            public char LastChar { get; set; }
         }
 
         private class NumberedRepetitionState
@@ -52,7 +53,7 @@ namespace Piglet.Lexer.Construction
             state = State.Normal;
         }
 
-        private IEnumerable<char> EscapedCharToAcceptChars(char c)
+        private CharSet EscapedCharToAcceptCharRange(char c)
         {
             switch (c)
             {
@@ -72,9 +73,9 @@ namespace Piglet.Lexer.Construction
                     return AllCharactersExceptNull.Except(
                         CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')));
                 case 'n':
-                    return new [] {'\n'};
+                    return SingleChar('\n');
                 case 'r':
-                    return new []  {'\r'};
+                    return SingleChar('\r');
                 case '.':
                 case '*':
                 case '|':
@@ -88,23 +89,30 @@ namespace Piglet.Lexer.Construction
                 case '}':
                 case ' ':
                 case '?':
-                    return new [] {c};
+                    return SingleChar(c);
                 default:
-                    return new char[] {};
+                    return new CharSet();   // Empty charset, might be added to
             }
         }
 
-        private IEnumerable<char> EscapedCharToAcceptCharsInClass(char c)
+        private CharSet SingleChar(char c)
+        {
+            var cs = new CharSet();
+            cs.Add(c);
+            return cs;
+        }
+
+        private CharSet EscapedCharToAcceptCharsInClass(char c)
         {
             // There are some additional escapeable characters for a character class
             switch (c)
             {
                 case '-':
                 case '^':
-                    return new[] {c};
+                    return SingleChar(c);
 
             }
-            return EscapedCharToAcceptChars(c);
+            return EscapedCharToAcceptCharRange(c);
         }
 
         public RegExToken NextToken()
@@ -140,13 +148,13 @@ namespace Piglet.Lexer.Construction
                             case '*':   return new RegExToken { Type = RegExToken.TokenType.OperatorMul };
                             case '?':   return new RegExToken { Type = RegExToken.TokenType.OperatorQuestion };
                             case '.':   return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = AllCharactersExceptNull };
-                            default:    return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = new[] {c}};
+                            default:    return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = SingleChar(c)};
                         }
                         break;
 
                     case State.NormalEscaped:
                         {
-                            var characters = EscapedCharToAcceptChars(c).ToArray();
+                            var characters = EscapedCharToAcceptCharRange(c);
                             if (!characters.Any())
                             {
                                 throw new LexerConstructionException(string.Format("Unknown escaped character '{0}'", c));
@@ -162,7 +170,7 @@ namespace Piglet.Lexer.Construction
                                 {
                                     // If the classstate is ALREADY negated
                                     // Readd the ^ to the expression
-                                    classState.ClassChars.Add('^');
+                                    classState.LastChar = '^';
                                     state = State.InsideCharacterClass;
                                 }
                                 classState.Negated = true;
@@ -171,13 +179,13 @@ namespace Piglet.Lexer.Construction
                             case ']':
                             case '-':
                                 // This does not break the character class TODO: I THINK!!!
-                                classState.ClassChars.Add(c);
+                                classState.LastChar = c;
                                 break;
                             case '\\':
                                 state = State.InsideCharacterClassEscaped;
                                 break;
                             default:
-                                classState.ClassChars.Add(c);
+                                classState.LastChar = c;
                                 state = State.InsideCharacterClass;
                                 break;
                         }
@@ -192,31 +200,41 @@ namespace Piglet.Lexer.Construction
                             case '[':
                                 throw new LexerConstructionException("Opening new character class inside an already open one");
                             case ']':
+                                if (classState.LastChar != (char)0) 
+                                    classState.CharsSet.Add(classState.LastChar);
+
                                 // Ending class
                                 return new RegExToken
                                            {
                                                Type = RegExToken.TokenType.Accept,
                                                Characters = classState.Negated
-                                                                ? AllCharactersExceptNull.Except(classState.ClassChars)
-                                                                : classState.ClassChars.Distinct()
+                                                                ? AllCharactersExceptNull.Except(classState.CharsSet)
+                                                                : classState.CharsSet
                                            };
                             case '\\':
                                 state = State.InsideCharacterClassEscaped;
                                 break;
                             default:
-                                classState.ClassChars.Add(c);
+                                if (classState.LastChar != 0)
+                                    classState.CharsSet.Add(classState.LastChar);
+                                classState.LastChar = c;
                                 break;
                         }
                         break;
 
                     case State.InsideCharacterClassEscaped:
                         {
-                            var characters = EscapedCharToAcceptCharsInClass(c).ToArray();
+                            var characters = EscapedCharToAcceptCharsInClass(c);
                             if (!characters.Any())
                             {
                                 throw new LexerConstructionException(string.Format("Unknown escaped character '{0}' in character class", c));
                             }
-                            classState.ClassChars.UnionWith(characters);
+
+                            if (classState.LastChar != 0)
+                                classState.CharsSet.Add(classState.LastChar);
+
+                            classState.CharsSet.UnionWith(characters);
+                            classState.LastChar = (char)0;
                             state = State.InsideCharacterClass;
                         }
                         break;
@@ -228,22 +246,23 @@ namespace Piglet.Lexer.Construction
                             case ']':
                                 // We found the - at the position BEFORE the end of the class
                                 // which means we should handle it as a litteral and end the class
+                                classState.CharsSet.Add(classState.LastChar);
+                                classState.CharsSet.Add('-');
+
                                 return new RegExToken
                                 {
                                     Type = RegExToken.TokenType.Accept,
                                     Characters = classState.Negated
-                                                     ? AllCharactersExceptNull.Except(classState.ClassChars)
-                                                     : classState.ClassChars.Distinct()
+                                                     ? AllCharactersExceptNull.Except(classState.CharsSet)
+                                                     : classState.CharsSet
                                 };
 
                             default:
-                                char lastClassChar = classState.ClassChars.Last();
+                                char lastClassChar = classState.LastChar;
                                 char from = lastClassChar < c ? lastClassChar : c;
                                 char to = lastClassChar < c ? c : lastClassChar;
-                                for (; from <= to; ++from)
-                                {
-                                    classState.ClassChars.Add(from);
-                                }
+                                classState.CharsSet.AddRange(from, to);
+                                classState.LastChar = (char) 0;
                                 state = State.InsideCharacterClass;
                                 break;
                         }
@@ -324,31 +343,31 @@ namespace Piglet.Lexer.Construction
             return null;
         }
 
-        private static IEnumerable<char> CharRange(char start, char end)
+        private static CharSet CharRange(char start, char end)
         {
-            for (var c = start; c <= end; ++c)
-            {
-                yield return c;
-            }
+            var charRange = new CharSet();
+            charRange.AddRange(start, end);
+            return charRange;
         }
 
-        protected static IEnumerable<char> AllCharactersExceptNull
+        protected static CharSet AllCharactersExceptNull
         {
             get
             {
-                for (var c = (char)1; c < 256; ++c)
-                    yield return c;
+                return CharRange((char) 1, char.MaxValue);                
             }
         }
 
-        protected static IEnumerable<char> AllWhitespaceCharacters
+        protected static CharSet AllWhitespaceCharacters
         {
             get
             {
-                yield return ' ';
-                yield return '\t';
-                yield return '\n';
-                yield return '\r';            
+                var cs = new CharSet();
+                cs.Add(' ');
+                cs.Add('\t');
+                cs.Add('\n');
+                cs.Add('\r');
+                return cs;
             }
         }
     }

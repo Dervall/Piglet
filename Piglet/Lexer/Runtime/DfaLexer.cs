@@ -53,7 +53,7 @@ namespace Piglet.Lexer.Runtime
         protected override DFA.State GetNextState(char input)
         {
             return dfa.Transitions
-                .Where(f => f.From == State && f.ValidInput.Contains(input))
+                .Where(f => f.From == State && f.ValidInput.Ranges.Any(r => r.From <= input && r.To >= input))
                 .Select(f => f.To)
                 .SingleOrDefault();
         }

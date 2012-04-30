@@ -72,7 +72,7 @@ namespace Piglet.Lexer.Construction
             return nfa;
         }
 
-        private static NFA Accept(IEnumerable<char> acceptCharacters)
+        private static NFA Accept(CharSet acceptCharacters)
         {
             // Generate a NFA with a simple path with one state transitioning into an accept state.
             var nfa = new NFA();
@@ -223,9 +223,5 @@ namespace Piglet.Lexer.Construction
 
             return output;
         }
-
-        
-
-        
     }
 }

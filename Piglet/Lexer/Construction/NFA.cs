@@ -43,7 +43,7 @@ namespace Piglet.Lexer.Construction
             {
                 // Hard copy the valid input
                 var newTransition = new Transition<State>(stateMap[transition.From], stateMap[transition.To],
-                    transition.ValidInput == null ? null : transition.ValidInput.ToArray());
+                    transition.ValidInput);
                 newNFA.Transitions.Add(newTransition);
             }
 

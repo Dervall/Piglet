@@ -46,6 +46,8 @@
     </Compile>
     <Compile Include="Common\CompressedTable.cs" />
     <Compile Include="Common\SublistSearch.cs" />
+    <Compile Include="Lexer\Construction\CharRange.cs" />
+    <Compile Include="Lexer\Construction\CharSet.cs" />
     <Compile Include="Lexer\Runtime\DfaLexer.cs" />
     <Compile Include="Lexer\Configuration\ILexerConfigurator.cs" />
     <Compile Include="Lexer\Configuration\LexerConfigurator.cs" />

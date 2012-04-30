@@ -51,7 +51,9 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Lexer\Construction\TestCharRange.cs" />
     <Compile Include="Lexer\Construction\TestStateMinimization.cs" />
+    <Compile Include="Lexer\Construction\TestUnicodeLexing.cs" />
     <Compile Include="Parser\Configuration\TestNonTerminal.cs" />
     <Compile Include="Parser\Configuration\TestTerminal.cs" />
     <Compile Include="Parser\Construction\Debug\TestDebugStrings.cs" />

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Piglet.Lexer.Construction
+﻿namespace Piglet.Lexer.Construction
 {
     internal class Transition<TState>
     {
@@ -10,22 +7,18 @@ namespace Piglet.Lexer.Construction
 
         // An empty set of valid input means that this is an Epsilon transition. Epsilon transitions
         // are only valid in NFAs
-        public ISet<char> ValidInput { get; private set; }
+        public CharSet ValidInput { get; private set; }
         
-        public Transition(TState from, TState to, IEnumerable<char> validInput = null)
+        public Transition(TState from, TState to, CharSet validInput = null)
         {
-            ValidInput = new HashSet<char>();
+            ValidInput = validInput??new CharSet();
             From = from;
             To = to;
-            if (validInput != null)
-            {
-                ValidInput.UnionWith(validInput);
-            }
         }
 
         public override string ToString()
         {
-            return string.Format("{0} ={1}=> {2}", From, !ValidInput.Any() ? "ε" : string.Join( ", ", ValidInput), To);
+            return string.Format("{0} ={1}=> {2}", From, To, ValidInput);
         }
     }
 }

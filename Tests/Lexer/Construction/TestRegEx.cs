@@ -203,7 +203,7 @@ nextLine");
         [Test]
         public void TestBracketInCharacterClass()
         {
-            CheckMatch("[][][]", "[][ab]+");
+            CheckMatch("[][][]", @"[\]\[ab]+");
         }
 
         [Test]

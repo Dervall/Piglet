@@ -21,7 +21,7 @@ namespace Piglet.Lexer.Construction
 
         public TokenType Type { get; set; }
 
-        public IEnumerable<char> Characters { get; set; }
+        public CharSet Characters { get; set; }
 
         public int MinRepetitions { get; set; }
 

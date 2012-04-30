@@ -118,44 +118,7 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <returns></returns>
         internal static string TransitionLabel<T>(this Transition<T> transition )
         {
-            if ( !transition.ValidInput.Any()) return "ε";
-
-            if (transition.ValidInput.Count == 1)
-                return transition.ValidInput.First().ToString();
-
-            return string.Join(", ", ValidInputToTransitionLabel(transition.ValidInput));
-        }
-
-        private static string ToGraphSafeString(this char c)
-        {
-            return c >= 33 && c <= 0x7e
-                ? c.ToString()
-                : string.Format("0x{0:x2}", (int) c);
-        }
-
-        private static IEnumerable<string> ValidInputToTransitionLabel(IEnumerable<char> validInput)
-        {
-            var input = validInput.OrderBy(f => f).ToArray();
-            char start = input[0];
-            for (int i = 1; i < input.Length + 1; ++i)
-            {
-                if (i == input.Length || input[i] != input[i - 1] + 1)
-                {
-                    char end = input[i - 1];
-                    if ((end - start) > 0)
-                    {
-                        yield return string.Format("{0}-{1}",
-                                                   start.ToGraphSafeString(),
-                                                   end.ToGraphSafeString());
-                    }
-                    else
-                    {
-                        yield return start.ToGraphSafeString();
-                    }
-                    if(i != input.Length) 
-                        start = input[i];
-                }
-            }
+            return transition.ValidInput.ToString();
         }
     }
 }

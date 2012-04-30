@@ -16,15 +16,15 @@ namespace Piglet.Lexer.Construction
                 NfaStates = nfaStates.ToList();
             }
 
-            public IEnumerable<char> LegalMoves(NFA nfa)
+            public IEnumerable<CharRange> LegalMoves(NFA nfa)
             {
-                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From)) select e.ValidInput).SelectMany(f => f).Distinct();
+                return nfa.Transitions.Where(f => NfaStates.Contains(f.From)).SelectMany(f => f.ValidInput.Ranges).Distinct();
             }
 
-            public NFA.State[] Move(NFA nfa, char c)
+            public NFA.State[] Move(NFA nfa, CharRange c)
             {
                 // Find transitions going OUT from this state that is valid with an input c
-                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput.Contains(c)) select e.To).ToArray();
+                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput.Ranges.Contains(c)) select e.To).ToArray();
             }
 
             public override string ToString()
@@ -44,10 +44,15 @@ namespace Piglet.Lexer.Construction
         {
             var closures = nfa.GetAllClosures();
 
+            // The valid input ranges that the NFA contains will need to be split up so that
+            // the smallest possible units which NEVER overlaps will be contained in each of the
+            // states
+            nfa.DistinguishValidInputs();
+
             // Get the closure set of S0
             var dfa = new DFA();
             dfa.States.Add(new State(closures[nfa.StartState]));
-
+            
             while (true)
             {
                 // Get an unmarked state in dfaStates
@@ -62,7 +67,7 @@ namespace Piglet.Lexer.Construction
 
                 // Get the move states by stimulating this DFA state with
                 // all possible characters.
-                foreach (char c in t.LegalMoves(nfa))
+                foreach (CharRange c in t.LegalMoves(nfa))
                 {
                     NFA.State[] moveSet = t.Move(nfa, c);
                     if (moveSet.Any())
@@ -103,7 +108,7 @@ namespace Piglet.Lexer.Construction
                             dfa.Transitions.Add(transition);                     
                         }
 
-                        transition.ValidInput.Add(c);
+                        transition.ValidInput.AddRange(c.From, c.To, false);
                     }
                 }
             }
@@ -133,11 +138,11 @@ namespace Piglet.Lexer.Construction
                 }        
             };
 
-            // Get a set of all valid input that we have in the DFA
-            ISet<char> allValidInputs = new HashSet<char>();
+            // Get a set of all valid input ranges that we have in the DFA
+            ISet<CharRange> allValidInputs = new HashSet<CharRange>();
             foreach (var transition in Transitions)
             {
-                allValidInputs.UnionWith(transition.ValidInput);
+                allValidInputs.UnionWith(transition.ValidInput.Ranges);
             }
 
             // For every distinct pair of states, if one of them is an accepting state
@@ -189,8 +194,8 @@ namespace Piglet.Lexer.Construction
                 {
                     if (distinct[p, q] == -1) 
                     {
-                        Func<State, char, State> targetState = (state, c) => {
-                            var trans = Transitions.FirstOrDefault(t => t.From == state && t.ValidInput.Contains(c));
+                        Func<State, CharRange, State> targetState = (state, c) => {
+                            var trans = Transitions.FirstOrDefault(t => t.From == state && t.ValidInput.Ranges.Contains(c));
                             return trans == null ? null : trans.To;
                         };
 
@@ -201,9 +206,9 @@ namespace Piglet.Lexer.Construction
 
                             if (pa == null ^ qa == null)
                             {
-                                // If one of them has a transition on this character but the other one doesn't then
+                                // If one of them has a transition on this character range but the other one doesn't then
                                 // they are separate.
-                                distinct[p, q] = a;
+                                distinct[p, q] = a.GetHashCode();
                                 changes = true;
 
                                 break;
@@ -215,7 +220,7 @@ namespace Piglet.Lexer.Construction
 
                             if (distinct[qa, pa] != -1)
                             {
-                                distinct[p, q] = a;
+                                distinct[p, q] = a.GetHashCode();
                                 changes = true;
                                 break;
                             }

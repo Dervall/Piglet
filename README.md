@@ -184,6 +184,10 @@ All releases are available from both NuGet, and are always represented as tags o
 
 Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
 
+# 1.3.0
+* Piglet now supports Unicode! Piglet will now lex the full unicode character set.
+* You can now specify the lexer runtime, giving you more options on the speed tradeoffs of lexer construction and lexer runtime
+
 # 1.2.2
 * Added support for ignoring expressions in fluent configuration parsing.
 

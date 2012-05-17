@@ -10,6 +10,8 @@ namespace Piglet.Lexer.Construction
 
         public IEnumerable<CharRange> Ranges { get { return ranges; } } 
 
+        
+
         public void Add(char c)
         {
             AddRange(c,c, true);
@@ -172,8 +174,6 @@ namespace Piglet.Lexer.Construction
                 var r = ranges[i];
                 foreach (var r2 in other.ranges)
                 {
-
-
                     // If from is inside the range (not on borders), split the range
                     if (r2.From > r.From && r2.From <= r.To)
                     {

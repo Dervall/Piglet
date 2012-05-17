@@ -1,15 +1,32 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using Piglet.Lexer;
+using Piglet.Lexer.Configuration;
 
 namespace Piglet.Tests.Lexer.Construction
 {
     [TestFixture]
     public class TestRegEx
     {
-        private ILexer<string> CreateLexer(string regEx)
+        private IEnumerable<Action<ILexerConfigurator<string>>> GetAllConfigurationOptions()
         {
-            return LexerFactory<string>.Configure(c => c.Token(regEx, f => regEx));
+            return Enum.GetValues(typeof (LexerRuntime)).Cast<LexerRuntime>().Select(
+                f => new Action<ILexerConfigurator<string>>(c => c.Runtime = f));
+        }
+
+        private IEnumerable<ILexer<string>> CreateLexers(string regEx)
+        {
+            Action<ILexerConfigurator<string>> tokenAction = c => c.Token(regEx, f => f);
+            return GetAllConfigurationOptions().Select(f => 
+                LexerFactory<string>.Configure(
+                c =>
+                    {
+                        f(c);
+                        tokenAction(c);
+                    }));
         }
 
         private void CheckMatch(string input, string regEx)
@@ -17,17 +34,32 @@ namespace Piglet.Tests.Lexer.Construction
             IsMatch(input, regEx, true);
         }
 
+        private void CheckMatch(string input, string regEx, string expectedMatch)
+        {
+            IsMatch(input, regEx, true, expectedMatch);
+        }
+
         private void IsMatch(string input, string regEx, bool shouldMatch)
         {
-            ILexer<string> lexer = CreateLexer(regEx);
-            lexer.SetSource(new StringReader(input));
-            try
+            IsMatch(input, regEx, shouldMatch, input);
+        }
+
+        private void IsMatch(string input, string regEx, bool shouldMatch, string matchedInput)
+        {
+            foreach (ILexer<string> lexer in CreateLexers(regEx))
             {
-                Assert.AreEqual(regEx, lexer.Next().Item2);
-            }
-            catch (LexerException)
-            {
-                Assert.False(shouldMatch);
+                lexer.SetSource(new StringReader(input));
+                try
+                {
+                    Tuple<int, string> token = lexer.Next();
+                    Assert.AreEqual(0, token.Item1);
+                    Assert.AreEqual(matchedInput, token.Item2);
+                    Assert.IsTrue(shouldMatch);
+                }
+                catch (LexerException)
+                {
+                    Assert.False(shouldMatch);
+                }
             }
         }
 
@@ -210,7 +242,7 @@ nextLine");
         public void TestExactNumberedRepetition()
         {
             CheckMatch("aaa", "a{3}");
-            CheckMatchFail("aaaa", "a{3}");
+            CheckMatchFail("a", "a{3}");
             CheckMatchFail("aa", "a{3}");
         }
 
@@ -245,7 +277,7 @@ nextLine");
         [Test]
         public void TestNumberedRepetitionWithMaxValue()
         {
-            CheckMatchFail("coolcoolcoolcoolcoolcool", "(cool){3:5}");
+            CheckMatch("coolcoolcoolcoolcoolcool", "(cool){3:5}", "coolcoolcoolcoolcool");
             CheckMatch("coolcoolcoolcoolcool", "(cool){3:5}");
             CheckMatch("coolcoolcoolcool", "(cool){3:5}");
             CheckMatch("coolcoolcool", "(cool){3:5}");

@@ -230,7 +230,7 @@ Authors
 -------
 
 **Per Dervall**
-+ http://twitter.com/dervall
++ http://twitter.com/perdervall
 + http://binarysculpting.com
 
 Copyright and license

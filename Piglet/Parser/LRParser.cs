@@ -113,7 +113,7 @@ namespace Piglet.Parser
                         // End of input will cause the exception to be thrown
                         for (; parseTable.Action[state, input.Item1] == short.MinValue && 
                                input.Item1 != endOfInputTokenNumber; input = Lexer.Next())
-                            Console.WriteLine("Ate '{0}'", Lexer.LexerState.LastLexeme);// nom nom nom
+                            ; // nom nom nom
 
                         // Ran out of file looking for the end of the error rule
                         if (input.Item1 == endOfInputTokenNumber)

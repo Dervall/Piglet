@@ -95,9 +95,10 @@ function generateNuspec($version)
     <owners>Per Dervall</owners>
     <licenseUrl>https://github.com/Dervall/Piglet/blob/master/LICENSE.txt</licenseUrl>
     <projectUrl>https://github.com/Dervall/Piglet</projectUrl>
+    <iconUrl>https://raw.github.com/Dervall/Piglet/master/logo32.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration</summary>
-    <description>Piglet is a library for lexing and parsing text, in the spirit of those big parser and lexer genererators such as bison, antlr and flex. While not as feature packed as those, it is also a whole lot leaner and much easier to understand.</description>
+    <description>Piglet is a lightweight library for lexing and parsing text, in the spirit of those big parser and lexer genererators such as bison, antlr and flex focusing on ease of use and integration.</description>
     <tags>parser generator parser lexer fluent</tags>
   </metadata>
   <files>

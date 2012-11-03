@@ -8,9 +8,21 @@ namespace Piglet.Lexer.Construction
     {
         private IList<CharRange> ranges = new List<CharRange>();
 
-        public IEnumerable<CharRange> Ranges { get { return ranges; } } 
+        public IEnumerable<CharRange> Ranges { get { return ranges; } }
 
-        
+        public CharSet()
+        {
+        }
+
+        public CharSet(params char[] ranges)
+        {
+            if (ranges.Length % 2 != 0)
+                throw new ArgumentException("Number of chars in ranges must be an even number");
+            for (int i = 0; i < ranges.Length; i += 2)
+            {
+                AddRange(ranges[i], ranges[i+1]);
+            }
+        }
 
         public void Add(char c)
         {

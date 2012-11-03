@@ -207,13 +207,14 @@ nextLine");
         [TestCase("åäöÅÄÖ")]
         [TestCase("_")]
         [TestCase("01234567890")]
+        [TestCase("\x16C8\x16C1\x16B7\x16DA\x16D6\x16CF")]//Piglet in Runic
         public void TestMatchWordCharactersInclude(string input)
         {
             CheckMatch(input, "\\w+");
         }
 
         [Test]
-        [TestCase("-!\\\"#€%&/\\(\\)='\\|<>")]
+        [TestCase("-!\\\"#€%&/()='|<>,.*^¨`´?+;:@$")]
         public void TestMatchWordCharactersExclude(string input)
         {
             CheckMatchFail(input, "\\w+");

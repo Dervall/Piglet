@@ -206,13 +206,13 @@ nextLine");
         [TestCase("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
         [TestCase("åäöÅÄÖ")]
         [TestCase("_")]
+        [TestCase("01234567890")]
         public void TestMatchWordCharactersInclude(string input)
         {
             CheckMatch(input, "\\w+");
         }
 
         [Test]
-      //  [TestCase("01234567890")]
         [TestCase("-!\\\"#€%&/\\(\\)='\\|<>")]
         public void TestMatchWordCharactersExclude(string input)
         {

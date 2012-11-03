@@ -202,9 +202,21 @@ nextLine");
         }
 
         [Test]
-        public void TestMatchAlphanumeric()
+        [TestCase("abcdefghijklmnopqrstuvwxyz")]
+        [TestCase("ABCDEFGHIJKLMNOPQRSTUVWXYZ")]
+        [TestCase("åäöÅÄÖ")]
+        [TestCase("_")]
+        public void TestMatchWordCharactersInclude(string input)
         {
-            CheckMatch("abcdef90210", "\\w+");
+            CheckMatch(input, "\\w+");
+        }
+
+        [Test]
+        [TestCase("01234567890")]
+        [TestCase("-!\\\"#€%&/\\(\\)='\\|<>")]
+        public void TestMatchWordCharactersExclude(string input)
+        {
+            CheckMatchFail(input, "\\w+");
         }
 
         [Test]

@@ -68,7 +68,8 @@ namespace Piglet.Lexer.Construction
                 case 'S':
                     return AllCharactersExceptNull.Except(AllWhitespaceCharacters);
                 case 'w':
-                    return CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'));
+                    return CharRange('ä', 'å').Union(CharRange('Ä', 'Å')).Union(CharRange('ö', 'ö'))
+                        .Union(CharRange('Ö','Ö')).Union(CharRange('_', '_')).Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'));
                 case 'W':
                     return AllCharactersExceptNull.Except(
                         CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')));

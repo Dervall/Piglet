@@ -72,7 +72,8 @@ namespace Piglet.Lexer.Construction
                         .Union(CharRange('Ö','Ö')).Union(CharRange('_', '_')).Union(CharRange('a', 'z')).Union(CharRange('A', 'Z'));
                 case 'W':
                     return AllCharactersExceptNull.Except(
-                        CharRange('0', '9').Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')));
+                        CharRange('ä', 'å').Union(CharRange('Ä', 'Å')).Union(CharRange('ö', 'ö'))
+                        .Union(CharRange('Ö', 'Ö')).Union(CharRange('_', '_')).Union(CharRange('a', 'z')).Union(CharRange('A', 'Z')));
                 case 'n':
                     return SingleChar('\n');
                 case 'r':

@@ -22,8 +22,7 @@ namespace Piglet.Demo.Lexer
 
             // Run the lexer
             string input = "10 piglets 5 boars 1 big sow";
-            lexer.SetSource(input);
-            for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
+            foreach (var token in lexer.Tokenize(input))
             {
                 if (token.Item2 is int)
                 {

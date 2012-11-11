@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Piglet.Lexer;
 
 namespace Piglet.Demo.Lexer
@@ -40,10 +37,7 @@ namespace Piglet.Demo.Lexer
                 configurator.Ignore(@"\s+");
             });
 
-            lexer.SetSource("up down left right right north west left north up");
-
-
-            for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
+            foreach (var token in lexer.Tokenize("up down left right right north west left north up"))
             {
                 Console.WriteLine("{0} Current position is {1},{2}", token.Item2, positionX, positionY);
             }

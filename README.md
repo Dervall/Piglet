@@ -99,21 +99,20 @@ Sometimes you don't need a full parser, but only a tool to identify tokens. This
 ```csharp
 // Create a lexer returning type object
 var lexer = LexerFactory<object>.Configure(configurator =>
-{
-    // Returns an integer for each number it finds
-    configurator.Token(@"\d+", f => int.Parse(f));
+                                    {
+                                        // Returns an integer for each number it finds
+                                        configurator.Token(@"\d+", f => int.Parse(f));
 
-    // Returns a string for each string found
-    configurator.Token(@"[a-zA-Z]+", f => f);
+                                        // Returns a string for each string found
+                                        configurator.Token(@"[a-zA-Z]+", f => f);
 
-    // Ignores all white space
-    configurator.Ignore(@"\s+");
-});
+                                        // Ignores all white space
+                                        configurator.Ignore(@"\s+");
+                                    });
 
 // Run the lexer
 string input = "10 piglets 5 boars 1 big sow";
-lexer.SetSource(input);
-for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
+foreach (var token in lexer.Tokenize(input))
 {
     if (token.Item2 is int)
     {
@@ -157,10 +156,7 @@ var lexer = LexerFactory<string>.Configure(configurator =>
     configurator.Ignore(@"\s+");
 });
 
-lexer.SetSource("up down left right right north west left north up");
-
-
-for (var token = lexer.Next(); token.Item1 != -1; token = lexer.Next())
+foreach (var token in lexer.Tokenize("up down left right right north west left north up"))
 {
     Console.WriteLine("{0} Current position is {1},{2}", token.Item2, positionX, positionY);
 }
@@ -183,6 +179,14 @@ Releases are numbered in major, minor and revision number.
 All releases are available from both NuGet, and are always represented as tags on github.
 
 Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
+
+# 1.4.0
+* Added thread safety to lexing and parsing.
+* Improved lexer usage. Tokenize is now new preferred method of listing tokens, which is also thread safe.
+* Made \w and \d more consistent with MS use of the term.
+* Added icon to NuGet package
+* Added convenience reduction functions for common cases of reducing to a single member in tech configuration
+* Fixed some left over console output in error recovery
 
 # 1.3.0
 * Piglet now supports Unicode! Piglet will now lex the full unicode character set.

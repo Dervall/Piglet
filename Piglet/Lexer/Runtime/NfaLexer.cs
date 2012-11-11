@@ -18,18 +18,18 @@ namespace Piglet.Lexer.Runtime
                 i < tokens.Count ? tokens[i].Item2 : null))).ToArray();
         }
 
-        protected override Tuple<int, Func<string, T>> GetAction()
+        protected override Tuple<int, Func<string, T>> GetAction(HashSet<NFA.State> state)
         {
             // If none of the included states are accepting states we will return null to signal that there is no appropriate
             // action to take
-            if (!State.Any(f => f.AcceptState))
+            if (!state.Any(f => f.AcceptState))
             {
                 return null;
             }
 
             // Get the first applicable action. This returns null of there is no action defined but there are accepting
             // states. This is fine, this means an ignored token.
-            var action = actions.FirstOrDefault(f => State.Contains(f.Item1));
+            var action = actions.FirstOrDefault(f => state.Contains(f.Item1));
             return action != null && action.Item2.Item2 != null ? action.Item2 : new Tuple<int, Func<string, T>>(int.MinValue, null);
         }
 
@@ -38,19 +38,20 @@ namespace Piglet.Lexer.Runtime
             return !nextState.Any();
         }
 
-        protected override HashSet<NFA.State> GetNextState(char input)
+        protected override HashSet<NFA.State> GetNextState(HashSet<NFA.State> state, char input)
         {
             var nextState = new HashSet<NFA.State>();
             nextState.UnionWith(nfa.Closure(
-                nfa.Transitions.Where(t => t.ValidInput.ContainsChar(input) && State.Contains(t.From)).Select(f => f.To).
+                nfa.Transitions.Where(t => t.ValidInput.ContainsChar(input) && state.Contains(t.From)).Select(f => f.To).
                     ToArray()));
             return nextState;
         }
 
-        protected override void ResetState()
+        protected override HashSet<NFA.State> GetInitialState()
         {
-            State = new HashSet<NFA.State>();
-            State.UnionWith(nfa.Closure(new[] {nfa.StartState}));
+            var initialState = new HashSet<NFA.State>();
+            initialState.UnionWith(nfa.Closure(new[] { nfa.StartState }));
+            return initialState;
         }
     }
 }

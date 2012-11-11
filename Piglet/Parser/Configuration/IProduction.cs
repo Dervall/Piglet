@@ -17,6 +17,17 @@ namespace Piglet.Parser.Configuration
         void SetReduceFunction(Func<T[], T> action);
 
         /// <summary>
+        /// Reduces to the first element in the production rule. Equivalent to SetReduceFunction(f => f[0])
+        /// </summary>
+        void SetReduceToFirst();
+
+        /// <summary>
+        /// Reduces to an indexed parameter. Equivalent to SetReduceFunction(f => f[index])
+        /// </summary>
+        /// <param name="index"></param>
+        void SetReduceToIndex(int index);
+
+        /// <summary>
         /// Sets context dependent precedence on this rule to make it the same precedence as the given level
         /// </summary>
         /// <param name="precedenceGroup">Precedence level to use</param>

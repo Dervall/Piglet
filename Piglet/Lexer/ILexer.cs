@@ -13,29 +13,22 @@ namespace Piglet.Lexer
     public interface ILexer<T>
     {
         /// <summary>
-        /// Get the current state of the lexer. This is primarily for error reporting purposes
-        /// </summary>
-        ILexerState LexerState { get; }
-
-        /// <summary>
-        /// Gets the next token from the input stream.
-        /// </summary>
-        /// <returns>A tuple where firstitem is token number, and second item is the tokens semantic value. If the 
-        /// end of input is reached the lexer will return the configuration given end of input token number and default(T) as the
-        /// semantic value</returns>
-        /// <throws>LexerException if illegal characters are detected</throws>
-        Tuple<int, T> Next();
-
-        /// <summary>
-        /// Set the source of the lexer.
+        /// Begin lexing a text
         /// </summary>
         /// <param name="reader">TextReader to read from</param>
-        void SetSource(TextReader reader);
+        ILexerInstance<T> Begin(TextReader reader);
 
         /// <summary>
-        /// Set the source of the lexer. This method is the same as writing SetSource(new StringReader(source))
+        /// Begin lexing a string. This method is the same as writing Begin(new StringReader(source))
         /// </summary>
         /// <param name="source">Source string to read from</param>
-        void SetSource(string source);
+        ILexerInstance<T> Begin(string source);
+
+        /// <summary>
+        /// Tokenize a string
+        /// </summary>
+        /// <param name="source">Input string to tokenize</param>
+        /// <returns></returns>
+        IEnumerable<Tuple<int, T>> Tokenize(string source);
     }
 }

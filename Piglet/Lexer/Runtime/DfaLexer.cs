@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Piglet.Lexer.Construction;
 
@@ -40,9 +39,9 @@ namespace Piglet.Lexer.Runtime
             }
         }
         
-        protected override Tuple<int, Func<string, T>> GetAction()
+        protected override Tuple<int, Func<string, T>> GetAction(DFA.State state)
         {
-            return actions.ContainsKey(State) ? actions[State] : null;
+            return actions.ContainsKey(state) ? actions[state] : null;
         }
 
         protected override bool ReachedTermination(DFA.State nextState)
@@ -50,17 +49,17 @@ namespace Piglet.Lexer.Runtime
             return nextState == null;
         }
 
-        protected override DFA.State GetNextState(char input)
+        protected override DFA.State GetNextState(DFA.State state, char input)
         {
             return dfa.Transitions
-                .Where(f => f.From == State && f.ValidInput.Ranges.Any(r => r.From <= input && r.To >= input))
+                .Where(f => f.From == state && f.ValidInput.Ranges.Any(r => r.From <= input && r.To >= input))
                 .Select(f => f.To)
                 .SingleOrDefault();
         }
 
-        protected override void ResetState()
+        protected override DFA.State GetInitialState()
         {
-            State = dfa.StartState;
+            return dfa.StartState;
         }
     }
 }

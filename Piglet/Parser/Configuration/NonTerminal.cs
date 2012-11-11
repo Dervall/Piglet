@@ -79,6 +79,16 @@ namespace Piglet.Parser.Configuration
                 ReduceAction = (e, f) => action(f);
             }
 
+            public void SetReduceToFirst()
+            {
+                SetReduceFunction(f => f[0]);
+            }
+
+            public void SetReduceToIndex(int index)
+            {
+                SetReduceFunction(f => f[index]);
+            }
+
             public void SetPrecedence(IPrecedenceGroup precedenceGroup)
             {
                 ContextPrecedence = precedenceGroup;

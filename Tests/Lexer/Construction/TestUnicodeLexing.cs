@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Piglet.Lexer;
 using Piglet.Lexer.Configuration;
 
@@ -21,10 +17,10 @@ namespace Piglet.Tests.Lexer.Construction
                                                 c.Ignore(" ");
                                                 c.Runtime = LexerRuntime.Nfa;
                                             });
-            lexer.SetSource("خنزير صغير" + " nasse");
+            var lexerInstance = lexer.Begin("خنزير صغير" + " nasse");
             
-            Assert.AreEqual("arabic", lexer.Next().Item2);
-            Assert.AreEqual("swedish", lexer.Next().Item2);
+            Assert.AreEqual("arabic", lexerInstance.Next().Item2);
+            Assert.AreEqual("swedish", lexerInstance.Next().Item2);
 
         }
 
@@ -38,10 +34,10 @@ namespace Piglet.Tests.Lexer.Construction
                 c.Ignore(" ");
                 c.Runtime = LexerRuntime.Dfa;
             });
-            lexer.SetSource("خنزير صغير" + " nasse");
+            var lexerInstance = lexer.Begin("خنزير صغير" + " nasse");
 
-            Assert.AreEqual("arabic", lexer.Next().Item2);
-            Assert.AreEqual("swedish", lexer.Next().Item2);
+            Assert.AreEqual("arabic", lexerInstance.Next().Item2);
+            Assert.AreEqual("swedish", lexerInstance.Next().Item2);
 
         }
     }

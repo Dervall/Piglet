@@ -19,8 +19,8 @@ namespace Piglet.Tests.Lexer
                                                    c.Token("abb", f => "ABB");
                                                    c.Token("a*b+", f => "A*B+");
                                                });
-            lexer.SetSource(new StringReader("abb"));
-            Tuple<int, string> tuple = lexer.Next();
+            var li = lexer.Begin(new StringReader("abb"));
+            Tuple<int, string> tuple = li.Next();
             Assert.AreEqual(1, tuple.Item1);
             Assert.AreEqual("ABB", tuple.Item2);
         }
@@ -35,8 +35,8 @@ namespace Piglet.Tests.Lexer
                 c.Token("a*b+", f => "A*B+");
                 c.Runtime = LexerRuntime.Dfa;
             });
-            lexer.SetSource(new StringReader("abb"));
-            Tuple<int, string> tuple = lexer.Next();
+            var li = lexer.Begin(new StringReader("abb"));
+            Tuple<int, string> tuple = li.Next();
             Assert.AreEqual(1, tuple.Item1);
             Assert.AreEqual("ABB", tuple.Item2);
         }
@@ -51,8 +51,8 @@ namespace Piglet.Tests.Lexer
                 c.Token("a*b+", f => "A*B+");
                 c.Runtime = LexerRuntime.Nfa;
             });
-            lexer.SetSource(new StringReader("abb"));
-            Tuple<int, string> tuple = lexer.Next();
+            var li = lexer.Begin(new StringReader("abb"));
+            Tuple<int, string> tuple = li.Next();
             Assert.AreEqual(1, tuple.Item1);
             Assert.AreEqual("ABB", tuple.Item2);
         }
@@ -67,12 +67,12 @@ namespace Piglet.Tests.Lexer
                                                                c.Token("a+", f => "a+");
                                                                c.Ignore(" ");
                                                            });
-            lexer.SetSource("aa aaaaaaa aa aaaa aa");
-            Assert.AreEqual("aa", lexer.Next().Item2);
-            Assert.AreEqual("a+", lexer.Next().Item2);
-            Assert.AreEqual("aa", lexer.Next().Item2);
-            Assert.AreEqual("a+", lexer.Next().Item2);
-            Assert.AreEqual("aa", lexer.Next().Item2);
+            var li = lexer.Begin("aa aaaaaaa aa aaaa aa");
+            Assert.AreEqual("aa", li.Next().Item2);
+            Assert.AreEqual("a+", li.Next().Item2);
+            Assert.AreEqual("aa", li.Next().Item2);
+            Assert.AreEqual("a+", li.Next().Item2);
+            Assert.AreEqual("aa", li.Next().Item2);
         }
 
         [Test]
@@ -85,11 +85,11 @@ namespace Piglet.Tests.Lexer
                 c.Token("a*b+", f => "A*B+");
                 c.Ignore(" *");
             });
-            lexer.SetSource(new StringReader("    abb   bbbbbbbbb"));
+            var li = lexer.Begin(new StringReader("    abb   bbbbbbbbb"));
 
-            Tuple<int, string> tuple = lexer.Next();
+            Tuple<int, string> tuple = li.Next();
             Assert.AreEqual("ABB", tuple.Item2);
-            tuple = lexer.Next();
+            tuple = li.Next();
             Assert.AreEqual("A*B+", tuple.Item2);
         }
 
@@ -102,14 +102,14 @@ namespace Piglet.Tests.Lexer
                                                                           c.Ignore("b+");
                                                                           c.EndOfInputTokenNumber = -1;
                                                                       });
-            lexer.SetSource("bbbbbbaaabbbaaaaabbbb");
-            Tuple<int, string> lexVal = lexer.Next();
+            var li = lexer.Begin("bbbbbbaaabbbaaaaabbbb");
+            Tuple<int, string> lexVal = li.Next();
             Assert.AreEqual(0, lexVal.Item1);
             Assert.AreEqual("aaa", lexVal.Item2);
-            lexVal = lexer.Next();
+            lexVal = li.Next();
             Assert.AreEqual(0, lexVal.Item1);
             Assert.AreEqual("aaaaa", lexVal.Item2);
-            lexVal = lexer.Next();
+            lexVal = li.Next();
             Assert.AreEqual(-1, lexVal.Item1);
             Assert.AreEqual(null, lexVal.Item2);
         }
@@ -122,11 +122,11 @@ namespace Piglet.Tests.Lexer
                 c.Token("\\d+", int.Parse);
                 c.Ignore(" *");
             });
-            lexer.SetSource(new StringReader("    123   42"));
+            var li = lexer.Begin(new StringReader("    123   42"));
 
-            Tuple<int, int> tuple = lexer.Next();
+            Tuple<int, int> tuple = li.Next();
             Assert.AreEqual(123, tuple.Item2);
-            tuple = lexer.Next();
+            tuple = li.Next();
             Assert.AreEqual(42, tuple.Item2);
         }
 
@@ -138,12 +138,12 @@ namespace Piglet.Tests.Lexer
                     c.Token("a+", s => s);
                     c.Ignore("( |\\n)+");
                 });
-            lexer.SetSource("aaa         aa  \n   aaa    aa\n   error \n   aaaa");
+            var li = lexer.Begin("aaa         aa  \n   aaa    aa\n   error \n   aaaa");
             try
             {
                 for (int i = 0; i < 10; ++i)
                 {
-                    lexer.Next();
+                    li.Next();
                 }
                 Assert.Fail();
             }

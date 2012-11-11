@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Text;
 
 namespace Piglet.Lexer.Runtime
 {
@@ -20,19 +18,19 @@ namespace Piglet.Lexer.Runtime
             return nextState == -1;
         }
 
-        protected override int GetNextState(char c)
+        protected override int GetNextState(int state, char c)
         {
-            return transitionTable[State, c];
+            return transitionTable[state, c];
         }
 
-        protected override Tuple<int, Func<string, T>> GetAction()
+        protected override Tuple<int, Func<string, T>> GetAction(int state)
         {
-            return transitionTable.GetAction(State);
+            return transitionTable.GetAction(state);
         }
 
-        protected override void ResetState()
+        protected override int GetInitialState()
         {
-            State = 0;
+            return 0;
         }
     }
 }

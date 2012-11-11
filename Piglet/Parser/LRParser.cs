@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Piglet.Lexer;
@@ -10,8 +9,6 @@ namespace Piglet.Parser
     internal class LRParser<T> : IParser<T>
     {
         private readonly IParseTable<T> parseTable;
-        private readonly Stack<T> valueStack;
-        private readonly Stack<int> parseStack;
 
         private readonly int errorTokenNumber;
         private readonly int endOfInputTokenNumber;
@@ -21,9 +18,6 @@ namespace Piglet.Parser
         {
             this.parseTable = parseTable;
             
-            valueStack = new Stack<T>();
-            parseStack = new Stack<int>();
-
             this.errorTokenNumber = errorTokenNumber;
             this.endOfInputTokenNumber = endOfInputTokenNumber;
             this.terminalDebugNames = terminalDebugNames;
@@ -33,16 +27,15 @@ namespace Piglet.Parser
 
         public ILexer<T> Lexer { get; set; }
 
-        private T Parse()
+        private T Parse(ILexerInstance<T> lexerInstance)
         {
-            // If this parser has been used before, clear the stacks
-            valueStack.Clear();
-            parseStack.Clear();
+            var valueStack = new Stack<T>();
+            var parseStack = new Stack<int>();
 
             // Push default state onto the parse stack. Default state is always 0
             parseStack.Push(0);
 
-            var input = Lexer.Next();
+            var input = lexerInstance.Next();
 
             // This holds the last exception we found when parsing, since we
             // will need to pass this to an error handler once the proper handler has been found
@@ -68,7 +61,7 @@ namespace Piglet.Parser
                     valueStack.Push(input.Item2);
 
                     // Lex next token
-                    input = Lexer.Next();
+                    input = lexerInstance.Next();
                 }
                 else
                 {
@@ -81,7 +74,7 @@ namespace Piglet.Parser
                         exception = new ParseException(string.Format("Illegal token {0}. Expected {1}", 
                             terminalDebugNames[input.Item1], string.Join(",", expectedTokens)))
                                         {
-                                            LexerState = Lexer.LexerState,
+                                            LexerState = lexerInstance,
                                             FoundToken = terminalDebugNames[input.Item1],
                                             ExpectedTokens = expectedTokens,
                                             FoundTokenId = input.Item1,
@@ -111,8 +104,8 @@ namespace Piglet.Parser
                         // We have now found a state where error recovery is enabled. This means that we 
                         // continue to scan the input stream looking for something which is accepted.
                         // End of input will cause the exception to be thrown
-                        for (; parseTable.Action[state, input.Item1] == short.MinValue && 
-                               input.Item1 != endOfInputTokenNumber; input = Lexer.Next())
+                        for (; parseTable.Action[state, input.Item1] == short.MinValue &&
+                               input.Item1 != endOfInputTokenNumber; input = lexerInstance.Next())
                             ; // nom nom nom
 
                         // Ran out of file looking for the end of the error rule
@@ -162,14 +155,12 @@ namespace Piglet.Parser
 
         public T Parse(string input)
         {
-            Lexer.SetSource(input);
-            return Parse();
+            return Parse(Lexer.Begin(input));
         }
 
         public T Parse(TextReader input)
         {
-            Lexer.SetSource(input);
-            return Parse();
+            return Parse(Lexer.Begin(input));
         }
     }
 }

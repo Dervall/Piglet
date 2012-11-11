@@ -48,10 +48,10 @@ namespace Piglet.Tests.Lexer.Construction
         {
             foreach (ILexer<string> lexer in CreateLexers(regEx))
             {
-                lexer.SetSource(new StringReader(input));
+                var lexerInstance = lexer.Begin(new StringReader(input));
                 try
                 {
-                    Tuple<int, string> token = lexer.Next();
+                    Tuple<int, string> token = lexerInstance.Next();
                     Assert.AreEqual(0, token.Item1);
                     Assert.AreEqual(matchedInput, token.Item2);
                     Assert.IsTrue(shouldMatch);
@@ -177,10 +177,10 @@ namespace Piglet.Tests.Lexer.Construction
                         f.Token("nextLine", a => a + "%" );
                     });
 
-            lexer.SetSource(@"; this is a comment
+            var lexerInstance = lexer.Begin(@"; this is a comment
 nextLine");
-            Assert.AreEqual("; this is a comment\r\n", lexer.Next().Item2);
-            Assert.AreEqual("nextLine%", lexer.Next().Item2);
+            Assert.AreEqual("; this is a comment\r\n", lexerInstance.Next().Item2);
+            Assert.AreEqual("nextLine%", lexerInstance.Next().Item2);
         }
 
         [Test]

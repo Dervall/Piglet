@@ -84,7 +84,8 @@ namespace Piglet.Lexer.Construction
 
                         // See if the new state already exists. If so change the reference to point to 
                         // the already created object, since we will need to add a transition back to the same object
-                        var oldState = dfa.States.FirstOrDefault(f => !f.NfaStates.Except(newState.NfaStates).Any() &&
+                        var oldState = dfa.States.FirstOrDefault(f => f.NfaStates.Count == newState.NfaStates.Count && 
+																	  !f.NfaStates.Except(newState.NfaStates).Any() &&
                                                                       !newState.NfaStates.Except(f.NfaStates).Any());
                         if (oldState == null)
                         {

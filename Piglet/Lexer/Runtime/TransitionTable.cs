@@ -119,7 +119,7 @@ namespace Piglet.Lexer.Runtime
         }
 
         private int FindTableIndex(char c)
-        {
+        {        	
             for (int i = 0; i < inputRangeEnds.Length; ++i)
             {
                 // If the character is less or equal to the end of the input range,

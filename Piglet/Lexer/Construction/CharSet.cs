@@ -85,9 +85,10 @@ namespace Piglet.Lexer.Construction
                 if (!ranges.Contains(charRange))
                 {
                     // Sanity check
+#if DEBUG
                     if (ranges.Any( f => f.From == charRange.From || f.To == charRange.To))
                         throw new Exception("Do not want");
-
+#endif
                     ranges.Add(charRange);
                 }
             }

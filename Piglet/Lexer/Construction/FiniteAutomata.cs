@@ -40,9 +40,9 @@ namespace Piglet.Lexer.Construction
 		public void DistinguishValidInputs()
         {
 			var ranges = new List<CharRange>(Transitions.SelectMany(f => f.ValidInput.Ranges));
-			var distinguishedRanges = new List<CharRange>();
 			var beginningsAndEnds = new SortedSet<char>(ranges.Select(f => f.From).Union(ranges.Select(f => f.To == char.MaxValue ? f.To : (char)(f.To+1)))).ToArray();
-			
+			var distinguishedRanges = new List<CharRange>(beginningsAndEnds.Count() * 2);
+
 			for(int i = 1; i < beginningsAndEnds.Length; ++i)
 			{
 				distinguishedRanges.Add(new CharRange {From = beginningsAndEnds[i-1], To = beginningsAndEnds[i] });

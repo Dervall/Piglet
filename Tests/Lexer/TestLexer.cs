@@ -165,7 +165,6 @@ namespace Piglet.Tests.Lexer
 				var lexer = LexerFactory<int>.Configure(configurator =>
 				{
 					configurator.Runtime = (LexerRuntime) runtime;
-
 					configurator.Token("\\w[0-9]", null);
 					configurator.Token("\\d\\D\\W", null);
 					configurator.Token("abcdefghijklmnopqrstuvxyz", null);

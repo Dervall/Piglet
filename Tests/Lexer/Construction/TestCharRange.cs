@@ -1,8 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Piglet.Lexer.Construction;
 
 namespace Piglet.Tests.Lexer.Construction
@@ -12,47 +8,7 @@ namespace Piglet.Tests.Lexer.Construction
     /// </summary>
     [TestFixture]
     public class TestCharRange
-    {
-        [Test]
-        public void TestDistinguishRanges()
-        {
-            var r1 = new CharSet();
-            r1.AddRange('a', 'k');
-            var r2 = new CharSet();
-            r2.AddRange('g', 'z');
-
-            r1.DistinguishRanges(r2);
-            r2.DistinguishRanges(r1);
-
-            Assert.AreEqual(2, r1.Ranges.Count());
-            Assert.AreEqual(2, r2.Ranges.Count());
-            
-            r1.DistinguishRanges(r2);
-            r2.DistinguishRanges(r1);
-
-            Assert.AreEqual(2, r1.Ranges.Count());
-            Assert.AreEqual(2, r2.Ranges.Count());
-        }
-
-        [Test]
-        public void TestDistinguishRangesWithSingleChar()
-        {
-            var r1 = new CharSet();
-            r1.AddRange('a', 'k');
-            var r2 = new CharSet();
-            r2.Add('a');
-            r2.Add('k');
-
-            r1.DistinguishRanges(r2);
-            r2.DistinguishRanges(r1);
-
-            r1.DistinguishRanges(r2);
-            r2.DistinguishRanges(r1);
-
-            Assert.IsFalse(r1.DistinguishRanges(r2));
-            Assert.IsFalse(r2.DistinguishRanges(r1));
-        }
-
+    {        
         [Test]
         public void TestExcept()
         {

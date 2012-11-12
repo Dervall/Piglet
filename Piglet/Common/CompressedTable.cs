@@ -6,14 +6,14 @@ namespace Piglet.Common
 {
     internal class CompressedTable : ITable2D
     {
-        private readonly short[] displacement;
+        private readonly int[] displacement;
         private readonly short[] data;
 
         public CompressedTable(short[,] uncompressed)
         {
             // Create a displacement table
             var numStates = uncompressed.GetUpperBound(0) + 1;
-            displacement = new short[numStates];
+            displacement = new int[numStates];
 
             var table = new List<short>();
 
@@ -30,7 +30,7 @@ namespace Piglet.Common
                 // this will not index out of the table, so there is no need to worry.
                 var tableCount = table.Count();
 
-                for (short displacementIndex = 0; displacementIndex <= tableCount; ++displacementIndex)
+                for (int displacementIndex = 0; displacementIndex <= tableCount; ++displacementIndex)
                 {
                     bool spotFound = true;
                     int offset = displacementIndex;

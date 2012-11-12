@@ -37,24 +37,29 @@ namespace Piglet.Lexer.Construction
             StartState.StateNumber = 0;
         }
 
-        public void DistinguishValidInputs()
+		public void DistinguishValidInputs()
         {
-            // For each transition which has valid inputs, if any other state has a valid input range which in any way 
-            // intersects with the valid inputs of this range, create two ranges instead.
-            bool changes;
-            do
-            {
-                changes = false;
-                foreach (var t1 in Transitions)
-                {
-                    Transition<TState> t = t1;
-                    foreach (var t2 in Transitions.Where(f => f != t))
-                    {
-                        changes |= t.ValidInput.DistinguishRanges(t2.ValidInput);
-                    }
-                }
-            } while (changes);
+			var ranges = new List<CharRange>(Transitions.SelectMany(f => f.ValidInput.Ranges));
+			var distinguishedRanges = new List<CharRange>();
+			var beginningsAndEnds = new SortedSet<char>(ranges.Select(f => f.From).Union(ranges.Select(f => f.To == char.MaxValue ? f.To : (char)(f.To+1)))).ToArray();
+			
+			for(int i = 1; i < beginningsAndEnds.Length; ++i)
+			{
+				distinguishedRanges.Add(new CharRange {From = beginningsAndEnds[i-1], To = beginningsAndEnds[i] });
+			}
 
+        	foreach (var transition in Transitions)
+        	{
+        		var newRanges = new List<CharRange>();
+        		foreach (var range in transition.ValidInput.Ranges )
+        		{
+					newRanges.AddRange(distinguishedRanges
+						.SkipWhile(f => f.From < range.From)
+						.TakeWhile(f => f.From <= range.To)
+						.Select(f => new CharRange{ From = f.From, To = f.To == char.MaxValue ? f.To : (char)(f.To-1)}));
+        		}
+				transition.ValidInput = new CharSet(newRanges);
+        	}
         }
 
         public StimulateResult<TState> Stimulate(string input)

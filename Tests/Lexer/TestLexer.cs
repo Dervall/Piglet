@@ -154,7 +154,29 @@ namespace Piglet.Tests.Lexer
             }
         }
 
-        [Test]
+		[Test]
+		public void TestPerformanceWhenHandlingVeryLargeCharRanges()
+		{
+			foreach (var runtime in Enum.GetValues(typeof(LexerRuntime)))
+			{
+				Console.WriteLine(runtime.ToString());
+				var ticks = System.DateTime.Now.Ticks;
+
+				var lexer = LexerFactory<int>.Configure(configurator =>
+				{
+					configurator.Runtime = (LexerRuntime) runtime;
+
+					configurator.Token("\\w[0-9]", null);
+					configurator.Token("\\d\\D\\W", null);
+					configurator.Token("abcdefghijklmnopqrstuvxyz", null);
+					configurator.Token("01234567890&%#", null);
+				});
+
+				Console.WriteLine(System.DateTime.Now.Ticks - ticks);	
+			}
+		}
+
+    	[Test]
         public void TestCreateDFA()
         {
             NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a|b*cd"))));

@@ -14,7 +14,12 @@ namespace Piglet.Lexer.Construction
         {
         }
 
-        public CharSet(params char[] ranges)
+		public CharSet(IEnumerable<CharRange> ranges)
+		{
+			this.ranges = ranges.ToList();
+		}
+
+    	public CharSet(params char[] ranges)
         {
             if (ranges.Length % 2 != 0)
                 throw new ArgumentException("Number of chars in ranges must be an even number");
@@ -171,51 +176,6 @@ namespace Piglet.Lexer.Construction
         public bool ContainsChar(char input)
         {
             return ranges.Any(charRange => charRange.From <= input && charRange.To >= input);
-        }
-
-        public bool DistinguishRanges(CharSet other)
-        {
-            bool changes = false;
-
-            ISet<CharRange> newRanges = new HashSet<CharRange>();
-
-            // For each of the ranges that this set contains, if there is another range that intersects
-            // create new ranges so that there is no intersecting ranges
-            for (int i = 0; i < ranges.Count; ++i )
-            {
-                var r = ranges[i];
-                foreach (var r2 in other.ranges)
-                {
-                    // If from is inside the range (not on borders), split the range
-                    if (r2.From > r.From && r2.From <= r.To)
-                    {
-                        var oldTo = r.To;
-                        r.To = (char) (r2.From - 1);
-
-                        var newRange = new CharRange { From = r2.From, To = oldTo };
-                        newRanges.Add(newRange);
-                        changes = true;
-                    }
-
-                    // Same thing goes for to
-                    if (r2.To >= r.From && r2.To < r.To)
-                    {
-                        var oldTo = r.To;
-                        r.To = r2.To;
-                        
-                        var newRange = new CharRange { From = (char) (r2.To + 1), To = oldTo };
-                        newRanges.Add(newRange);
-
-                        changes = true;
-                    }
-                }
-
-                newRanges.Add(r);
-            }
-
-            ranges = newRanges.ToList();
-
-            return changes;
         }
     }
 }

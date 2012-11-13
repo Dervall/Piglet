@@ -11,7 +11,7 @@ namespace Piglet.Parser.Configuration
     {
         private NonTerminal<T> startSymbol;
         private readonly List<NonTerminal<T>> nonTerminals;
-        private readonly List<Terminal<T>> terminals;
+        private readonly LinkedList<Terminal<T>> terminals;
         private readonly ILexerSettings lexerSettings;
         private readonly List<TerminalPrecedence> terminalPrecedences;
         private int currentPrecedence;
@@ -24,7 +24,7 @@ namespace Piglet.Parser.Configuration
         public ParserConfigurator()
         {
             nonTerminals = new List<NonTerminal<T>>();
-            terminals = new List<Terminal<T>>();
+        	terminals = new LinkedList<Terminal<T>>();
             lexerSettings = new LexerSettingsImpl();
             terminalPrecedences = new List<TerminalPrecedence>();
             currentPrecedence = 0;
@@ -53,7 +53,7 @@ namespace Piglet.Parser.Configuration
             public LexerRuntime Runtime { get; set; }
         }
 
-        public ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null)
+        public ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null, bool topPrecedence = false)
         {
             Terminal<T> terminal = terminals.SingleOrDefault(f => f.RegExp == regExp);
             if (terminal != null && regExp != null)
@@ -65,7 +65,14 @@ namespace Piglet.Parser.Configuration
             else
             {
                 terminal = new Terminal<T>(regExp, onParse);
-                terminals.Add(terminal);
+				if (topPrecedence)
+				{
+					terminals.AddFirst(terminal);
+				}
+				else
+				{
+					terminals.AddLast(terminal);	
+				}
             }
             return terminal;
         }
@@ -153,6 +160,8 @@ namespace Piglet.Parser.Configuration
             // This becomes neccessary since the user can configure the parser using only strings.
             // Since the nonterminal used for that does not carry a back-reference to the configurator,
             // we do it this way.
+			// TODO: Does the terminals.AddLast ever get called? This looks like dead code to me, apart from the sanity
+			// TODO: check for redefinition. Which even that gets done someplace else.
             foreach (var nonTerminal in nonTerminals)
             {
                 foreach (var terminal in nonTerminal.ProductionRules.SelectMany(f => f.Symbols).OfType<Terminal<T>>())
@@ -168,7 +177,7 @@ namespace Piglet.Parser.Configuration
                     }
                     else
                     {
-                        terminals.Add(terminal);
+                        terminals.AddLast(terminal);
                     }
                 }
             }
@@ -181,7 +190,7 @@ namespace Piglet.Parser.Configuration
             // Hackish I know, but it guarantees that the ErrorToken is always created and that 0 -> n-2 are reserved 
             // for the REAL symbols in the grammar.
             terminals.Remove((Terminal<T>) ErrorToken);
-            terminals.Add((Terminal<T>) ErrorToken);
+            terminals.AddLast((Terminal<T>) ErrorToken);
 
             // Assign all tokens in the grammar token numbers!
             AssignTokenNumbers();

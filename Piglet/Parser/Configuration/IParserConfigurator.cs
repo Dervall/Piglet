@@ -11,14 +11,16 @@ namespace Piglet.Parser.Configuration
     /// <typeparam name="T">Semantic value of tokens</typeparam>
     public interface IParserConfigurator<T>
     {
-        /// <summary>
-        /// Create a new Terminal. If using the built in lexer terminals will be recognized in the order
-        /// of declaration. A terminal may not be redefined using different onParse actions.
-        /// </summary>
-        /// <param name="regExp">Regular expression to match</param>
-        /// <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
-        /// <returns>A terminal symbol</returns>
-        ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null);
+    	/// <summary>
+    	/// Create a new Terminal. If using the built in lexer terminals will be recognized in the order
+    	/// of declaration, unless the topPrecedence is set. A top precedence will be recognized before all other
+    	/// declared terminals. A terminal may not be redefined using different onParse actions.
+    	/// </summary>
+    	/// <param name="regExp">Regular expression to match</param>
+    	/// <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
+    	/// <param name="topPrecedence">If true, this terminal takes precedence over previously created terminals</param>
+    	/// <returns>A terminal symbol</returns>
+    	ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null, bool topPrecedence = false);
         
         /// <summary>
         /// Create a new NonTerminal. Production actions may be specified directly, or deferred until later. The

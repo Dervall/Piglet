@@ -347,5 +347,44 @@ namespace Piglet.Tests.Parser
             var parser = configurator.CreateParser();
             parser.Parse("abcd");
         }
+
+		[Test]
+		public void TestConstantStringsInRulesTakesPrecedenceOverDeclaredTerminals()
+		{
+			var configurator = ParserFactory.Configure<int>();
+			var ident = configurator.CreateTerminal("[a-z]+");
+			var s = configurator.CreateNonTerminal();
+			int x = 0;
+			s.AddProduction("abc", ident).SetReduceFunction(f => 
+			{ 
+				x = 1;
+				return 0;
+			});
+			var parser = configurator.CreateParser();
+
+			parser.Parse("abc abcde");
+
+			Assert.AreEqual(1, x);
+		}
+
+		[Test]
+		public void TestRedeclaredTerminalDoesNotChangePrecedence()
+		{
+			var configurator = ParserFactory.Configure<int>();
+			var name = configurator.CreateTerminal("abc");
+			var ident = configurator.CreateTerminal("[a-z]+");
+			var s = configurator.CreateNonTerminal();
+			int x = 0;
+			s.AddProduction("abc", ident).SetReduceFunction(f =>
+			{
+				x = 1;
+				return 0;
+			});
+			var parser = configurator.CreateParser();
+
+			parser.Parse("abc abcde");
+
+			Assert.AreEqual(1, x);
+		}
     }
 }

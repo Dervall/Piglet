@@ -62,7 +62,7 @@ namespace Piglet.Parser.Configuration
                             regex = Regex.Escape(regex);
                         }
 
-                        this.symbols[i] = configurator.CreateTerminal(regex, null);
+                        this.symbols[i] = configurator.CreateTerminal(regex, null, true);
                         this.symbols[i].DebugName = (string)part;   // Set debug name to unescaped string, so it's easy on the eyes.
                     }
                     else

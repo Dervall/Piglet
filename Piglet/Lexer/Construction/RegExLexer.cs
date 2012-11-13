@@ -59,7 +59,7 @@ namespace Piglet.Lexer.Construction
             {
                 // A lot of these are REALLY funky numbers. Tibetan numbers and such. You name it
                 case 'd':
-                    return new CharSet('\u0030', '\u0039', '\u0660', '\u0669', '\u06f0', '\u06f9', '\u07c0', '\u07c9', '\u0966', '\u096f', '\u09e6', '\u09ef',
+                    return new CharSet(false, '\u0030', '\u0039', '\u0660', '\u0669', '\u06f0', '\u06f9', '\u07c0', '\u07c9', '\u0966', '\u096f', '\u09e6', '\u09ef',
                         '\u0a66', '\u0a6f', '\u0ae6', '\u0aef', '\u0b66', '\u0b6f', '\u0be6', '\u0bef', '\u0c66', '\u0c6f', '\u0ce6', '\u0cef',
                         '\u0d66', '\u0d6f', '\u0e50', '\u0e59', '\u0ed0', '\u0ed9', '\u0f20', '\u0f29', '\u1040', '\u1049', '\u1090', '\u1099',
                         '\u17e0', '\u17e9', '\u1810', '\u1819', '\u1946', '\u194f', '\u19d0', '\u19d9', '\u1b50', '\u1b59', '\u1bb0', '\u1bb9',
@@ -67,7 +67,7 @@ namespace Piglet.Lexer.Construction
                         '\uff10', '\uff19');
                 // Shorthand for [^0-9]
                 case 'D':
-                    return new CharSet('\u0001', '\u002f', '\u003a', '\u065f', '\u066a', '\u06ef', '\u06fa', '\u07bf', '\u07ca', '\u0965', '\u0970', '\u09e5',
+					return new CharSet(false, '\u0001', '\u002f', '\u003a', '\u065f', '\u066a', '\u06ef', '\u06fa', '\u07bf', '\u07ca', '\u0965', '\u0970', '\u09e5',
                         '\u09f0', '\u0a65', '\u0a70', '\u0ae5', '\u0af0', '\u0b65', '\u0b70', '\u0be5', '\u0bf0', '\u0c65', '\u0c70', '\u0ce5',
                         '\u0cf0', '\u0d65', '\u0d70', '\u0e4f', '\u0e5a', '\u0ecf', '\u0eda', '\u0f1f', '\u0f2a', '\u103f', '\u104a', '\u108f',
                         '\u109a', '\u17df', '\u17ea', '\u180f', '\u181a', '\u1945', '\u1950', '\u19cf', '\u19da', '\u1b4f', '\u1b5a', '\u1baf',
@@ -79,7 +79,7 @@ namespace Piglet.Lexer.Construction
                     return AllCharactersExceptNull.Except(AllWhitespaceCharacters);
                 case 'w':
                     return new CharSet(
-                        '\u0030','\u0039','\u0041','\u005a','\u005f','\u005f','\u0061','\u007a','\u00aa','\u00aa','\u00b5','\u00b5',
+						false, '\u0030', '\u0039', '\u0041', '\u005a', '\u005f', '\u005f', '\u0061', '\u007a', '\u00aa', '\u00aa', '\u00b5', '\u00b5',
                         '\u00ba','\u00ba','\u00c0','\u00d6','\u00d8','\u00f6','\u00f8','\u02c1','\u02c6','\u02d1','\u02e0','\u02e4',
                         '\u02ec','\u02ec','\u02ee','\u02ee','\u0300','\u0374','\u0376','\u0377','\u037a','\u037d','\u0386','\u0386',
                         '\u0388','\u038a','\u038c','\u038c','\u038e','\u03a1','\u03a3','\u03f5','\u03f7','\u0481','\u0483','\u0487',
@@ -151,7 +151,7 @@ namespace Piglet.Lexer.Construction
                         '\ufe4d','\ufe4f','\ufe70','\ufe74','\ufe76','\ufefc','\uff10','\uff19','\uff21','\uff3a','\uff3f','\uff3f',
                         '\uff41','\uff5a','\uff66','\uffbe','\uffc2','\uffc7','\uffca','\uffcf','\uffd2','\uffd7','\uffda','\uffdc');
                 case 'W':
-                    return new CharSet('\u0001', '\u002f','\u003a','\u0040','\u005b','\u005e','\u0060','\u0060','\u007b','\u00a9','\u00ab','\u00b4',
+					return new CharSet(false, '\u0001', '\u002f', '\u003a', '\u0040', '\u005b', '\u005e', '\u0060', '\u0060', '\u007b', '\u00a9', '\u00ab', '\u00b4',
                         '\u00b6','\u00b9','\u00bb','\u00bf','\u00d7','\u00d7','\u00f7','\u00f7','\u02c2','\u02c5','\u02d2','\u02df',
                         '\u02e5','\u02eb','\u02ed','\u02ed','\u02ef','\u02ff','\u0375','\u0375','\u0378','\u0379','\u037e','\u0385',
                         '\u0387','\u0387','\u038b','\u038b','\u038d','\u038d','\u03a2','\u03a2','\u03f6','\u03f6','\u0482','\u0482',
@@ -512,7 +512,7 @@ namespace Piglet.Lexer.Construction
         {
             get
             {
-                return new CharSet('\u0009', '\u000d', '\u0020', '\u0020', '\u0085', '\u0085', '\u00a0', '\u00a0', '\u1680', '\u1680', '\u180e', '\u180e',
+                return new CharSet(false, '\u0009', '\u000d', '\u0020', '\u0020', '\u0085', '\u0085', '\u00a0', '\u00a0', '\u1680', '\u1680', '\u180e', '\u180e',
                                    '\u2000', '\u200a', '\u2028', '\u2029', '\u202f', '\u202f', '\u205f', '\u205f', '\u3000', '\u3000');
             }
         }

@@ -19,6 +19,16 @@ namespace Piglet.Lexer.Construction
             OperatorConcat
         }
 
+		private static readonly Dictionary<TokenType, int> precedences = new Dictionary<TokenType, int> {
+            			{TokenType.OperatorPlus, 3}, 
+						{TokenType.OperatorMul, 3}, 
+						{TokenType.OperatorQuestion, 3}, 
+						{TokenType.NumberedRepeat, 3}, 
+						{TokenType.OperatorConcat, 2}, 
+						{TokenType.OperatorOr, 1}, 
+						{TokenType.OperatorOpenParanthesis, 0}
+            		};
+
         public TokenType Type { get; set; }
 
         public CharSet Characters { get; set; }
@@ -29,19 +39,7 @@ namespace Piglet.Lexer.Construction
 
         public int Precedence
         {
-            get
-            {
-                return new[]
-                           {
-                               new Tuple<TokenType, int>(TokenType.OperatorPlus, 3),
-                               new Tuple<TokenType, int>(TokenType.OperatorMul, 3),
-                               new Tuple<TokenType, int>(TokenType.OperatorQuestion, 3),
-                               new Tuple<TokenType, int>(TokenType.NumberedRepeat, 3),
-                               new Tuple<TokenType, int>(TokenType.OperatorConcat, 2),
-                               new Tuple<TokenType, int>(TokenType.OperatorOr, 1),
-                               new Tuple<TokenType, int>(TokenType.OperatorOpenParanthesis, 0)
-                           }.First(f => f.Item1 == Type).Item2;
-            }
+            get { return precedences[Type]; }
         }
     }
 }

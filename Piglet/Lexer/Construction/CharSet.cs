@@ -19,13 +19,13 @@ namespace Piglet.Lexer.Construction
 			this.ranges = ranges.ToList();
 		}
 
-    	public CharSet(params char[] ranges)
+    	public CharSet(bool combine, params char[] ranges)
         {
             if (ranges.Length % 2 != 0)
                 throw new ArgumentException("Number of chars in ranges must be an even number");
             for (int i = 0; i < ranges.Length; i += 2)
             {
-                AddRange(ranges[i], ranges[i+1]);
+                AddRange(ranges[i], ranges[i+1], combine);
             }
         }
 

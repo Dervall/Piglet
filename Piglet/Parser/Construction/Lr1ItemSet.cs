@@ -15,11 +15,7 @@ namespace Piglet.Parser.Construction
 
         public Lr1ItemSet(IEnumerable<Lr1Item<T>> lr1Items)
         {
-            Items = new List<Lr1Item<T>>();
-            foreach (var lr1Item in lr1Items)
-            {
-                Items.Add(lr1Item);
-            }
+            Items = new List<Lr1Item<T>>(lr1Items);
         }
 
         public override string ToString()

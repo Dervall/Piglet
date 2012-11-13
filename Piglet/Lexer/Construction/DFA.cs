@@ -16,15 +16,9 @@ namespace Piglet.Lexer.Construction
                 NfaStates = nfaStates.ToList();
             }
 
-            public IEnumerable<CharRange> LegalMoves(NFA nfa)
+			public IEnumerable<CharRange> LegalMoves(Transition<NFA.State>[] fromTransitions)
             {
-                return nfa.Transitions.Where(f => NfaStates.Contains(f.From)).SelectMany(f => f.ValidInput.Ranges).Distinct();
-            }
-
-            public NFA.State[] Move(NFA nfa, CharRange c)
-            {
-                // Find transitions going OUT from this state that is valid with an input c
-                return (from e in nfa.Transitions.Where(f => NfaStates.Contains(f.From) && f.ValidInput.Ranges.Contains(c)) select e.To).ToArray();
+            	return fromTransitions.SelectMany(f => f.ValidInput.Ranges).Distinct();
             }
 
             public override string ToString()
@@ -67,9 +61,27 @@ namespace Piglet.Lexer.Construction
 
                 // Get the move states by stimulating this DFA state with
                 // all possible characters.
-                foreach (CharRange c in t.LegalMoves(nfa))
+				var fromTransitions = nfa.Transitions.Where(f => t.NfaStates.Contains(f.From)).ToArray();
+
+            	var moveDestinations = new Dictionary<CharRange, List<NFA.State>>();
+            	foreach (var fromTransition in fromTransitions)
+            	{
+            		foreach (var range in fromTransition.ValidInput.Ranges)
+            		{
+            			List<NFA.State> destList;
+            			if (!moveDestinations.TryGetValue(range, out destList))
+            			{
+            				destList = new List<NFA.State>();
+            				moveDestinations.Add(range, destList);
+            			}
+
+						destList.Add(fromTransition.To);
+            		}
+            	}
+
+                foreach (CharRange c in t.LegalMoves(fromTransitions))
                 {
-                    NFA.State[] moveSet = t.Move(nfa, c);
+                	var moveSet = moveDestinations[c];
                     if (moveSet.Any())
                     {
                         // Get the closure of the move set. This is the NFA states that will form the new set
@@ -185,6 +197,24 @@ namespace Piglet.Lexer.Construction
                 }
             });
 
+			// Make a dictionary of from transitions. This is well worth the time, since
+			// this gets accessed lots of times.
+        	var targetDict = new Dictionary<State, Dictionary<CharRange, State>>();
+        	foreach (var transition in Transitions)
+        	{
+        		Dictionary<CharRange, State> toDict;
+        		targetDict.TryGetValue(transition.From, out toDict);
+        		if (toDict == null)
+        		{
+        			toDict = new Dictionary<CharRange, State>();
+        			targetDict.Add(transition.From, toDict);
+        		}
+        		foreach (var range in transition.ValidInput.Ranges)
+        		{
+        			toDict.Add(range, transition.To);	
+        		}
+			}
+
             // Start iterating
             bool changes;
             do
@@ -195,10 +225,19 @@ namespace Piglet.Lexer.Construction
                 {
                     if (distinct[p, q] == -1) 
                     {
-                        Func<State, CharRange, State> targetState = (state, c) => {
-                            var trans = Transitions.FirstOrDefault(t => t.From == state && t.ValidInput.Ranges.Contains(c));
-                            return trans == null ? null : trans.To;
-                        };
+                        Func<State, CharRange, State> targetState = (state, c) =>
+                        	{
+                        		Dictionary<CharRange, State> charDict;
+								if (targetDict.TryGetValue(state, out charDict))
+								{
+									State toState;
+									if (charDict.TryGetValue(c, out toState))
+									{
+										return toState;	
+									}
+								}
+                        		return null;
+                        	};
 
                         foreach (var a in allValidInputs)
                         {

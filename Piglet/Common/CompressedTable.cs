@@ -21,8 +21,7 @@ namespace Piglet.Common
         	var offsetHashes = new List<int>();
 
             // Add the first range straight away.
-        	IEnumerable<short> firstState = StateActions(0, uncompressed);
-        	table.AddRange(firstState);
+        	table.AddRange(StateActions(0, uncompressed));
             displacement[0] = 0;
 
             // For each additional state, try to match as best as possible with the existing list

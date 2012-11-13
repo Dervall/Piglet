@@ -38,7 +38,6 @@ namespace Piglet.Common
                 {
                 	if (displacementIndex < offsetHashes.Count && offsetHashes[displacementIndex] != hash)
                 	{
-                		++displacementIndex;
 						continue;
                 	}
 

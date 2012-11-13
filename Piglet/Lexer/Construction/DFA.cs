@@ -8,12 +8,12 @@ namespace Piglet.Lexer.Construction
     {
         public class State : BaseState
         {
-            public IList<NFA.State> NfaStates { get; private set; }
+            public ISet<NFA.State> NfaStates { get; private set; }
             public bool Mark { get; set; }
 
-            public State(IEnumerable<NFA.State> nfaStates)
+            public State(ISet<NFA.State> nfaStates)
             {
-                NfaStates = nfaStates.ToList();
+                NfaStates = nfaStates;
             }
 
 			public IEnumerable<CharRange> LegalMoves(Transition<NFA.State>[] fromTransitions)
@@ -27,7 +27,7 @@ namespace Piglet.Lexer.Construction
                 return string.Format( "{0} {{{1}}}", StateNumber, String.Join( ", ", NfaStates));
             }
 
-            public override bool AcceptState
+        	public override bool AcceptState
             {
                 get { return NfaStates.Any(f=>f.AcceptState); }
                 set {}  // Do nothing, cannot set
@@ -96,9 +96,9 @@ namespace Piglet.Lexer.Construction
 
                         // See if the new state already exists. If so change the reference to point to 
                         // the already created object, since we will need to add a transition back to the same object
-                        var oldState = dfa.States.FirstOrDefault(f => f.NfaStates.Count == newState.NfaStates.Count && 
+                        var oldState = dfa.States.FirstOrDefault(f => f.NfaStates.SetEquals(newState.NfaStates));/* f.NfaStates.Count == newState.NfaStates.Count && 
 																	  !f.NfaStates.Except(newState.NfaStates).Any() &&
-                                                                      !newState.NfaStates.Except(f.NfaStates).Any());
+                                                                      !newState.NfaStates.Except(f.NfaStates).Any());*/
                         if (oldState == null)
                         {
                             dfa.States.Add(newState);

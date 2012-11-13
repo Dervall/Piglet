@@ -60,19 +60,13 @@ namespace Piglet.Lexer.Construction
 				distinguishedRanges.Add(new CharRange {From = beginningsAndEnds[i-1], To = beginningsAndEnds[i] });
 			}
 
-		//	FindNewRanges(distinguishedRanges);
-
         	foreach (var transition in Transitions)
         	{
-        //		transition.ValidInput = new CharSet(transition.ValidInput.Ranges.SelectMany(range => distinguishedRanges.SkipWhile(f => f.From < range.From)
-//        			.TakeWhile(f => f.From <= range.To)
-  //      			.Select(f => new CharRange { From = f.From, To = f.To == char.MaxValue ? f.To : (char) (f.To - 1) })));
-
 				transition.ValidInput = new CharSet(transition.ValidInput.Ranges.SelectMany(range => FindNewRanges(range, distinguishedRanges)));
         	}
         }
 
-		private static IEnumerable<CharRange> FindNewRanges(CharRange range, List<CharRange> distinguishedRanges)
+		private IEnumerable<CharRange> FindNewRanges(CharRange range, List<CharRange> distinguishedRanges)
 		{
 			int a = 0;
 			int b = distinguishedRanges.Count;

@@ -65,14 +65,11 @@ namespace Piglet.Lexer.Runtime
                 foreach (var transition in dfa.Transitions.Where(f => f.From == state1))
                 {
                     // Set the table entry
-                    for (int i = 0; i < allValidRanges.Count(); ++i )
-                    {
-                        var range = allValidRanges[i];
-                        if (transition.ValidInput.Ranges.Contains(range))
-                        {
-                            uncompressed[state.StateNumber, i] = (short) transition.To.StateNumber;
-                        }
-                    }
+                	foreach (var range in transition.ValidInput.Ranges)
+                	{
+                		int ix = allValidRanges.BinarySearch(range);
+                		uncompressed[state.StateNumber, ix] = (short) transition.To.StateNumber;
+                	}
                 }
 
                 // If this is an accepting state, set the action function to be
@@ -119,18 +116,13 @@ namespace Piglet.Lexer.Runtime
         }
 
         private int FindTableIndex(char c)
-        {        	
-            for (int i = 0; i < inputRangeEnds.Length; ++i)
-            {
-                // If the character is less or equal to the end of the input range,
-                // return the index
-                if (c <= inputRangeEnds[i])
-                {
-                    return i;
-                }
-            }
-            throw new LexerConstructionException("Input ranges are unterminated." +
-                                                 "This should never happen and is a bug. Please report this as an issue.");
+        {
+        	int ix = Array.BinarySearch(inputRangeEnds, c);
+			if (ix < 0)
+			{
+				ix = ~ix;
+			}
+        	return ix;
         }
 
         public Tuple<int, Func<string, T>> GetAction(int state)

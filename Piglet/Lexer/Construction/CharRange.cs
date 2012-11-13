@@ -1,6 +1,8 @@
+using System;
+
 namespace Piglet.Lexer.Construction
 {
-    internal class CharRange
+    internal class CharRange : IComparable<CharRange>
     {
         public char From { get; set; }
         public char To { get; set; }
@@ -12,7 +14,13 @@ namespace Piglet.Lexer.Construction
                        : string.Format("0x{0:x2}", (int)c);
         }
 
-        public override string ToString()
+    	public int CompareTo(CharRange other)
+    	{
+    		int cmp = From - other.From;
+    		return cmp == 0 ? To - other.To : cmp;
+    	}
+
+    	public override string ToString()
         {
             return From == To ? ToGraphSafeString(From) : string.Format("{0}-{1}", ToGraphSafeString(From), ToGraphSafeString(To));
         }

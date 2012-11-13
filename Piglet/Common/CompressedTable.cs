@@ -8,8 +8,6 @@ namespace Piglet.Common
     {
         private readonly int[] displacement;
         private readonly short[] data;
-    	private readonly short[] starts;
-    	private readonly short[] ends;
 
         public CompressedTable(short[,] uncompressed)
         {

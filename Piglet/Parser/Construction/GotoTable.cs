@@ -37,8 +37,7 @@ namespace Piglet.Parser.Construction
             var stateGotos = new short[maxToken];
             // Stategotos now holds only 0, which is what we want (every state points to defaultGotos)
 
-            var offsets = new List<short>();
-            offsets.AddRange(defaultGotos);     // The offsets is where we will store the default gotos in the end
+			var offsets = new List<short>(defaultGotos); // The offsets is where we will store the default gotos in the end
 
             foreach ( var state in gotos.Select(f => f.State).Distinct())
             {

@@ -11,6 +11,7 @@ namespace Piglet.Lexer.Runtime
         private readonly ITable2D table;
         private readonly Tuple<int, Func<string, T>>[] actions;
         private readonly char[] inputRangeEnds;
+    	private readonly int[] asciiIndices;
 
         public TransitionTable(DFA dfa, IList<NFA> nfas, IList<Tuple<string, Func<string, T>>> tokens)
         {
@@ -103,6 +104,11 @@ namespace Piglet.Lexer.Runtime
             }
 
             table = new CompressedTable(uncompressed);
+			asciiIndices = new int[256];
+			for (int i = 0; i < asciiIndices.Length; ++i)
+			{
+				asciiIndices[i] = FindTableIndexFromRanges((char)i);
+			}
         }
 
         public int this[int state, char c]
@@ -117,15 +123,20 @@ namespace Piglet.Lexer.Runtime
 
         private int FindTableIndex(char c)
         {
-        	int ix = Array.BinarySearch(inputRangeEnds, c);
+        	return c < asciiIndices.Length ? asciiIndices[c] : FindTableIndexFromRanges(c);
+        }
+
+    	private int FindTableIndexFromRanges(char c)
+		{
+			int ix = Array.BinarySearch(inputRangeEnds, c);
 			if (ix < 0)
 			{
 				ix = ~ix;
 			}
-        	return ix;
-        }
+			return ix;
+		}
 
-        public Tuple<int, Func<string, T>> GetAction(int state)
+    	public Tuple<int, Func<string, T>> GetAction(int state)
         {
             return actions[state];
         }

@@ -6,14 +6,14 @@ using Piglet.Lexer.Construction;
 
 namespace Piglet.Lexer.Runtime
 {
-    internal class TransitionTable<T>
+    internal class TransitionTable<TContext, T>
     {
         private readonly ITable2D table;
-        private readonly Tuple<int, Func<string, T>>[] actions;
+        private readonly Tuple<int, Func<TContext, string, T>>[] actions;
         private readonly char[] inputRangeEnds;
     	private readonly int[] asciiIndices;
 
-        public TransitionTable(DFA dfa, IList<NFA> nfas, IList<Tuple<string, Func<string, T>>> tokens)
+		public TransitionTable(DFA dfa, IList<NFA> nfas, IList<Tuple<string, Func<TContext, string, T>>> tokens)
         {
             // Get a list of all valid input ranges that are distinct.
             // This will fill up the entire spectrum from 0 to max char
@@ -57,7 +57,7 @@ namespace Piglet.Lexer.Runtime
 
             // Save the ends of the input ranges into an array
             inputRangeEnds = allValidRanges.Select(f => f.To).ToArray();
-            actions = new Tuple<int, Func<string, T>>[dfa.States.Count];
+            actions = new Tuple<int, Func<TContext, string, T>>[dfa.States.Count];
 
             foreach (var state in dfa.States)
             {
@@ -90,11 +90,11 @@ namespace Piglet.Lexer.Runtime
                             // int.MinValue, NULL to signal that the parsing should restart without reporting errors
                             if (tokenNumber >= tokens.Count())
                             {
-                                actions[state.StateNumber] = new Tuple<int, Func<string, T>>(int.MinValue, null);
+								actions[state.StateNumber] = new Tuple<int, Func<TContext, string, T>>(int.MinValue, null);
                             }
                             else
                             {
-                                actions[state.StateNumber] = new Tuple<int, Func<string, T>>(
+								actions[state.StateNumber] = new Tuple<int, Func<TContext, string, T>>(
                                     tokenNumber, tokens[tokenNumber].Item2);
                             }
                             break;
@@ -136,7 +136,7 @@ namespace Piglet.Lexer.Runtime
 			return ix;
 		}
 
-    	public Tuple<int, Func<string, T>> GetAction(int state)
+    	public Tuple<int, Func<TContext, string, T>> GetAction(int state)
         {
             return actions[state];
         }

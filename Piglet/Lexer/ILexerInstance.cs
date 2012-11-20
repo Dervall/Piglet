@@ -2,6 +2,11 @@ using System;
 
 namespace Piglet.Lexer
 {
+	public interface ILexerInstance<in TContext, T> : ILexerState
+	{
+		Tuple<int, T> Next(TContext context);
+	}
+
 	/// <summary>
 	/// A running instance of a lexer containing the lexer state
 	/// </summary>

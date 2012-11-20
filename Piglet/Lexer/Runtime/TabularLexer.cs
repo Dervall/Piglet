@@ -2,11 +2,11 @@ using System;
 
 namespace Piglet.Lexer.Runtime
 {
-    internal class TabularLexer<T> : LexerBase<T, int>
+    internal class TabularLexer<TContext, T> : LexerBase<TContext, T, int>
     {
-        private readonly TransitionTable<T> transitionTable;
+        private readonly TransitionTable<TContext, T> transitionTable;
         
-        public TabularLexer(TransitionTable<T> transitionTable, int endOfInputTokenNumber)
+        public TabularLexer(TransitionTable<TContext, T> transitionTable, int endOfInputTokenNumber)
             :   base(endOfInputTokenNumber)
         {
             
@@ -23,7 +23,7 @@ namespace Piglet.Lexer.Runtime
             return transitionTable[state, c];
         }
 
-        protected override Tuple<int, Func<string, T>> GetAction(int state)
+        protected override Tuple<int, Func<TContext, string, T>> GetAction(int state)
         {
             return transitionTable.GetAction(state);
         }

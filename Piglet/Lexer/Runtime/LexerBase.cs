@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Piglet.Lexer.Runtime
 {
-    internal abstract class LexerBase<T, TState> : ILexer<T>
+    internal abstract class LexerBase<TContext, T, TState> : ILexer<T>, ILexer<TContext, T>
     {
         private readonly int endOfInputTokenNumber;
         
@@ -14,9 +14,9 @@ namespace Piglet.Lexer.Runtime
             this.endOfInputTokenNumber = endOfInputTokenNumber;
         }
 
-        private class LexerStateImpl : ILexerInstance<T>
+        private class LexerStateImpl : ILexerInstance<T>, ILexerInstance<TContext, T>
         {
-            private readonly LexerBase<T, TState> lexer;
+            private readonly LexerBase<TContext, T, TState> lexer;
             private readonly StringBuilder currentLine = new StringBuilder();
             private readonly StringBuilder lexeme = new StringBuilder();
             private readonly TextReader source;
@@ -24,7 +24,7 @@ namespace Piglet.Lexer.Runtime
             private int lineNumber = 1;
             private TState state;
 
-            public LexerStateImpl(TextReader source, LexerBase<T, TState> lexer)
+            public LexerStateImpl(TextReader source, LexerBase<TContext, T, TState> lexer)
             {
                 this.lexer = lexer;
                 this.source = source;
@@ -34,7 +34,12 @@ namespace Piglet.Lexer.Runtime
             public string CurrentLine { get { return currentLine.ToString(); } }
             public string LastLexeme { get { return lexeme.ToString(); } }
 
-            public Tuple<int, T> Next()
+			public Tuple<int, T> Next()
+			{
+				return Next(default(TContext));
+			}
+
+        	public Tuple<int, T> Next(TContext context)
             {
                 state = lexer.GetInitialState();
 
@@ -82,7 +87,7 @@ namespace Piglet.Lexer.Runtime
                             {
                                 // Token completed. Return it
                                 return new Tuple<int, T>(action.Item1,
-                                                         action.Item2 == null ? default(T) : action.Item2(lexeme.ToString()));
+                                                         action.Item2 == null ? default(T) : action.Item2(context, lexeme.ToString()));
                             }
                         }
                         else
@@ -129,21 +134,45 @@ namespace Piglet.Lexer.Runtime
             return new LexerStateImpl(reader, this);
         }
 
-        public ILexerInstance<T> Begin(string source)
+    	ILexerInstance<TContext, T> ILexer<TContext, T>.Begin(string source)
+    	{
+    		return ContextualBegin(source);
+    	}
+
+    	private ILexerInstance<TContext, T> ContextualBegin(string source)
+    	{
+    		return new LexerStateImpl(new StringReader(source), this);
+    	}
+
+    	public IEnumerable<Tuple<int, T>> Tokenize(TContext context, string source)
+    	{
+			var instance = ContextualBegin(source);
+			for (var token = instance.Next(context); token.Item1 != -1; token = instance.Next(context))
+			{
+				yield return token;
+			}
+    	}
+
+    	ILexerInstance<TContext, T> ILexer<TContext, T>.Begin(TextReader reader)
+    	{
+			return new LexerStateImpl(reader, this);
+    	}
+
+    	public ILexerInstance<T> Begin(string source)
         {
             return Begin(new StringReader(source));
         }
 
         public IEnumerable<Tuple<int, T>> Tokenize(string source)
         {
-            var instance = Begin(source);
-            for (var token = instance.Next(); token.Item1 != -1; token = instance.Next())
-            {
-                yield return token;
-            }
+			var instance = Begin(source);
+			for (var token = instance.Next(); token.Item1 != -1; token = instance.Next())
+			{
+				yield return token;
+			}
         }
 
-        protected abstract Tuple<int, Func<string, T>> GetAction(TState state);
+        protected abstract Tuple<int, Func<TContext, string, T>> GetAction(TState state);
 
         protected abstract bool ReachedTermination(TState nextState);
 

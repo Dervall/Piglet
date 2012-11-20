@@ -2,7 +2,12 @@ using System;
 
 namespace Piglet.Lexer.Configuration
 {
-    /// <summary>
+	public interface ILexerConfigurator<out TContext, in T> : ILexerConfigurator<T>
+	{
+		void Token(string regEx, Func<TContext, string, T> action);
+	}
+
+	/// <summary>
     /// ILexerConfigurator is the main configuration interface used to configure the lexer behaviour programmatically. This
     /// is used inside the LexerFactory.Configure method and should not be retained after the lexer has been created.
     /// Further modifying the LexerConfigurator after a lexer has been created will not result in modifications to the lexer.

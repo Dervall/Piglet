@@ -5,9 +5,15 @@ using System.IO;
 
 namespace Piglet.Lexer
 {
-    /// <summary>
-    /// A lexer that tokenizes input into tuples of tokennumber and semantic value. Lexers are not thread safe, but they are reentrant. You
-    /// can reuse the same lexer by setting a new character source.
+	public interface ILexer<in TContext, T>
+	{
+		ILexerInstance<TContext, T> Begin(TextReader reader);
+		ILexerInstance<TContext, T> Begin(string source);
+		IEnumerable<Tuple<int, T>> Tokenize(TContext context, string source);
+	}
+
+	/// <summary>
+    /// A lexer that tokenizes input into tuples of tokennumber and semantic value. Lexers are reentrant and thread safe.
     /// </summary>
     /// <typeparam name="T">The semantic value type</typeparam>
     public interface ILexer<T>

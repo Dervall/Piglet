@@ -5,17 +5,17 @@ using Piglet.Lexer.Construction;
 
 namespace Piglet.Lexer.Runtime
 {
-    internal class DfaLexer<T> : LexerBase<T, DFA.State>
+    internal class DfaLexer<TContext, T> : LexerBase<TContext, T, DFA.State>
     {
         private readonly DFA dfa;
-        private readonly Dictionary<DFA.State, Tuple<int, Func<string, T>>> actions; 
+        private readonly Dictionary<DFA.State, Tuple<int, Func<TContext, string, T>>> actions; 
 
-        public DfaLexer(DFA dfa, IList<NFA> nfas, List<Tuple<string, Func<string, T>>> tokens, int endOfInputTokenNumber)
+        public DfaLexer(DFA dfa, IList<NFA> nfas, List<Tuple<string, Func<TContext, string, T>>> tokens, int endOfInputTokenNumber)
             : base(endOfInputTokenNumber)
         {
             this.dfa = dfa;
 
-            actions = new Dictionary<DFA.State, Tuple<int, Func<string, T>>>();
+            actions = new Dictionary<DFA.State, Tuple<int, Func<TContext, string, T>>>();
 
             // Calculate which DFA state corresponds to each action
             foreach (var dfaState in dfa.States)
@@ -30,8 +30,8 @@ namespace Piglet.Lexer.Runtime
                             // This matches, we will store the action in the dictionary
                             actions.Add(dfaState,
                                         i >= tokens.Count
-                                            ? new Tuple<int, Func<string, T>>(int.MinValue, null)
-                                            : new Tuple<int, Func<string, T>>(i, tokens[i].Item2));
+                                            ? new Tuple<int, Func<TContext, string, T>>(int.MinValue, null)
+                                            : new Tuple<int, Func<TContext, string, T>>(i, tokens[i].Item2));
                             break;
                         }
                     }
@@ -39,7 +39,7 @@ namespace Piglet.Lexer.Runtime
             }
         }
         
-        protected override Tuple<int, Func<string, T>> GetAction(DFA.State state)
+        protected override Tuple<int, Func<TContext, string, T>> GetAction(DFA.State state)
         {
             return actions.ContainsKey(state) ? actions[state] : null;
         }

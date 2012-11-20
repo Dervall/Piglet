@@ -1,4 +1,3 @@
-using System;
 using Piglet.Parser.Configuration;
 using Piglet.Parser.Configuration.Fluent;
 
@@ -16,11 +15,10 @@ namespace Piglet.Parser
         /// <returns>A configurator, ready for use</returns>
         public static IParserConfigurator<T> Configure<T>()
         {
-            var parserConfigurator = new ParserConfigurator<T>();
-            return parserConfigurator;
+            return new ParserConfigurator<T>();
         }
 
-        /// <summary>
+    	/// <summary>
         /// Create a fluent configurator object.
         /// </summary>
         /// <returns>A fluent configurator</returns>

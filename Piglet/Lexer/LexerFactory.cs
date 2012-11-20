@@ -6,7 +6,17 @@ using System.Linq;
 
 namespace Piglet.Lexer
 {
-    /// <summary>
+	public static class LexerFactory<TContext, T>
+	{
+		public static ILexer<TContext, T> Configure(Action<ILexerConfigurator<TContext, T>> configureAction)
+		{
+			var lexerConfigurator = new LexerConfigurator<TContext, T>();
+			configureAction(lexerConfigurator);
+			return lexerConfigurator.CreateContextualLexer();
+		}
+	}
+
+	/// <summary>
     /// The lexer factory is the main way of obtaining lexers in Piglet. 
     /// </summary>
     /// <typeparam name="T">Semantic value class of tokens recognized</typeparam>
@@ -20,7 +30,7 @@ namespace Piglet.Lexer
         /// <throws>LexerConfigurationException for errors</throws>
         public static ILexer<T> Configure(Action<ILexerConfigurator<T>> configureAction)
         {
-            var lexerConfigurator = new LexerConfigurator<T>();
+            var lexerConfigurator = new LexerConfigurator<object, T>();
             configureAction(lexerConfigurator);
             return lexerConfigurator.CreateLexer();
         }

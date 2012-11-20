@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.0.12054\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -54,6 +55,7 @@
     <Compile Include="Lexer\Construction\TestCharRange.cs" />
     <Compile Include="Lexer\Construction\TestStateMinimization.cs" />
     <Compile Include="Lexer\Construction\TestUnicodeLexing.cs" />
+    <Compile Include="Lexer\TestContextualLexer.cs" />
     <Compile Include="Parser\Configuration\TestNonTerminal.cs" />
     <Compile Include="Parser\Configuration\TestTerminal.cs" />
     <Compile Include="Parser\Construction\Debug\TestDebugStrings.cs" />
@@ -63,6 +65,7 @@
     <Compile Include="Parser\FluentConfigurationTest.cs" />
     <Compile Include="Parser\ParserConfigurationTest.cs" />
     <Compile Include="Parser\ParsingErrorTests.cs" />
+    <Compile Include="Parser\TestContextualParser.cs" />
     <Compile Include="Parser\TokenPrecedenceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Lexer\Construction\DotNotation\TestDotNotation.cs" />

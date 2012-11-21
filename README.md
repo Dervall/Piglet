@@ -180,7 +180,7 @@ All releases are available from both NuGet, and are always represented as tags o
 
 Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
 
-# 1.4.0 (Not released yet)
+# 1.4.0
 * Added thread safety to lexing and parsing.
 * Improved lexer usage. Tokenize is now new preferred method of listing tokens, which is also thread safe.
 * Made \w and \d more consistent with MS use of the term.

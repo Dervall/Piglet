@@ -102,15 +102,17 @@ namespace Piglet.Parser.Construction
 
                 if (!gotoCounts.ContainsKey(t))
                     gotoCounts.Add(t, 0);
-                gotoCounts[t] = gotoCounts[t] + 1;
+
+                ++gotoCounts[t];
             }
 
             // For every token in the grammar, store the most stored count as the default goto
             for (int t = 0; t < maxToken; ++t)
-            {
-                var mostCommonNewState = gotoCounts.Where(f => f.Key.Item1 == t).OrderBy(f => -f.Value).Select(f => f.Key.Item2);
-                defaultGotos[t] = (short) mostCommonNewState.First();
-            }
+                defaultGotos[t] = (short)(from f in gotoCounts
+                                          where f.Key.Item1 == t
+                                          orderby -f.Value
+                                          select f.Key.Item2).FirstOrDefault();
+
             return defaultGotos;
         }
 

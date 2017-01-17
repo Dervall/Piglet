@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Piglet.Common;
 
@@ -106,12 +107,28 @@ namespace Piglet.Parser.Construction
                 ++gotoCounts[t];
             }
 
+            List<int> unassigned = new List<int>();
+
             // For every token in the grammar, store the most stored count as the default goto
             for (int t = 0; t < maxToken; ++t)
-                defaultGotos[t] = (short)(from f in gotoCounts
-                                          where f.Key.Item1 == t
-                                          orderby -f.Value
-                                          select f.Key.Item2).FirstOrDefault();
+            {
+                int[] def = (from f in gotoCounts
+                             where f.Key.Item1 == t
+                             orderby -f.Value
+                             select f.Key.Item2).ToArray();
+
+                if (def.Length == 0)
+                    unassigned.Add(t);
+                else
+                    defaultGotos[t] = (short)def[0];
+            }
+
+            foreach (int t in unassigned)
+                defaultGotos[t] = (from f in gotoCounts
+                                   let i2 = (short)f.Key.Item2
+                                   where !defaultGotos.Contains(i2)
+                                   orderby -f.Value
+                                   select i2).FirstOrDefault();
 
             return defaultGotos;
         }

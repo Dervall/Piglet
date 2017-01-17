@@ -17,7 +17,6 @@ namespace Piglet.Parser
         internal LRParser(IParseTable<T> parseTable, int errorTokenNumber, int endOfInputTokenNumber, string[] terminalDebugNames)
         {
             this.parseTable = parseTable;
-            
             this.errorTokenNumber = errorTokenNumber;
             this.endOfInputTokenNumber = endOfInputTokenNumber;
             this.terminalDebugNames = terminalDebugNames;
@@ -71,15 +70,14 @@ namespace Piglet.Parser
                         string[] expectedTokens = GetExpectedTokenNames(state).ToArray();
                         
                         // Create an exception that either might be thrown or may be handed to the error handling routine.
-                        exception = new ParseException(string.Format("Illegal token {0}. Expected {1}", 
-                            terminalDebugNames[input.Item1], string.Join(",", expectedTokens)))
-                                        {
-                                            LexerState = lexerInstance,
-                                            FoundToken = terminalDebugNames[input.Item1],
-                                            ExpectedTokens = expectedTokens,
-                                            FoundTokenId = input.Item1,
-                                            ParserState = state
-                                        };
+                        exception = new ParseException($"Illegal token '{terminalDebugNames[input.Item1]}', Expected '{string.Join(",", expectedTokens)}'.")
+                                    {
+                                        LexerState = lexerInstance,
+                                        FoundToken = terminalDebugNames[input.Item1],
+                                        ExpectedTokens = expectedTokens,
+                                        FoundTokenId = input.Item1,
+                                        ParserState = state
+                                    };
 
                         // Go for error recovery!
                         while (parseTable.Action[parseStack.Peek(), errorTokenNumber] == short.MinValue)

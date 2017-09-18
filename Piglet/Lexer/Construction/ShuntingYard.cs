@@ -7,11 +7,8 @@ namespace Piglet.Lexer.Construction
     {
         private readonly RegExLexer lexer;
 
-        public ShuntingYard(RegExLexer lexer)
-        {
-            this.lexer = lexer;
-        }
 
+        public ShuntingYard(RegExLexer lexer) => this.lexer = lexer;
 
         private IEnumerable<RegExToken> TokensWithImplicitConcat()
         {

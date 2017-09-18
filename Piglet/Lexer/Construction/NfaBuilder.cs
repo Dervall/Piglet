@@ -55,6 +55,7 @@ namespace Piglet.Lexer.Construction
             nfa.AssignStateNumbers();
             return nfa;
         }
+
         private static NFA RepeatOnceOrMore(NFA nfa)
         {
             // Add an epsilon transition from the accept state back to the start state

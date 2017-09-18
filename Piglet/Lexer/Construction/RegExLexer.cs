@@ -9,6 +9,7 @@ namespace Piglet.Lexer.Construction
         private readonly TextReader input;
         private State state;
 
+
         private enum State
         {
             Normal,
@@ -46,6 +47,7 @@ namespace Piglet.Lexer.Construction
             public List<char> Chars { get; private set; }
             public int CurrentPart { get; set; }
         }
+
 
         public RegExLexer(TextReader input)
         {

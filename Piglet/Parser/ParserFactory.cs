@@ -14,19 +14,12 @@ namespace Piglet.Parser
         /// </summary>
         /// <typeparam name="T">Semantic value type of tokens</typeparam>
         /// <returns>A configurator, ready for use</returns>
-        public static IParserConfigurator<T> Configure<T>()
-        {
-            var parserConfigurator = new ParserConfigurator<T>();
-            return parserConfigurator;
-        }
+        public static IParserConfigurator<T> Configure<T>() => new ParserConfigurator<T>();
 
         /// <summary>
         /// Create a fluent configurator object.
         /// </summary>
         /// <returns>A fluent configurator</returns>
-        public static IFluentParserConfigurator Fluent()
-        {
-            return new FluentParserConfigurator(new ParserConfigurator<object>());
-        }
+        public static IFluentParserConfigurator Fluent() => new FluentParserConfigurator(new ParserConfigurator<object>());
     }
 }

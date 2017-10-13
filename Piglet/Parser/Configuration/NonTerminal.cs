@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -6,21 +6,22 @@ using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
 {
-    internal class NonTerminal<T> : Symbol<T>, INonTerminal<T>
+    internal class NonTerminal<T>
+        : Symbol<T>
+        , INonTerminal<T>
     {
         private readonly IParserConfigurator<T> configurator;
         private readonly IList<NonTerminalProduction> productions;
 
+
         public NonTerminal(IParserConfigurator<T> configurator)
         {
             this.configurator = configurator;
+
             productions = new List<NonTerminalProduction>();
         }
 
-        public IEnumerable<IProductionRule<T>> ProductionRules
-        {
-            get { return productions; }
-        }
+        public IEnumerable<IProductionRule<T>> ProductionRules => productions;
 
         public IProduction<T> AddProduction(params object[] parts)
         {
@@ -35,15 +36,22 @@ namespace Piglet.Parser.Configuration
             return nonTerminalProduction;
         }
 
-        private class NonTerminalProduction : IProduction<T>, IProductionRule<T>
+        public override string ToString() =>
+            $"{DebugName} --> {string.Join(" | ", from r in ProductionRules select string.Join(" ", from s in r.Symbols select s is ITerminal<T> ? $"'{s.DebugName}'" : s.DebugName))}";
+
+
+        internal class NonTerminalProduction
+            : IProduction<T>
+            , IProductionRule<T>
         {
             private readonly ISymbol<T>[] symbols;
             private readonly INonTerminal<T> resultSymbol;
 
-            public ISymbol<T>[] Symbols { get { return symbols; } }
-            public ISymbol<T> ResultSymbol { get { return resultSymbol; } }
+            public ISymbol<T>[] Symbols => symbols;
+            public ISymbol<T> ResultSymbol => resultSymbol;
             public Func<ParseException, T[], T> ReduceAction { get; private set; }
             public IPrecedenceGroup ContextPrecedence { get; private set; }
+
 
             public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object[] symbols)
             {
@@ -79,30 +87,20 @@ namespace Piglet.Parser.Configuration
                 ReduceAction = (e, f) => action(f);
             }
 
-            public void SetReduceToFirst()
-            {
-                SetReduceFunction(f => f[0]);
-            }
+            public void SetReduceToFirst() => SetReduceFunction(f => f[0]);
 
-            public void SetReduceToIndex(int index)
-            {
-                SetReduceFunction(f => f[index]);
-            }
+            public void SetReduceToIndex(int index) => SetReduceFunction(f => f[index]);
 
-            public void SetPrecedence(IPrecedenceGroup precedenceGroup)
-            {
-                ContextPrecedence = precedenceGroup;
-            }
+            public void SetPrecedence(IPrecedenceGroup precedenceGroup) => ContextPrecedence = precedenceGroup;
 
-            public void SetErrorFunction(Func<ParseException, T[], T> errorHandler)
-            {
-                ReduceAction = errorHandler;
-            }
-        }
+            public void SetErrorFunction(Func<ParseException, T[], T> errorHandler) => ReduceAction = errorHandler;
 
-        public override string ToString()
-        {
-            return string.Format("{0} =>", DebugName);
+            public override string ToString()
+            {
+                string tstr<T>(ISymbol<T> s) => s is ITerminal<T> ? $"'{s.DebugName}'" : s.DebugName;
+                
+                return $"{string.Join(" ", symbols.Select(tstr))} --> {tstr(ResultSymbol)}";
+            }
         }
     }
 }

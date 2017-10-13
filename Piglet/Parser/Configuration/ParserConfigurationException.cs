@@ -5,7 +5,8 @@ namespace Piglet.Parser.Configuration
     /// <summary>
     /// This exception is thrown for illegal parser configurations
     /// </summary>
-    public class ParserConfigurationException : Exception
+    public class ParserConfigurationException
+        : Exception
     {
         /// <summary>
         /// Construct a new parser configuration exception

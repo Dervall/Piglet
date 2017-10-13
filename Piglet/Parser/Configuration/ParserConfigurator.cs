@@ -7,7 +7,9 @@ using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
 {
-    internal class ParserConfigurator<T> : IParserConfigurator<T>, IGrammar<T>
+    internal class ParserConfigurator<T>
+        : IParserConfigurator<T>
+        , IGrammar<T>
     {
         private NonTerminal<T> startSymbol;
         private readonly List<NonTerminal<T>> nonTerminals;
@@ -16,10 +18,27 @@ namespace Piglet.Parser.Configuration
         private readonly List<TerminalPrecedence> terminalPrecedences;
         private int currentPrecedence;
 
-        private class TerminalPrecedence : PrecedenceGroup
+
+        private class TerminalPrecedence
+            : PrecedenceGroup
         {
             public Terminal<T> Terminal { get; set; }
         }
+
+        private class LexerSettingsImpl
+            : ILexerSettings
+        {
+            public LexerSettingsImpl()
+            {
+                Runtime = LexerRuntime.Tabular;
+            }
+
+            public bool CreateLexer { get; set; }
+            public bool EscapeLiterals { get; set; }
+            public string[] Ignore { get; set; }
+            public LexerRuntime Runtime { get; set; }
+        }
+
 
         public ParserConfigurator()
         {
@@ -38,19 +57,6 @@ namespace Piglet.Parser.Configuration
             LexerSettings.CreateLexer = true;
             LexerSettings.EscapeLiterals = true;
             LexerSettings.Ignore = new[] { "\\s+" };     // Ignore all whitespace by default
-        }
-
-        private class LexerSettingsImpl : ILexerSettings
-        {
-            public LexerSettingsImpl()
-            {
-                Runtime = LexerRuntime.Tabular;
-            }
-
-            public bool CreateLexer { get; set; }
-            public bool EscapeLiterals { get; set; }
-            public string[] Ignore { get; set; }
-            public LexerRuntime Runtime { get; set; }
         }
 
         public ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null, bool topPrecedence = false)

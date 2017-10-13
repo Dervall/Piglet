@@ -8,7 +8,8 @@ namespace Piglet.Parser.Construction
     /// by a given rule.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ShiftReduceConflictException<T> : AmbiguousGrammarException
+    public class ShiftReduceConflictException<T>
+        : AmbiguousGrammarException
     {
         /// <summary>
         /// Construct a new shift reduce exception
@@ -28,5 +29,7 @@ namespace Piglet.Parser.Construction
         /// The reduce symbol in the conflict
         /// </summary>
         public ISymbol<T> ReduceSymbol { get; internal set; }
+
+        public override string Message => $"The grammar contains a shift-reduce conflict.\nShift symbol: {ShiftSymbol}\nReduce symbol: {ReduceSymbol}";
     }
 }

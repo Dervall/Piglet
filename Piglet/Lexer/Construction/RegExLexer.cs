@@ -247,6 +247,8 @@ namespace Piglet.Lexer.Construction
                     return SingleChar('\n');
                 case 'r':
                     return SingleChar('\r');
+                case 't':
+                    return SingleChar('\t');
                 case '.':
                 case '*':
                 case '|':

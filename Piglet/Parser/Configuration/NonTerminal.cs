@@ -97,7 +97,7 @@ namespace Piglet.Parser.Configuration
 
             public override string ToString()
             {
-                string tstr<T>(ISymbol<T> s) => s is ITerminal<T> ? $"'{s.DebugName}'" : s.DebugName;
+                string tstr<U>(ISymbol<U> s) => s is ITerminal<U> ? $"'{s.DebugName}'" : s.DebugName;
                 
                 return $"{string.Join(" ", symbols.Select(tstr))} --> {tstr(ResultSymbol)}";
             }

@@ -4,33 +4,28 @@ using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    internal class DFA : FiniteAutomata<DFA.State>
+    internal class DFA
+        : FiniteAutomata<DFA.State>
     {
-        public class State : BaseState
+        public class State
+            : BaseState
         {
             public ISet<NFA.State> NfaStates { get; private set; }
             public bool Mark { get; set; }
 
-            public State(ISet<NFA.State> nfaStates)
-            {
-                NfaStates = nfaStates;
-            }
 
-			public IEnumerable<CharRange> LegalMoves(Transition<NFA.State>[] fromTransitions)
-            {
-            	return fromTransitions.SelectMany(f => f.ValidInput.Ranges).Distinct();
-            }
+            public State(ISet<NFA.State> nfaStates) => NfaStates = nfaStates;
 
-            public override string ToString()
-            {
-                // Purely for debugging purposes
-                return string.Format( "{0} {{{1}}}", StateNumber, String.Join( ", ", NfaStates));
-            }
+            public IEnumerable<CharRange> LegalMoves(Transition<NFA.State>[] fromTransitions) =>
+                fromTransitions.SelectMany(f => f.ValidInput.Ranges).Distinct();
 
-        	public override bool AcceptState
+            // Purely for debugging purposes
+            public override string ToString() => $"{StateNumber} {{{String.Join(", ", NfaStates)}}}";
+
+            public override bool AcceptState
             {
-                get { return NfaStates.Any(f=>f.AcceptState); }
-                set {}  // Do nothing, cannot set
+                get => NfaStates.Any(f => f.AcceptState);
+                set { }  // Do nothing, cannot set
             }
         }
 
@@ -143,6 +138,7 @@ namespace Piglet.Lexer.Construction
                 for (int i = 0; i < States.Count; ++i)
                 {
                     var p = States[i];
+
                     for (int j = i + 1; j < States.Count; ++j)
                     {
                         var q = States[j];
@@ -153,10 +149,9 @@ namespace Piglet.Lexer.Construction
 
             // Get a set of all valid input ranges that we have in the DFA
             ISet<CharRange> allValidInputs = new HashSet<CharRange>();
+
             foreach (var transition in Transitions)
-            {
                 allValidInputs.UnionWith(transition.ValidInput.Ranges);
-            }
 
             // For every distinct pair of states, if one of them is an accepting state
             // and the other one is not set the distinct 
@@ -192,9 +187,7 @@ namespace Piglet.Lexer.Construction
                 }
 
                 if (pIsAcceptState ^ bIsAcceptState)
-                {
                     distinct[p, q] = int.MaxValue;
-                }
             });
 
 			// Make a dictionary of from transitions. This is well worth the time, since
@@ -389,9 +382,6 @@ namespace Piglet.Lexer.Construction
             AssignStateNumbers();
         }
 
-        public override IEnumerable<State> Closure(State[] states, ISet<State> visitedStates = null)
-        {
-            return states;
-        }
+        public override IEnumerable<State> Closure(State[] states, ISet<State> visitedStates = null) => states;
     }
 }

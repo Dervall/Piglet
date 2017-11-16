@@ -1,61 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.IO;
 
 namespace Piglet.Lexer.Construction
 {
     internal class RegExLexer
     {
-        private readonly TextReader input;
-        private State state;
-
-
-        private enum State
-        {
-            Normal,
-            NormalEscaped,
-            BeginCharacterClass,
-            InsideCharacterClass,
-            RangeEnd,
-            NumberedRepetition,
-            InsideCharacterClassEscaped
-        }
-
-        private class CharacterClassState
-        {
-            public CharacterClassState()
-            {
-                CharsSet = new CharSet();
-            }
-
-            public CharSet CharsSet { get; private set; }
-            public bool Negated { get; set; }
-            public char LastChar { get; set; }
-        }
-
-        private class NumberedRepetitionState
-        {
-            public NumberedRepetitionState()
-            {
-                MinRepetitions = -1;
-                MaxRepetitions = -1;
-                Chars = new List<char>();
-            }
-
-            public int MaxRepetitions { get; set; }
-            public int MinRepetitions { get; set; }
-            public List<char> Chars { get; private set; }
-            public int CurrentPart { get; set; }
-        }
-
-
-        public RegExLexer(TextReader input)
-        {
-            this.input = input;
-            state = State.Normal;
-        }
-
-		private static readonly char[] escd = new[] 
+        private static readonly char[] escd = new[] 
 			{
 				'\u0030', '\u0039', '\u0660', '\u0669', '\u06f0', '\u06f9', '\u07c0', '\u07c9', '\u0966', '\u096f', '\u09e6', '\u09ef',
 				'\u0a66', '\u0a6f', '\u0ae6', '\u0aef', '\u0b66', '\u0b6f', '\u0be6', '\u0bef', '\u0c66', '\u0c6f', '\u0ce6', '\u0cef',
@@ -64,7 +15,6 @@ namespace Piglet.Lexer.Construction
 				'\u1c40', '\u1c49', '\u1c50', '\u1c59', '\ua620', '\ua629', '\ua8d0', '\ua8d9', '\ua900', '\ua909', '\uaa50', '\uaa59',
 				'\uff10', '\uff19'
 			};
-
 		private static readonly char[] escD = new []
 			{
 				'\u0001', '\u002f', '\u003a', '\u065f', '\u066a', '\u06ef', '\u06fa', '\u07bf', '\u07ca', '\u0965', '\u0970', '\u09e5',
@@ -74,7 +24,6 @@ namespace Piglet.Lexer.Construction
                 '\u1bba', '\u1c3f', '\u1c4a', '\u1c4f', '\u1c5a', '\ua61f', '\ua62a', '\ua8cf', '\ua8da', '\ua8ff', '\ua90a', '\uaa4f',
                 '\uaa5a', '\uff0f'
 			};
-
     	private static readonly char[] escw = new[]
     		{
 				'\u0030', '\u0039', '\u0041', '\u005a', '\u005f', '\u005f', '\u0061', '\u007a', '\u00aa', '\u00aa', '\u00b5', '\u00b5',
@@ -149,7 +98,6 @@ namespace Piglet.Lexer.Construction
                 '\ufe4d','\ufe4f','\ufe70','\ufe74','\ufe76','\ufefc','\uff10','\uff19','\uff21','\uff3a','\uff3f','\uff3f',
                 '\uff41','\uff5a','\uff66','\uffbe','\uffc2','\uffc7','\uffca','\uffcf','\uffd2','\uffd7','\uffda','\uffdc'
 			};
-
 		private static readonly char[] escW = new []
 			{
 				'\u0001', '\u002f', '\u003a', '\u0040', '\u005b', '\u005e', '\u0060', '\u0060', '\u007b', '\u00a9', '\u00ab', '\u00b4',
@@ -224,6 +172,23 @@ namespace Piglet.Lexer.Construction
                 '\ufe35','\ufe4c','\ufe50','\ufe6f','\ufe75','\ufe75','\ufefd','\uff0f','\uff1a','\uff20','\uff3b','\uff3e',
                 '\uff40','\uff40','\uff5b','\uff65','\uffbf','\uffc1','\uffc8','\uffc9','\uffd0','\uffd1','\uffd8','\uffd9'
 			};
+        private readonly TextReader input;
+        private State state;
+        
+
+        protected static CharSet AllCharactersExceptNull => CharRange((char)1, char.MaxValue);
+
+        protected static CharSet AllWhitespaceCharacters => new CharSet(false, '\u0009', '\u000d', '\u0020', '\u0020', '\u0085', '\u0085', '\u00a0', '\u00a0',
+                                                                               '\u1680', '\u1680', '\u180e', '\u180e', '\u2000', '\u200a', '\u2028', '\u2029',
+                                                                               '\u202f', '\u202f', '\u205f', '\u205f', '\u3000', '\u3000');
+
+        
+        public RegExLexer(TextReader input)
+        {
+            this.input = input;
+
+            state = State.Normal;
+        }
 
         private CharSet EscapedCharToAcceptCharRange(char c)
         {
@@ -270,8 +235,10 @@ namespace Piglet.Lexer.Construction
 
         private CharSet SingleChar(char c)
         {
-            var cs = new CharSet();
+            CharSet cs = new CharSet();
+
             cs.Add(c);
+
             return cs;
         }
 
@@ -293,11 +260,12 @@ namespace Piglet.Lexer.Construction
             // These keeps track of classes
             var classState = new CharacterClassState();
             var numberedRepetitionState = new NumberedRepetitionState();
+
             state = State.Normal;
 
             while (input.Peek() != -1)
             {
-                var c = (char)input.Read();
+                char c = (char)input.Read();
                 
                 switch (state)
                 {
@@ -313,28 +281,26 @@ namespace Piglet.Lexer.Construction
                             case '{':
                                 state = State.NumberedRepetition;
                                 break;
-
-                            case '(':   return new RegExToken { Type = RegExToken.TokenType.OperatorOpenParanthesis };
-                            case ')':   return new RegExToken { Type = RegExToken.TokenType.OperatorCloseParanthesis };
-                            case '|':   return new RegExToken { Type = RegExToken.TokenType.OperatorOr };
-                            case '+':   return new RegExToken { Type = RegExToken.TokenType.OperatorPlus };
-                            case '*':   return new RegExToken { Type = RegExToken.TokenType.OperatorMul };
-                            case '?':   return new RegExToken { Type = RegExToken.TokenType.OperatorQuestion };
-                            case '.':   return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = AllCharactersExceptNull };
-                            default:    return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = SingleChar(c)};
+                            case '(': return new RegExToken { Type = RegExToken.TokenType.OperatorOpenParanthesis };
+                            case ')': return new RegExToken { Type = RegExToken.TokenType.OperatorCloseParanthesis };
+                            case '|': return new RegExToken { Type = RegExToken.TokenType.OperatorOr };
+                            case '+': return new RegExToken { Type = RegExToken.TokenType.OperatorPlus };
+                            case '*': return new RegExToken { Type = RegExToken.TokenType.OperatorMul };
+                            case '?': return new RegExToken { Type = RegExToken.TokenType.OperatorQuestion };
+                            case '.': return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = AllCharactersExceptNull };
+                            default:  return new RegExToken { Type = RegExToken.TokenType.Accept, Characters = SingleChar(c)};
                         }
                         break;
 
                     case State.NormalEscaped:
                         {
-                            var characters = EscapedCharToAcceptCharRange(c);
-                            if (!characters.Any())
-                            {
-                                throw new LexerConstructionException(string.Format("Unknown escaped character '{0}'", c));
-                            }
-                            return new RegExToken {Characters = characters, Type = RegExToken.TokenType.Accept};
-                        }
+                            CharSet characters = EscapedCharToAcceptCharRange(c);
 
+                            if (characters.Any())
+                                return new RegExToken { Characters = characters, Type = RegExToken.TokenType.Accept };
+                            else
+                                throw new LexerConstructionException(string.Format("Unknown escaped character '{0}'", c));
+                        }
                     case State.BeginCharacterClass:
                         switch (c)
                         {
@@ -346,24 +312,28 @@ namespace Piglet.Lexer.Construction
                                     classState.LastChar = '^';
                                     state = State.InsideCharacterClass;
                                 }
+
                                 classState.Negated = true;
+
                                 break;
                             case '[':
                             case ']':
                             case '-':
                                 // This does not break the character class TODO: I THINK!!!
                                 classState.LastChar = c;
+
                                 break;
                             case '\\':
                                 state = State.InsideCharacterClassEscaped;
+
                                 break;
                             default:
                                 classState.LastChar = c;
                                 state = State.InsideCharacterClass;
+
                                 break;
                         }
                         break;
-
                     case State.InsideCharacterClass:
                         switch (c)
                         {
@@ -386,22 +356,24 @@ namespace Piglet.Lexer.Construction
                                            };
                             case '\\':
                                 state = State.InsideCharacterClassEscaped;
+
                                 break;
                             default:
                                 if (classState.LastChar != 0)
                                     classState.CharsSet.Add(classState.LastChar);
+
                                 classState.LastChar = c;
+
                                 break;
                         }
                         break;
 
                     case State.InsideCharacterClassEscaped:
                         {
-                            var characters = EscapedCharToAcceptCharsInClass(c);
+                            CharSet characters = EscapedCharToAcceptCharsInClass(c);
+
                             if (!characters.Any())
-                            {
                                 throw new LexerConstructionException(string.Format("Unknown escaped character '{0}' in character class", c));
-                            }
 
                             if (classState.LastChar != 0)
                                 classState.CharsSet.Add(classState.LastChar);
@@ -411,8 +383,6 @@ namespace Piglet.Lexer.Construction
                             state = State.InsideCharacterClass;
                         }
                         break;
-
-
                     case State.RangeEnd:
                         switch (c)
                         {
@@ -440,7 +410,6 @@ namespace Piglet.Lexer.Construction
                                 break;
                         }
                         break;
-
                     case State.NumberedRepetition:
                         switch (c)
                         {
@@ -466,9 +435,7 @@ namespace Piglet.Lexer.Construction
                                 if (numberedRepetitionState.Chars.Any() || numberedRepetitionState.CurrentPart == 0)
                                 {
                                     if (!int.TryParse(new string(numberedRepetitionState.Chars.ToArray()), out reps))
-                                    {
                                         throw new LexerConstructionException("Numbered repetition operator contains operand that is not a number");
-                                    }
                                 }
                                 else
                                 {
@@ -476,33 +443,30 @@ namespace Piglet.Lexer.Construction
                                     // Use the max value to say that it can be infinite numbers.
                                     reps = int.MaxValue;
                                 }
+
                                 numberedRepetitionState.Chars.Clear();
 
                                 // Set the right value
                                 if (numberedRepetitionState.CurrentPart == 0)
-                                {
                                     numberedRepetitionState.MinRepetitions = reps;
-                                }
                                 else
-                                {
                                     numberedRepetitionState.MaxRepetitions = reps;
-                                }
 
                                 if (c == ':' || c == ',')
                                 {
                                     ++numberedRepetitionState.CurrentPart;
+
                                     if (numberedRepetitionState.CurrentPart > 1)
                                         throw new LexerConstructionException("More than one , in numbered repetition.");
                                 }
                                 else
-                                {
                                     return new RegExToken
                                     {
                                         Type = RegExToken.TokenType.NumberedRepeat,
-                                        MinRepetitions = numberedRepetitionState.MinRepetitions, 
+                                        MinRepetitions = numberedRepetitionState.MinRepetitions,
                                         MaxRepetitions = numberedRepetitionState.MaxRepetitions
                                     };
-                                }
+
                                 break;
                             default:
                                 throw new LexerConstructionException(
@@ -519,24 +483,47 @@ namespace Piglet.Lexer.Construction
         private static CharSet CharRange(char start, char end)
         {
             var charRange = new CharSet();
+
             charRange.AddRange(start, end);
+
             return charRange;
         }
 
-        protected static CharSet AllCharactersExceptNull
+
+        private enum State
         {
-            get
-            {
-                return CharRange((char) 1, char.MaxValue);                
-            }
+            Normal,
+            NormalEscaped,
+            BeginCharacterClass,
+            InsideCharacterClass,
+            RangeEnd,
+            NumberedRepetition,
+            InsideCharacterClassEscaped
         }
 
-        protected static CharSet AllWhitespaceCharacters
+        private class CharacterClassState
         {
-            get
+            public CharSet CharsSet { get; private set; }
+            public bool Negated { get; set; }
+            public char LastChar { get; set; }
+
+
+            public CharacterClassState() => CharsSet = new CharSet();
+        }
+
+        private class NumberedRepetitionState
+        {
+            public int MaxRepetitions { get; set; }
+            public int MinRepetitions { get; set; }
+            public List<char> Chars { get; private set; }
+            public int CurrentPart { get; set; }
+
+
+            public NumberedRepetitionState()
             {
-                return new CharSet(false, '\u0009', '\u000d', '\u0020', '\u0020', '\u0085', '\u0085', '\u00a0', '\u00a0', '\u1680', '\u1680', '\u180e', '\u180e',
-                                   '\u2000', '\u200a', '\u2028', '\u2029', '\u202f', '\u202f', '\u205f', '\u205f', '\u3000', '\u3000');
+                MinRepetitions = -1;
+                MaxRepetitions = -1;
+                Chars = new List<char>();
             }
         }
     }

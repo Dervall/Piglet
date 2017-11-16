@@ -5,20 +5,7 @@ using System.Linq;
 namespace Piglet.Lexer.Construction
 {
     internal class RegExToken
-    {       
-        internal enum TokenType
-        {
-            OperatorOr,
-            OperatorPlus,
-            OperatorMul,
-            OperatorQuestion,
-            Accept,
-            NumberedRepeat,
-            OperatorOpenParanthesis,
-            OperatorCloseParanthesis,
-            OperatorConcat
-        }
-
+    {
 		private static readonly Dictionary<TokenType, int> precedences = new Dictionary<TokenType, int> {
             			{TokenType.OperatorPlus, 3}, 
 						{TokenType.OperatorMul, 3}, 
@@ -30,16 +17,24 @@ namespace Piglet.Lexer.Construction
             		};
 
         public TokenType Type { get; set; }
-
         public CharSet Characters { get; set; }
-
         public int MinRepetitions { get; set; }
-
         public int MaxRepetitions { get; set; }
 
-        public int Precedence
+        public int Precedence => precedences[Type];
+
+
+        internal enum TokenType
         {
-            get { return precedences[Type]; }
+            OperatorOr,
+            OperatorPlus,
+            OperatorMul,
+            OperatorQuestion,
+            Accept,
+            NumberedRepeat,
+            OperatorOpenParanthesis,
+            OperatorCloseParanthesis,
+            OperatorConcat
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Piglet.Lexer.Construction
     {
         public static NFA Create(ShuntingYard yard)
         {
-            var stack = new Stack<NFA>();
+            Stack<NFA> stack = new Stack<NFA>();
 
             foreach (var token in yard.ShuntedTokens())
             {
@@ -45,14 +45,14 @@ namespace Piglet.Lexer.Construction
             // We should end up with only ONE NFA on the stack or the expression
             // is malformed.
             if (stack.Count() != 1)
-            {
                 throw new LexerConstructionException("Malformed regexp expression");
-            }
 
             // Pop it from the stack, and assign each state a number, primarily for debugging purposes,
             // they dont _really_ need it. The state numbers actually used are the one used in the DFA.
             var nfa = stack.Pop();
+
             nfa.AssignStateNumbers();
+
             return nfa;
         }
 

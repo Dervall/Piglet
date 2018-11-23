@@ -9,3 +9,5 @@ TestResults
 *.dotCover
 *.nupkg
 build
+
+.vs

@@ -13,3 +13,13 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("70c31d99-7aa8-43ea-b4cc-a97bcf3d0ae8")]
+
+// [assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Piglet")]
+[assembly: AssemblyCopyright("Copyright ©  2012")]
+// [assembly: AssemblyTrademark("")]
+// [assembly: AssemblyCulture("")]
+
+
+[assembly: AssemblyVersion("1.1.0")]
+[assembly: AssemblyFileVersion("1.1.0")]

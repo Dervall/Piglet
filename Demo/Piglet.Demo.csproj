@@ -43,9 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="Demo.cs" />
     <Compile Include="Lexer\Movement.cs" />
     <Compile Include="Lexer\WordsAndNumbers.cs" />

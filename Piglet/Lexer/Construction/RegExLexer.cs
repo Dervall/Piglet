@@ -258,8 +258,8 @@ namespace Piglet.Lexer.Construction
         public RegExToken NextToken()
         {
             // These keeps track of classes
-            var classState = new CharacterClassState();
-            var numberedRepetitionState = new NumberedRepetitionState();
+            CharacterClassState classState = new CharacterClassState();
+            NumberedRepetitionState numberedRepetitionState = new NumberedRepetitionState();
 
             state = State.Normal;
 
@@ -482,7 +482,7 @@ namespace Piglet.Lexer.Construction
 
         private static CharSet CharRange(char start, char end)
         {
-            var charRange = new CharSet();
+            CharSet charRange = new CharSet();
 
             charRange.AddRange(start, end);
 

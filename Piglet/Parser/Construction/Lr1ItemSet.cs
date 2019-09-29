@@ -8,30 +8,21 @@ namespace Piglet.Parser.Construction
     {
         public List<Lr1Item<T>> Items { get; private set; }
 
-        public Lr1ItemSet()
-        {
-            Items = new List<Lr1Item<T>>();
-        }
+        public Lr1ItemSet() => Items = new List<Lr1Item<T>>();
 
-        public Lr1ItemSet(IEnumerable<Lr1Item<T>> lr1Items)
-        {
-            Items = new List<Lr1Item<T>>(lr1Items);
-        }
+        public Lr1ItemSet(IEnumerable<Lr1Item<T>> lr1Items) => Items = new List<Lr1Item<T>>(lr1Items);
 
-        public override string ToString()
-        {
-            return string.Join("\n", Items);
-        }
+        public override string ToString() => string.Join("\n", Items);
 
         public bool Add(Lr1Item<T> item)
         {
             // See if there already exists an item with the same core
-            var oldItem = Items.FirstOrDefault(f => f.ProductionRule == item.ProductionRule && f.DotLocation == item.DotLocation);
+            Lr1Item<T> oldItem = Items.FirstOrDefault(f => f.ProductionRule == item.ProductionRule && f.DotLocation == item.DotLocation);
             if (oldItem != null)
             {
                 // There might be lookaheads that needs adding
                 bool addedLookahead = false;
-                foreach (var lookahead in item.Lookaheads)
+                foreach (Configuration.Terminal<T> lookahead in item.Lookaheads)
                 {
                     addedLookahead |= oldItem.Lookaheads.Add(lookahead);
                 }
@@ -42,15 +33,9 @@ namespace Piglet.Parser.Construction
             return true;
         }
 
-        public IEnumerator<Lr1Item<T>> GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
+        public IEnumerator<Lr1Item<T>> GetEnumerator() => Items.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return Items.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => Items.GetEnumerator();
 
         public Lr1Item<T> this[int index]
         {
@@ -70,9 +55,9 @@ namespace Piglet.Parser.Construction
 
         public void MergeLookaheads(Lr1ItemSet<T> other)
         {
-            foreach (var lr1Item in Items)
+            foreach (Lr1Item<T> lr1Item in Items)
             {
-                var otherRule = other.First(f => f.ProductionRule == lr1Item.ProductionRule && f.DotLocation == lr1Item.DotLocation);
+                Lr1Item<T> otherRule = other.First(f => f.ProductionRule == lr1Item.ProductionRule && f.DotLocation == lr1Item.DotLocation);
                 lr1Item.Lookaheads.UnionWith(otherRule.Lookaheads);
             }
         }

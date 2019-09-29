@@ -35,7 +35,7 @@ namespace Piglet.Lexer.Construction
                 // ia must contain the larger of the two
                 if (ia < ib)
                 {
-                    var t = ia;
+                    int t = ia;
                     ia = ib;
                     ib = t;
                 }
@@ -50,7 +50,7 @@ namespace Piglet.Lexer.Construction
                 // ia must contain the larger of the two
                 if (ia < ib)
                 {
-                    var t = ia;
+                    int t = ia;
                     ia = ib;
                     ib = t;
                 }

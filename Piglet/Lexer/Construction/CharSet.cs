@@ -8,18 +8,15 @@ namespace Piglet.Lexer.Construction
     {
         private IList<CharRange> ranges = new List<CharRange>();
 
-        public IEnumerable<CharRange> Ranges { get { return ranges; } }
+        public IEnumerable<CharRange> Ranges => ranges;
 
         public CharSet()
         {
         }
 
-		public CharSet(IEnumerable<CharRange> ranges)
-		{
-			this.ranges = ranges.ToList();
-		}
+        public CharSet(IEnumerable<CharRange> ranges) => this.ranges = ranges.ToList();
 
-    	public CharSet(bool combine, params char[] ranges)
+        public CharSet(bool combine, params char[] ranges)
         {
             if (ranges.Length % 2 != 0)
                 throw new ArgumentException("Number of chars in ranges must be an even number");
@@ -29,10 +26,7 @@ namespace Piglet.Lexer.Construction
             }
         }
 
-        public void Add(char c)
-        {
-            AddRange(c,c, true);
-        }
+        public void Add(char c) => AddRange(c, c, true);
 
         public void AddRange(char from, char to, bool combine = true)
         {
@@ -47,7 +41,7 @@ namespace Piglet.Lexer.Construction
             {
                 // See if there is an old range that contains the new from as the to
                 // in that case merge the ranges
-                var range = ranges.SingleOrDefault(f => f.To == from);
+                CharRange range = ranges.SingleOrDefault(f => f.To == from);
                 if (range != null)
                 {
                     range.To = to;
@@ -67,10 +61,7 @@ namespace Piglet.Lexer.Construction
             ranges.Add(new CharRange { From = from, To = to });
         }
 
-        public bool Any()
-        {
-            return ranges.Any();
-        }
+        public bool Any() => ranges.Any();
 
         public override string ToString()
         {
@@ -80,7 +71,7 @@ namespace Piglet.Lexer.Construction
 
         public void UnionWith(CharSet charSet)
         {
-            foreach (var charRange in charSet.ranges)
+            foreach (CharRange charRange in charSet.ranges)
             {
                 if (!ranges.Contains(charRange))
                 {
@@ -96,11 +87,11 @@ namespace Piglet.Lexer.Construction
 
         public CharSet Except(CharSet except)
         {
-            var cs = new CharSet();
+            CharSet cs = new CharSet();
 
-            foreach (var range in ranges)
+            foreach (CharRange range in ranges)
             {
-                foreach (var clippedRange in ClipRange(range, except.ranges))
+                foreach (CharRange clippedRange in ClipRange(range, except.ranges))
                 {
                     cs.AddRange(clippedRange.From, clippedRange.To);
                 }
@@ -113,7 +104,7 @@ namespace Piglet.Lexer.Construction
             char from = range.From;
             char to = range.To;
 
-            foreach (var excludedRange in excludedCharRanges)
+            foreach (CharRange excludedRange in excludedCharRanges)
             {
                 // If the range is fully excluded by the excluded range, yield nothing
                 if (excludedRange.From <= from && excludedRange.To >= to)
@@ -125,13 +116,13 @@ namespace Piglet.Lexer.Construction
                 if (excludedRange.From > from && excludedRange.To < to )
                 {
                     // Split this range and return
-                    foreach (var charRange in ClipRange(new CharRange {From = @from, To = (char)(excludedRange.From - 1)}, excludedCharRanges))
+                    foreach (CharRange charRange in ClipRange(new CharRange {From = @from, To = (char)(excludedRange.From - 1)}, excludedCharRanges))
                     {
                         yield return charRange;
                     }
 
                     // Second split
-                    foreach (var charRange in ClipRange(new CharRange { From = (char)(excludedRange.To + 1), To = to }, excludedCharRanges))
+                    foreach (CharRange charRange in ClipRange(new CharRange { From = (char)(excludedRange.To + 1), To = to }, excludedCharRanges))
                     {
                         yield return charRange;
                     }
@@ -161,22 +152,19 @@ namespace Piglet.Lexer.Construction
 
         public CharSet Union(CharSet charRange)
         {
-            var c = new CharSet();
-            foreach (var range in ranges)
+            CharSet c = new CharSet();
+            foreach (CharRange range in ranges)
             {
                 c.AddRange(range.From, range.To);
             }
 
-            foreach (var range in charRange.ranges)
+            foreach (CharRange range in charRange.ranges)
             {
                 c.AddRange(range.From, range.To);
             }
             return c;
         }
 
-        public bool ContainsChar(char input)
-        {
-            return ranges.Any(charRange => charRange.From <= input && charRange.To >= input);
-        }
+        public bool ContainsChar(char input) => ranges.Any(charRange => charRange.From <= input && charRange.To >= input);
     }
 }

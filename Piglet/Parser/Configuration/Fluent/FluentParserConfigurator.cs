@@ -29,15 +29,12 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public IRule Rule()
         {
-            var rule = new FluentRule(this, configurator.CreateNonTerminal());
+            FluentRule rule = new FluentRule(this, configurator.CreateNonTerminal());
             rules.Add(rule);
             return rule;
         }
 
-        public IExpressionConfigurator Expression()
-        {
-            return new FluentExpression(configurator);
-        }
+        public IExpressionConfigurator Expression() => new FluentExpression(configurator);
 
         public IExpressionConfigurator QuotedString
         {
@@ -52,17 +49,14 @@ namespace Piglet.Parser.Configuration.Fluent
             }
         }
 
-        public IExpressionConfigurator Error
-        {
-            get { return errorToken ?? (errorToken = new FluentExpression(configurator.ErrorToken)); }
-        }
+        public IExpressionConfigurator Error => errorToken ?? (errorToken = new FluentExpression(configurator.ErrorToken));
 
         public IParser<object> CreateParser()
         {
             // At this point the underlying parser configurator contains a bunch of nonterminals
             // It won't contain all of the nonterminals. We are going to replace everything in every rule with the proper
             // [non]terminals. Then we are going to generate the parser.
-            foreach (var rule in rules)
+            foreach (FluentRule rule in rules)
             {
                 rule.ConfigureProductions();
             }
@@ -71,37 +65,22 @@ namespace Piglet.Parser.Configuration.Fluent
             configurator.LexerSettings.EscapeLiterals = true;
             configurator.LexerSettings.Ignore = new[] { @"\s+" }.Concat(ignored).ToArray();
 
-            var parser = configurator.CreateParser();
+            IParser<object> parser = configurator.CreateParser();
             parser.Lexer = configurator.CreateLexer();
 
             return parser;
         }
 
-        private ITerminal<object>[] ParamsToTerminalArray(object[] p)
-        {
-            return p.OfType<string>().Select(f => configurator.CreateTerminal(Regex.Escape(f)))
+        private ITerminal<object>[] ParamsToTerminalArray(object[] p) => p.OfType<string>().Select(f => configurator.CreateTerminal(Regex.Escape(f)))
                 .Concat(p.OfType<FluentExpression>().Select(f => f.Terminal)).ToArray();
-        }
 
-        public void LeftAssociative(params object[] p)
-        {
-            configurator.LeftAssociative(ParamsToTerminalArray(p));
-        }
+        public void LeftAssociative(params object[] p) => configurator.LeftAssociative(ParamsToTerminalArray(p));
 
-        public void RightAssociative(params object[] p)
-        {
-            configurator.RightAssociative(ParamsToTerminalArray(p));
-        }
+        public void RightAssociative(params object[] p) => configurator.RightAssociative(ParamsToTerminalArray(p));
 
-        public void NonAssociative(params object[] p)
-        {
-            configurator.NonAssociative(ParamsToTerminalArray(p));
-        }
+        public void NonAssociative(params object[] p) => configurator.NonAssociative(ParamsToTerminalArray(p));
 
-        public void Ignore(string ignoreExpression)
-        {
-            ignored.Add(ignoreExpression);
-        }
+        public void Ignore(string ignoreExpression) => ignored.Add(ignoreExpression);
 
         public LexerRuntime Runtime {
             get { return configurator.LexerSettings.Runtime; }
@@ -110,18 +89,18 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)
         {
-            var t = new Tuple<IRule, string>(rule, separator);
+            Tuple<IRule, string> t = new Tuple<IRule, string>(rule, separator);
             if (listRules.ContainsKey(t))
                 return listRules[t];
 
             // Create a new nonterminal
-            var listRule = (NonTerminal<object>)configurator.CreateNonTerminal();
+            NonTerminal<object> listRule = (NonTerminal<object>)configurator.CreateNonTerminal();
 
             if (separator != null)
             {
                 listRule.AddProduction(listRule, separator, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
                 {
-                    var list = (List<TListType>)f[0];
+                    List<TListType> list = (List<TListType>)f[0];
                     list.Add((TListType)f[2]);
                     return list;
                 });
@@ -130,7 +109,7 @@ namespace Piglet.Parser.Configuration.Fluent
             {
                 listRule.AddProduction(listRule, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
                 {
-                    var list = (List<TListType>)f[0];
+                    List<TListType> list = (List<TListType>)f[0];
                     list.Add((TListType)f[1]);
                     return list;
                 });
@@ -147,7 +126,7 @@ namespace Piglet.Parser.Configuration.Fluent
                 return optionalRules[nonTerminal];
 
             // Makes a new rule
-            var optionalRule = (NonTerminal<object>)configurator.CreateNonTerminal();
+            NonTerminal<object> optionalRule = (NonTerminal<object>)configurator.CreateNonTerminal();
 
             optionalRule.AddProduction(nonTerminal).SetReduceFunction(f => f[0]);
             optionalRule.AddProduction();

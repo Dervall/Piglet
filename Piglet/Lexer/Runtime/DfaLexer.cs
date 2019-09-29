@@ -18,9 +18,9 @@ namespace Piglet.Lexer.Runtime
             actions = new Dictionary<DFA.State, Tuple<int, Func<string, T>>>();
 
             // Calculate which DFA state corresponds to each action
-            foreach (var dfaState in dfa.States)
+            foreach (DFA.State dfaState in dfa.States)
             {
-                var acceptingNfaStates = dfaState.NfaStates.Where(a => a.AcceptState).ToArray();
+                NFA.State[] acceptingNfaStates = dfaState.NfaStates.Where(a => a.AcceptState).ToArray();
                 if (acceptingNfaStates.Any())
                 {
                     for (int i = 0; i < nfas.Count; ++i)
@@ -38,28 +38,16 @@ namespace Piglet.Lexer.Runtime
                 }
             }
         }
-        
-        protected override Tuple<int, Func<string, T>> GetAction(DFA.State state)
-        {
-            return actions.ContainsKey(state) ? actions[state] : null;
-        }
 
-        protected override bool ReachedTermination(DFA.State nextState)
-        {
-            return nextState == null;
-        }
+        protected override Tuple<int, Func<string, T>> GetAction(DFA.State state) => actions.ContainsKey(state) ? actions[state] : null;
 
-        protected override DFA.State GetNextState(DFA.State state, char input)
-        {
-            return dfa.Transitions
+        protected override bool ReachedTermination(DFA.State nextState) => nextState == null;
+
+        protected override DFA.State GetNextState(DFA.State state, char input) => dfa.Transitions
                 .Where(f => f.From == state && f.ValidInput.Ranges.Any(r => r.From <= input && r.To >= input))
                 .Select(f => f.To)
                 .SingleOrDefault();
-        }
 
-        protected override DFA.State GetInitialState()
-        {
-            return dfa.StartState;
-        }
+        protected override DFA.State GetInitialState() => dfa.StartState;
     }
 }

@@ -31,4 +31,20 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Parser\Configuration\Wrapper\ParsingUitilities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ParsingUitilities.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Parser\Configuration\Wrapper\ParsingUitilities.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ParsingUitilities.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

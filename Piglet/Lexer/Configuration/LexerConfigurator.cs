@@ -25,7 +25,7 @@ namespace Piglet.Lexer.Configuration
         {
             // For each token, create a NFA
             IList<NFA> nfas = tokens.Select(token => NfaBuilder.Create(new ShuntingYard(new RegExLexer( new StringReader(token.Item1))))).ToList();
-            foreach (var ignoreExpr in ignore)
+            foreach (string ignoreExpr in ignore)
             {
                 nfas.Add(NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(ignoreExpr)))));
             }
@@ -56,20 +56,14 @@ namespace Piglet.Lexer.Configuration
             }
 
             // Convert the dfa to table form
-            var transitionTable = new TransitionTable<T>(dfa, nfas, tokens);
+            TransitionTable<T> transitionTable = new TransitionTable<T>(dfa, nfas, tokens);
 
             return new TabularLexer<T>(transitionTable, EndOfInputTokenNumber);
-        }        
-
-        public void Token(string regEx, Func<string, T> action)
-        {
-            tokens.Add(new Tuple<string, Func<string, T>>(regEx, action));
         }
 
-        public void Ignore(string regEx)
-        {
-            ignore.Add(regEx);
-        }
+        public void Token(string regEx, Func<string, T> action) => tokens.Add(new Tuple<string, Func<string, T>>(regEx, action));
+
+        public void Ignore(string regEx) => ignore.Add(regEx);
 
         public int EndOfInputTokenNumber { get; set; }
         public bool MinimizeDfa { get; set; }

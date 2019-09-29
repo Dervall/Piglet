@@ -11,7 +11,7 @@ namespace Piglet.Parser.Construction.Debug
             int numTokens = grammar.AllSymbols.Count() - 1;
             int numTerminals = grammar.AllSymbols.OfType<Terminal<T>>().Count();
 
-            var formatString = new StringBuilder("{0,8}|");
+            StringBuilder formatString = new StringBuilder("{0,8}|");
             for (int i = 0; i < numTokens; ++i)
             {
                 if (i == numTerminals)
@@ -20,13 +20,13 @@ namespace Piglet.Parser.Construction.Debug
             }
             formatString.Append("|\n");
             string format = formatString.ToString();
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append(string.Format(format, new[] { "STATE" }.Concat(grammar.AllSymbols.Select(f => f.DebugName)).ToArray<object>()));
             for (int i = 0; i<numStates; ++i)
             {
                 object[] formatParams = new[] { i.ToString() }.Concat(grammar.AllSymbols.OfType<Terminal<T>>().Select(f =>
                 {
-                    var actionValue = table.Action[i, f.TokenNumber];
+                    int actionValue = table.Action[i, f.TokenNumber];
                     if (actionValue == short.MaxValue)
                     {
                         return "acc";

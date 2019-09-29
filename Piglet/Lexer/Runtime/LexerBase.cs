@@ -8,11 +8,8 @@ namespace Piglet.Lexer.Runtime
     internal abstract class LexerBase<T, TState> : ILexer<T>
     {
         private readonly int endOfInputTokenNumber;
-        
-        protected LexerBase(int endOfInputTokenNumber)
-        {
-            this.endOfInputTokenNumber = endOfInputTokenNumber;
-        }
+
+        protected LexerBase(int endOfInputTokenNumber) => this.endOfInputTokenNumber = endOfInputTokenNumber;
 
         private class LexerStateImpl : ILexerInstance<T>
         {
@@ -30,9 +27,9 @@ namespace Piglet.Lexer.Runtime
                 this.source = source;
             }
 
-            public int CurrentLineNumber { get { return lineNumber; } }
-            public string CurrentLine { get { return currentLine.ToString(); } }
-            public string LastLexeme { get { return lexeme.ToString(); } }
+            public int CurrentLineNumber => lineNumber;
+            public string CurrentLine => currentLine.ToString();
+            public string LastLexeme => lexeme.ToString();
 
             public Tuple<int, T> Next()
             {
@@ -56,16 +53,16 @@ namespace Piglet.Lexer.Runtime
                         peek = 0;
                     }
 
-                    var c = (char)peek;
+                    char c = (char)peek;
                     TState nextState = lexer.GetNextState(state, c);
-                    var reachedTermination = lexer.ReachedTermination(nextState);
+                    bool reachedTermination = lexer.ReachedTermination(nextState);
 
                     if (reachedTermination)
                     {
                         // We have reached termination
                         // Two possibilities, current state accepts, if so return token ID
                         // else there is an error
-                        var action = lexer.GetAction(state);
+                        Tuple<int, Func<string, T>> action = lexer.GetAction(state);
                         if (action != null && lexeme.Length > 0)
                         {
                             // If tokennumber is int.MinValue it is an ignored token, like typically whitespace.
@@ -89,7 +86,7 @@ namespace Piglet.Lexer.Runtime
                         {
                             // We get here if there is no action at the state where the lexer cannot continue given the input.
                             // This is fail.
-                            var lexerException =
+                            LexerException lexerException =
                                 new LexerException(string.Format("Invalid character '{0}'",
                                                                  c == '\0' ? "NULL" : c.ToString()))
                                 {
@@ -124,20 +121,14 @@ namespace Piglet.Lexer.Runtime
             }
         }
 
-        public ILexerInstance<T> Begin(TextReader reader)
-        {
-            return new LexerStateImpl(reader, this);
-        }
+        public ILexerInstance<T> Begin(TextReader reader) => new LexerStateImpl(reader, this);
 
-        public ILexerInstance<T> Begin(string source)
-        {
-            return Begin(new StringReader(source));
-        }
+        public ILexerInstance<T> Begin(string source) => Begin(new StringReader(source));
 
         public IEnumerable<Tuple<int, T>> Tokenize(string source)
         {
-            var instance = Begin(source);
-            for (var token = instance.Next(); token.Item1 != -1; token = instance.Next())
+            ILexerInstance<T> instance = Begin(source);
+            for (Tuple<int, T> token = instance.Next(); token.Item1 != -1; token = instance.Next())
             {
                 yield return token;
             }

@@ -18,7 +18,7 @@ namespace Piglet.Lexer.Runtime
             // Get a list of all valid input ranges that are distinct.
             // This will fill up the entire spectrum from 0 to max char
             // Sort these ranges so that they start with the lowest to highest start
-            var allValidRanges =
+            List<CharRange> allValidRanges =
                 nfas.Select(
                     f =>
                     f.Transitions.Aggregate(Enumerable.Empty<CharRange>(), (acc, a) => acc.Union(a.ValidInput.Ranges)))
@@ -44,7 +44,7 @@ namespace Piglet.Lexer.Runtime
             // Create a 2D table
             // First dimension is the number of states found in the DFA
             // Second dimension is number of distinct character ranges
-            var uncompressed = new short[dfa.States.Count(),allValidRanges.Count()];
+            short[,] uncompressed = new short[dfa.States.Count(),allValidRanges.Count()];
 
             // Fill table with -1
             for (int i = 0; i < dfa.States.Count(); ++i )
@@ -59,14 +59,14 @@ namespace Piglet.Lexer.Runtime
             inputRangeEnds = allValidRanges.Select(f => f.To).ToArray();
             actions = new Tuple<int, Func<string, T>>[dfa.States.Count];
 
-            foreach (var state in dfa.States)
+            foreach (DFA.State state in dfa.States)
             {
                 // Store to avoid problems with modified closure
                 DFA.State state1 = state; 
-                foreach (var transition in dfa.Transitions.Where(f => f.From == state1))
+                foreach (Transition<DFA.State> transition in dfa.Transitions.Where(f => f.From == state1))
                 {
                     // Set the table entry
-                	foreach (var range in transition.ValidInput.Ranges)
+                	foreach (CharRange range in transition.ValidInput.Ranges)
                 	{
                 		int ix = allValidRanges.BinarySearch(range);
                 		uncompressed[state.StateNumber, ix] = (short) transition.To.StateNumber;
@@ -121,12 +121,9 @@ namespace Piglet.Lexer.Runtime
             }
         }
 
-        private int FindTableIndex(char c)
-        {
-        	return c < asciiIndices.Length ? asciiIndices[c] : FindTableIndexFromRanges(c);
-        }
+        private int FindTableIndex(char c) => c < asciiIndices.Length ? asciiIndices[c] : FindTableIndexFromRanges(c);
 
-    	private int FindTableIndexFromRanges(char c)
+        private int FindTableIndexFromRanges(char c)
 		{
 			int ix = Array.BinarySearch(inputRangeEnds, c);
 			if (ix < 0)
@@ -136,9 +133,6 @@ namespace Piglet.Lexer.Runtime
 			return ix;
 		}
 
-    	public Tuple<int, Func<string, T>> GetAction(int state)
-        {
-            return actions[state];
-        }
+        public Tuple<int, Func<string, T>> GetAction(int state) => actions[state];
     }
 }

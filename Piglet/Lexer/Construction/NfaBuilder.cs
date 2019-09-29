@@ -9,7 +9,7 @@ namespace Piglet.Lexer.Construction
         {
             Stack<NFA> stack = new Stack<NFA>();
 
-            foreach (var token in yard.ShuntedTokens())
+            foreach (RegExToken token in yard.ShuntedTokens())
             {
                 switch (token.Type)
                 {
@@ -30,8 +30,8 @@ namespace Piglet.Lexer.Construction
                         break;
                     case RegExToken.TokenType.OperatorConcat:
                         // & is not commutative, and the stack is reversed.
-                        var second = stack.Pop();
-                        var first = stack.Pop();
+                        NFA second = stack.Pop();
+                        NFA first = stack.Pop();
                         stack.Push(And(first, second));
                         break;
                     case RegExToken.TokenType.NumberedRepeat:
@@ -49,7 +49,7 @@ namespace Piglet.Lexer.Construction
 
             // Pop it from the stack, and assign each state a number, primarily for debugging purposes,
             // they dont _really_ need it. The state numbers actually used are the one used in the DFA.
-            var nfa = stack.Pop();
+            NFA nfa = stack.Pop();
 
             nfa.AssignStateNumbers();
 
@@ -63,7 +63,7 @@ namespace Piglet.Lexer.Construction
             nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, nfa.StartState));
 
             // Add a new accept state, since we cannot have edges exiting the accept state
-            var newAcceptState = new NFA.State { AcceptState = true };
+            NFA.State newAcceptState = new NFA.State { AcceptState = true };
             nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, newAcceptState));
             nfa.States.Add(newAcceptState);
 
@@ -76,11 +76,11 @@ namespace Piglet.Lexer.Construction
         private static NFA Accept(CharSet acceptCharacters)
         {
             // Generate a NFA with a simple path with one state transitioning into an accept state.
-            var nfa = new NFA();
-            var state = new NFA.State();
+            NFA nfa = new NFA();
+            NFA.State state = new NFA.State();
             nfa.States.Add(state);
 
-            var acceptState = new NFA.State { AcceptState = true };
+            NFA.State acceptState = new NFA.State { AcceptState = true };
             nfa.States.Add(acceptState);
 
             nfa.Transitions.Add(new Transition<NFA.State>(state, acceptState, acceptCharacters));
@@ -93,11 +93,11 @@ namespace Piglet.Lexer.Construction
         public static NFA And(NFA first, NFA second)
         {
             // Create a new NFA and use the first NFAs start state as the starting point
-            var nfa = new NFA { StartState = first.StartState };
+            NFA nfa = new NFA { StartState = first.StartState };
 
             // Change all links in to first acceptstate to go to seconds 
             // start state
-            foreach (var edge in first.Transitions.Where(f => f.To.AcceptState))
+            foreach (Transition<NFA.State> edge in first.Transitions.Where(f => f.To.AcceptState))
             {
                 edge.To = second.StartState;
             }
@@ -115,7 +115,7 @@ namespace Piglet.Lexer.Construction
 
         public static NFA Or(NFA a, NFA b)
         {
-            var nfa = new NFA();
+            NFA nfa = new NFA();
 
             // Composite NFA contains all the and all edges in both NFAs
             nfa.AddAll(a);
@@ -131,8 +131,8 @@ namespace Piglet.Lexer.Construction
 
             // Add a new accept state, link all old accept states to the new accept
             // state with an epsilon link and remove the accept flag
-            var newAcceptState = new NFA.State { AcceptState = true };
-            foreach (var oldAcceptState in nfa.States.Where(f => f.AcceptState))
+            NFA.State newAcceptState = new NFA.State { AcceptState = true };
+            foreach (NFA.State oldAcceptState in nfa.States.Where(f => f.AcceptState))
             {
                 oldAcceptState.AcceptState = false;
                 nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, newAcceptState));
@@ -144,7 +144,7 @@ namespace Piglet.Lexer.Construction
 
         public static NFA RepeatZeroOrMore(NFA input)
         {
-            var nfa = new NFA();
+            NFA nfa = new NFA();
 
             // Add everything from the input
             nfa.AddAll(input);
@@ -159,7 +159,7 @@ namespace Piglet.Lexer.Construction
             nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, input.StartState));
 
             // Create new accept state, link old accept state to new accept state with epsilon
-            var acceptState = new NFA.State { AcceptState = true };
+            NFA.State acceptState = new NFA.State { AcceptState = true };
             nfa.States.Add(acceptState);
             oldAcceptState.AcceptState = false;
             nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, acceptState));
@@ -191,7 +191,7 @@ namespace Piglet.Lexer.Construction
 
             // Copy the NFA max repetitions times, link them together.
             NFA output = nfa.Copy();
-            var epsilonLinkStates = new Stack<NFA.State>();
+            Stack<NFA.State> epsilonLinkStates = new Stack<NFA.State>();
             for (int i = 1; i < maxRepetitions; ++i)
             {
                 NFA newNfa = nfa.Copy();
@@ -205,7 +205,7 @@ namespace Piglet.Lexer.Construction
             if (infiniteMax)
             {
                 // Use Single to force an exception if this has gone astray
-                var finalState = epsilonLinkStates.Single();
+                NFA.State finalState = epsilonLinkStates.Single();
 
                 // Make a little epsilon loop from the final accept state to the start state of the final state
                 output.Transitions.Add(new Transition<NFA.State>(output.States.Single(f => f.AcceptState), finalState));
@@ -213,7 +213,7 @@ namespace Piglet.Lexer.Construction
             else
             {
                 // Add epsilon transitions from accept to beginning states of NFAs in the chain
-                var acceptState = output.States.Single(f => f.AcceptState);
+                NFA.State acceptState = output.States.Single(f => f.AcceptState);
                 while (epsilonLinkStates.Any())
                 {
                     output.Transitions.Add(new Transition<NFA.State>(epsilonLinkStates.Pop(),

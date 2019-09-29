@@ -22,19 +22,19 @@ namespace Piglet.Parser
             this.terminalDebugNames = terminalDebugNames;
         }
 
-        public IParseTable<T> ParseTable { get { return parseTable; } }
+        public IParseTable<T> ParseTable => parseTable;
 
         public ILexer<T> Lexer { get; set; }
 
         private T Parse(ILexerInstance<T> lexerInstance)
         {
-            var valueStack = new Stack<T>();
-            var parseStack = new Stack<int>();
+            Stack<T> valueStack = new Stack<T>();
+            Stack<int> parseStack = new Stack<int>();
 
             // Push default state onto the parse stack. Default state is always 0
             parseStack.Push(0);
 
-            var input = lexerInstance.Next();
+            System.Tuple<int, T> input = lexerInstance.Next();
 
             // This holds the last exception we found when parsing, since we
             // will need to pass this to an error handler once the proper handler has been found
@@ -116,7 +116,7 @@ namespace Piglet.Parser
                     else
                     {
                         // Get the right reduction rule to apply
-                        var reductionRule = parseTable.ReductionRules[-(action + 1)];
+                        IReductionRule<T> reductionRule = parseTable.ReductionRules[-(action + 1)];
                         for (int i = 0; i < reductionRule.NumTokensToPop*2; ++i)
                         {
                             parseStack.Pop();
@@ -128,7 +128,7 @@ namespace Piglet.Parser
                         parseStack.Push(parseTable.Goto[stateOnTopOfStack, reductionRule.TokenToPush]);
 
                         // Get tokens off the value stack for the OnReduce function to run on
-                        var onReduceParams = new T[reductionRule.NumTokensToPop];
+                        T[] onReduceParams = new T[reductionRule.NumTokensToPop];
 
                         // Need to do it in reverse since thats how the stack is organized
                         for (int i = reductionRule.NumTokensToPop - 1; i >= 0; --i)
@@ -139,26 +139,17 @@ namespace Piglet.Parser
                         // This calls the reduction function with the possible exception set. The exception could be cleared here, but
                         // there is no real reason to do so, since all the normal rules will ignore it, and all the error rules are guaranteed
                         // to have the exception set prior to entering the reduction function.
-                        var reduceFunc = reductionRule.OnReduce;
+                        System.Func<ParseException, T[], T> reduceFunc = reductionRule.OnReduce;
                         valueStack.Push(reduceFunc == null ? default(T) : reduceFunc(exception, onReduceParams));
                     }
                 }
             }
         }
 
-        private IEnumerable<string> GetExpectedTokenNames(int state)
-        {
-            return terminalDebugNames.Where((t, i) => parseTable.Action[state, i] != short.MinValue);
-        }
+        private IEnumerable<string> GetExpectedTokenNames(int state) => terminalDebugNames.Where((t, i) => parseTable.Action[state, i] != short.MinValue);
 
-        public T Parse(string input)
-        {
-            return Parse(Lexer.Begin(input));
-        }
+        public T Parse(string input) => Parse(Lexer.Begin(input));
 
-        public T Parse(TextReader input)
-        {
-            return Parse(Lexer.Begin(input));
-        }
+        public T Parse(TextReader input) => Parse(Lexer.Begin(input));
     }
 }

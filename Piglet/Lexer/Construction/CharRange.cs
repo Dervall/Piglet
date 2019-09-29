@@ -7,23 +7,17 @@ namespace Piglet.Lexer.Construction
         public char From { get; set; }
         public char To { get; set; }
 
-        private static string ToGraphSafeString(char c)
-        {
-            return c >= 33 && c <= 0x7e
+        private static string ToGraphSafeString(char c) => c >= 33 && c <= 0x7e
                        ? c.ToString()
                        : string.Format("0x{0:x2}", (int)c);
-        }
 
-    	public int CompareTo(CharRange other)
+        public int CompareTo(CharRange other)
     	{
     		int cmp = From - other.From;
     		return cmp == 0 ? To - other.To : cmp;
     	}
 
-    	public override string ToString()
-        {
-            return From == To ? ToGraphSafeString(From) : string.Format("{0}-{1}", ToGraphSafeString(From), ToGraphSafeString(To));
-        }
+        public override string ToString() => From == To ? ToGraphSafeString(From) : string.Format("{0}-{1}", ToGraphSafeString(From), ToGraphSafeString(To));
 
         public bool Equals(CharRange other)
         {

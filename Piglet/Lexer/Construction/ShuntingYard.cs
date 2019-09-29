@@ -14,7 +14,7 @@ namespace Piglet.Lexer.Construction
         {
             RegExToken lastToken = null;
 
-            for (var token = lexer.NextToken(); token != null; )
+            for (RegExToken token = lexer.NextToken(); token != null; )
             {
                 // If the last token was accept and this new token is also accept we need to insert a concat operator
                 // between the two.
@@ -61,9 +61,9 @@ namespace Piglet.Lexer.Construction
 
         public IEnumerable<RegExToken> ShuntedTokens()
         {
-            var operatorStack = new Stack<RegExToken>();
+            Stack<RegExToken> operatorStack = new Stack<RegExToken>();
 
-            foreach (var token in TokensWithImplicitConcat())
+            foreach (RegExToken token in TokensWithImplicitConcat())
             {
                 switch (token.Type)
                 {
@@ -98,7 +98,7 @@ namespace Piglet.Lexer.Construction
 
             while (operatorStack.Any())
             {
-                var op = operatorStack.Pop();
+                RegExToken op = operatorStack.Pop();
 
                 if (op.Type == RegExToken.TokenType.OperatorOpenParanthesis)
                     throw new LexerConstructionException("Mismatched parenthesis in regular expression");

@@ -34,24 +34,24 @@ namespace Piglet.Parser.Construction
             // them as we merge the sets together.
             // This starts with augmenting the grammar with an accept symbol, then we derive the
             // grammar from that
-            var start = grammar.Start;
+            IProductionRule<T> start = grammar.Start;
 
             // Get the first and follow sets for all nonterminal symbols
-            var nullable = CalculateNullable();
-            var first = CalculateFirst(nullable);
+            ISet<NonTerminal<T>> nullable = CalculateNullable();
+            TerminalSet<T> first = CalculateFirst(nullable);
 
             // So, we are going to calculate the LR1 closure for the start symbol, which should
             // be the augmented accept state of the grammar.
             // The closure is all states which are accessible by the dot at the left hand side of the
             // item.
-            var itemSets = new List<Lr1ItemSet<T>>
+            List<Lr1ItemSet<T>> itemSets = new List<Lr1ItemSet<T>>
                                {
                                    Closure(new List<Lr1Item<T>>
                                                {
                                                    new Lr1Item<T>(start, 0, new HashSet<Terminal<T>> {grammar.EndOfInputTerminal})
                                                }, first, nullable)
                                };
-            var gotoSetTransitions = new List<GotoSetTransition>();
+            List<GotoSetTransition> gotoSetTransitions = new List<GotoSetTransition>();
 
             // Repeat until nothing gets added any more
             // This is neccessary since we are merging sets as we go, which changes things around.
@@ -61,12 +61,12 @@ namespace Piglet.Parser.Construction
                 added = false;
                 for (int i = 0; i < itemSets.Count(); ++i)
                 {
-                    var itemSet = itemSets[i];
+                    Lr1ItemSet<T> itemSet = itemSets[i];
 
-                    foreach (var symbol in grammar.AllSymbols)
+                    foreach (ISymbol<T> symbol in grammar.AllSymbols)
                     {
                         // Calculate the itemset for by goto for each symbol in the grammar
-                        var gotoSet = Goto(itemSet, symbol);
+                        Lr1ItemSet<T> gotoSet = Goto(itemSet, symbol);
 
                         // If there is anything found in the set
                         if (gotoSet.Any())
@@ -75,7 +75,7 @@ namespace Piglet.Parser.Construction
                             // if that is not the case add it to the item set
                             gotoSet = Closure(gotoSet, first, nullable);
 
-                            var oldGotoSet = itemSets.FirstOrDefault(f => f.CoreEquals(gotoSet));
+                            Lr1ItemSet<T> oldGotoSet = itemSets.FirstOrDefault(f => f.CoreEquals(gotoSet));
 
                             if (oldGotoSet == null)
                             {
@@ -98,7 +98,7 @@ namespace Piglet.Parser.Construction
                                 oldGotoSet.MergeLookaheads(gotoSet);
 
                                 // Add a transition if it already isn't there
-                                var nt = new GotoSetTransition
+                                GotoSetTransition nt = new GotoSetTransition
                                              {
                                                  From = itemSet,
                                                  OnSymbol = symbol,
@@ -131,20 +131,20 @@ namespace Piglet.Parser.Construction
             // TODO: This could probably be optimized.
 
             // A nullable symbol is a symbol that may consist of only epsilon transitions
-            var nullable = new HashSet<NonTerminal<T>>();
+            HashSet<NonTerminal<T>> nullable = new HashSet<NonTerminal<T>>();
 
             bool nullableSetChanged;
 
             do
             {
                 nullableSetChanged = false;
-                foreach (var nonTerminal in grammar.AllSymbols.OfType<NonTerminal<T>>())
+                foreach (NonTerminal<T> nonTerminal in grammar.AllSymbols.OfType<NonTerminal<T>>())
                 {
                     // No need to reevaluate things we know to be nullable.
                     if (nullable.Contains(nonTerminal))
                         continue;
 
-                    foreach (var production in nonTerminal.ProductionRules)
+                    foreach (IProductionRule<T> production in nonTerminal.ProductionRules)
                     {
                         // If this production is nullable, add the nonterminal to the set.
 
@@ -166,23 +166,23 @@ namespace Piglet.Parser.Construction
 
         private LRParseTable<T> CreateParseTable(List<Lr1ItemSet<T>> itemSets, List<GotoSetTransition> gotoSetTransitions)
         {
-            var table = new LRParseTable<T>();
-            
+            LRParseTable<T> table = new LRParseTable<T>();
+
             // Create a temporary uncompressed action table. This is what we will use to create
             // the compressed action table later on. This could probably be improved upon to save
             // memory if needed.
-            var uncompressedActionTable = new short[itemSets.Count, grammar.AllSymbols.OfType<Terminal<T>>().Count()];
+            short[,] uncompressedActionTable = new short[itemSets.Count, grammar.AllSymbols.OfType<Terminal<T>>().Count()];
             for (int i = 0; i < itemSets.Count(); ++i)
                 for (int j = 0; j < grammar.AllSymbols.OfType<Terminal<T>>().Count(); ++j)
                     uncompressedActionTable[i, j] = short.MinValue;
 
             int firstNonTerminalTokenNumber = grammar.AllSymbols.OfType<NonTerminal<T>>().First().TokenNumber;
-            var gotos = new List<GotoTable.GotoTableValue>();
+            List<GotoTable.GotoTableValue> gotos = new List<GotoTable.GotoTableValue>();
 
             for (int i = 0; i < itemSets.Count(); ++i)
             {
-                var itemSet = itemSets[i];
-                foreach (var lr1Item in itemSet)
+                Lr1ItemSet<T> itemSet = itemSets[i];
+                foreach (Lr1Item<T> lr1Item in itemSet)
                 {
                     // Fill the action table first
 
@@ -194,7 +194,7 @@ namespace Piglet.Parser.Construction
                         {
                             // Look for a transition in the gotoSetTransitions
                             // there should always be one.
-                            var transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr1Item.SymbolRightOfDot);
+                            GotoSetTransition transition = gotoSetTransitions.First(t => t.From == itemSet && t.OnSymbol == lr1Item.SymbolRightOfDot);
                             int transitionIndex = itemSets.IndexOf(transition.To);
                             int tokenNumber = ((Terminal<T>)lr1Item.SymbolRightOfDot).TokenNumber;
 
@@ -231,7 +231,7 @@ namespace Piglet.Parser.Construction
                                     }));
                             }
 
-                            foreach (var lookahead in lr1Item.Lookaheads)
+                            foreach (Terminal<T> lookahead in lr1Item.Lookaheads)
                             {
                                 try
                                 {
@@ -257,7 +257,7 @@ namespace Piglet.Parser.Construction
 
                 // Fill the goto table with the state IDs of all states that have been originally
                 // produced by the GOTO operation from this state
-                foreach (var gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet && f.OnSymbol is NonTerminal<T>))
+                foreach (GotoSetTransition gotoTransition in gotoSetTransitions.Where(f => f.From == itemSet && f.OnSymbol is NonTerminal<T>))
                 {
                     gotos.Add(new GotoTable.GotoTableValue
                                   {
@@ -328,13 +328,13 @@ namespace Piglet.Parser.Construction
                     Terminal<T> shiftingTerminal =
                         grammar.AllSymbols.OfType<Terminal<T>>().First(
                             f => f.TokenNumber == shiftTokenNumber);
-                    var shiftPrecedence = grammar.GetPrecedence(shiftingTerminal);
-                    
-                    var productionRule = reductionRules[reduceRuleNumber].Item1;
+                    IPrecedenceGroup shiftPrecedence = grammar.GetPrecedence(shiftingTerminal);
+
+                    IProductionRule<T> productionRule = reductionRules[reduceRuleNumber].Item1;
 
                     // If the rule has a context dependent precedence, use that. Otherwise use
                     // the reduce precedence of the last terminal symbol in the production rules precedence                        
-                    var reducePrecedence = productionRule.ContextPrecedence??
+                    IPrecedenceGroup reducePrecedence = productionRule.ContextPrecedence??
                         grammar.GetPrecedence(productionRule.Symbols.Reverse().OfType<ITerminal<T>>().FirstOrDefault());
 
                     // If either rule has no precedence this is not a legal course of action.
@@ -400,7 +400,7 @@ namespace Piglet.Parser.Construction
 
         private TerminalSet<T> CalculateFirst(ISet<NonTerminal<T>> nullable)
         {
-            var first = new TerminalSet<T>(grammar);
+            TerminalSet<T> first = new TerminalSet<T>(grammar);
 
             // Algorithm is that if a nonterminal has a production that starts with a 
             // terminal, we add that to the first set. If it starts with a nonterminal, we add
@@ -410,11 +410,11 @@ namespace Piglet.Parser.Construction
             {
                 addedThings = false;
 
-                foreach (var symbol in grammar.AllSymbols.OfType<NonTerminal<T>>())
+                foreach (NonTerminal<T> symbol in grammar.AllSymbols.OfType<NonTerminal<T>>())
                 {
-                    foreach (var productionRule in symbol.ProductionRules)
+                    foreach (IProductionRule<T> productionRule in symbol.ProductionRules)
                     {
-                        foreach (var productionSymbol in productionRule.Symbols)
+                        foreach (ISymbol<T> productionSymbol in productionRule.Symbols)
                         {
                             // Terminals are trivial, just add them
                             if (productionSymbol is Terminal<T>)
@@ -427,9 +427,9 @@ namespace Piglet.Parser.Construction
 
                             if (productionSymbol is NonTerminal<T>)
                             {
-                                var nonTerminal = (NonTerminal<T>)productionSymbol;
+                                NonTerminal<T> nonTerminal = (NonTerminal<T>)productionSymbol;
                                 // Add everything in FIRST for the given terminal.
-                                foreach (var f in first[nonTerminal])
+                                foreach (Terminal<T> f in first[nonTerminal])
                                 {
                                     addedThings |= first.Add(symbol, f);
                                 }
@@ -449,20 +449,18 @@ namespace Piglet.Parser.Construction
             return first;
         }
 
-        private Lr1ItemSet<T> Goto(IEnumerable<Lr1Item<T>> closures, ISymbol<T> symbol)
-        {
+        private Lr1ItemSet<T> Goto(IEnumerable<Lr1Item<T>> closures, ISymbol<T> symbol) =>
             // Every place there is a symbol to the right of the dot that matches the symbol we are looking for
             // add a new Lr1 item that has the dot moved one step to the right.
-            return new Lr1ItemSet<T>(from lr1Item in closures
-                                     where lr1Item.SymbolRightOfDot != null && lr1Item.SymbolRightOfDot == symbol
-                                     select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads));
-        }
+            new Lr1ItemSet<T>(from lr1Item in closures
+                              where lr1Item.SymbolRightOfDot != null && lr1Item.SymbolRightOfDot == symbol
+                              select new Lr1Item<T>(lr1Item.ProductionRule, lr1Item.DotLocation + 1, lr1Item.Lookaheads));
 
         private Lr1ItemSet<T> Closure(IEnumerable<Lr1Item<T>> items, TerminalSet<T> first, ISet<NonTerminal<T>> nullable)
         {
             // The items themselves are always in their own closure set
-            var closure = new Lr1ItemSet<T>();
-            foreach (var lr1Item in items)
+            Lr1ItemSet<T> closure = new Lr1ItemSet<T>();
+            foreach (Lr1Item<T> lr1Item in items)
             {
                 closure.Add(lr1Item);
             }
@@ -471,18 +469,18 @@ namespace Piglet.Parser.Construction
             // as we go along. This avoids investigating the same rule twice
             for (int currentItem = 0; currentItem < closure.Count(); ++currentItem)
             {
-                var item = closure[currentItem];
+                Lr1Item<T> item = closure[currentItem];
 
                 ISymbol<T> symbolRightOfDot = item.SymbolRightOfDot;
                 if (symbolRightOfDot != null)
                 {
                     // Generate the lookahead items
-                    var lookaheads = new HashSet<Terminal<T>>();
+                    HashSet<Terminal<T>> lookaheads = new HashSet<Terminal<T>>();
 
                     bool nonNullableFound = false;
                     for (int i = item.DotLocation + 1; i < item.ProductionRule.Symbols.Length; ++i)
                     {
-                        var symbol = item.ProductionRule.Symbols[i];
+                        ISymbol<T> symbol = item.ProductionRule.Symbols[i];
 
                         // If symbol is terminal, just add it
                         if (symbol is Terminal<T>)
@@ -494,7 +492,7 @@ namespace Piglet.Parser.Construction
                             break;
                         }
 
-                        foreach (var terminal in first[(NonTerminal<T>)symbol])
+                        foreach (Terminal<T> terminal in first[(NonTerminal<T>)symbol])
                         {
                             lookaheads.Add(terminal);
                         }
@@ -510,7 +508,7 @@ namespace Piglet.Parser.Construction
                     {
                         // Add each of the lookahead symbols of the generating rule
                         // to the new lookahead set
-                        foreach (var lookahead in item.Lookaheads)
+                        foreach (Terminal<T> lookahead in item.Lookaheads)
                         {
                             lookaheads.Add(lookahead);
                         }
@@ -518,11 +516,11 @@ namespace Piglet.Parser.Construction
 
                     // Create new Lr1 items from all rules where the resulting symbol of the production rule
                     // matches the symbol that was to the right of the dot.
-                    var newLr1Items =
+                    IEnumerable<Lr1Item<T>> newLr1Items =
                         grammar.ProductionRules.Where(f => f.ResultSymbol == symbolRightOfDot).Select(
                             f => new Lr1Item<T>(f, 0, lookaheads));
 
-                    foreach (var lr1Item in newLr1Items)
+                    foreach (Lr1Item<T> lr1Item in newLr1Items)
                     {
                         closure.Add(lr1Item);
                     }

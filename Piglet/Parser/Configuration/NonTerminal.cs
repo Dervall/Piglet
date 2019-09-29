@@ -30,7 +30,7 @@ namespace Piglet.Parser.Configuration
                 throw new ArgumentException("Only string and ISymbol are valid arguments.", "parts");
             }
 
-            var nonTerminalProduction = new NonTerminalProduction(configurator, this, parts);
+            NonTerminalProduction nonTerminalProduction = new NonTerminalProduction(configurator, this, parts);
             productions.Add(nonTerminalProduction);
 
             return nonTerminalProduction;
@@ -60,11 +60,11 @@ namespace Piglet.Parser.Configuration
                 // Move production symbols to the list
                 this.symbols = new ISymbol<T>[symbols.Length];
                 int i = 0;
-                foreach (var part in symbols)
+                foreach (object part in symbols)
                 {
                     if (part is string)
                     {
-                        var regex = (string)part;
+                        string regex = (string)part;
                         if (configurator.LexerSettings.EscapeLiterals)
                         {
                             regex = Regex.Escape(regex);
@@ -81,11 +81,9 @@ namespace Piglet.Parser.Configuration
                 }
             }
 
-            public void SetReduceFunction(Func<T[], T> action)
-            {
+            public void SetReduceFunction(Func<T[], T> action) =>
                 // This creates a little lambda that ignores the exception
                 ReduceAction = (e, f) => action(f);
-            }
 
             public void SetReduceToFirst() => SetReduceFunction(f => f[0]);
 

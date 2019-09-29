@@ -12,11 +12,11 @@ namespace Piglet.Common
         public CompressedTable(short[,] uncompressed)
         {
             // Create a displacement table
-            var numStates = uncompressed.GetUpperBound(0) + 1;
+            int numStates = uncompressed.GetUpperBound(0) + 1;
             displacement = new int[numStates];
 
-            var table = new List<short>();
-        	var offsetHashes = new List<int>();
+            List<short> table = new List<short>();
+            List<int> offsetHashes = new List<int>();
 
             // Add the first range straight away.
         	table.AddRange(StateActions(0, uncompressed));
@@ -25,12 +25,12 @@ namespace Piglet.Common
             // For each additional state, try to match as best as possible with the existing list
             for (int state = 1; state < numStates; ++state)
             {
-                var stateActions = StateActions(state, uncompressed).ToArray();
-            	var hash = stateActions.Aggregate(0, (acc, x) => (acc * 397) ^ x);
+                short[] stateActions = StateActions(state, uncompressed).ToArray();
+                int hash = stateActions.Aggregate(0, (acc, x) => (acc * 397) ^ x);
 
                 // Need to run *past* the table in order to add wholly incompatible matches
                 // this will not index out of the table, so there is no need to worry.
-                var tableCount = table.Count();
+                int tableCount = table.Count();
 
                 for (int displacementIndex = 0; displacementIndex <= tableCount; ++displacementIndex)
                 {
@@ -41,7 +41,7 @@ namespace Piglet.Common
 
                 	bool spotFound = true;
                     int offset = displacementIndex;
-                    foreach (var stateAction in stateActions)
+                    foreach (short stateAction in stateActions)
                     {
                         if (offset >= tableCount)
                         {
@@ -68,7 +68,7 @@ namespace Piglet.Common
 						// Add the hashes that does not exist up to the displacement index
 						for (int i = offsetHashes.Count; i < displacementIndex; ++i)
 						{
-							var offsetHash = 0;
+                            int offsetHash = 0;
 							for (int j = i; j < stateActions.Length; ++j )
 							{
 								offsetHash = (offsetHash * 397) ^ table[j];

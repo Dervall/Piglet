@@ -11,11 +11,8 @@ namespace Piglet.Tests.Lexer.Construction
     [TestFixture]
     public class TestRegEx
     {
-        private IEnumerable<Action<ILexerConfigurator<string>>> GetAllConfigurationOptions()
-        {
-            return Enum.GetValues(typeof (LexerRuntime)).Cast<LexerRuntime>().Select(
+        private IEnumerable<Action<ILexerConfigurator<string>>> GetAllConfigurationOptions() => Enum.GetValues(typeof(LexerRuntime)).Cast<LexerRuntime>().Select(
                 f => new Action<ILexerConfigurator<string>>(c => c.Runtime = f));
-        }
 
         private IEnumerable<ILexer<string>> CreateLexers(string regEx)
         {
@@ -29,20 +26,11 @@ namespace Piglet.Tests.Lexer.Construction
                     }));
         }
 
-        private void CheckMatch(string input, string regEx)
-        {
-            IsMatch(input, regEx, true);
-        }
+        private void CheckMatch(string input, string regEx) => IsMatch(input, regEx, true);
 
-        private void CheckMatch(string input, string regEx, string expectedMatch)
-        {
-            IsMatch(input, regEx, true, expectedMatch);
-        }
+        private void CheckMatch(string input, string regEx, string expectedMatch) => IsMatch(input, regEx, true, expectedMatch);
 
-        private void IsMatch(string input, string regEx, bool shouldMatch)
-        {
-            IsMatch(input, regEx, shouldMatch, input);
-        }
+        private void IsMatch(string input, string regEx, bool shouldMatch) => IsMatch(input, regEx, shouldMatch, input);
 
         private void IsMatch(string input, string regEx, bool shouldMatch, string matchedInput)
         {
@@ -63,58 +51,31 @@ namespace Piglet.Tests.Lexer.Construction
             }
         }
 
-        private void CheckMatchFail(string input, string regEx)
-        {
-            IsMatch(input, regEx, false);
-        }
+        private void CheckMatchFail(string input, string regEx) => IsMatch(input, regEx, false);
 
         [Test]
-        public void TestMatchingQuotesWithEscapes()
-        {
-            CheckMatch("\" A quoted string with \\\" inside\"", @"""(\\.|[^""])*""");
-        }
+        public void TestMatchingQuotesWithEscapes() => CheckMatch("\" A quoted string with \\\" inside\"", @"""(\\.|[^""])*""");
 
         [Test]
-        public void TestStuff()
-        {
-            CheckMatch("absc", "a(bs|e)*c");
-        }
+        public void TestStuff() => CheckMatch("absc", "a(bs|e)*c");
 
         [Test]
-        public void TestDeepNestedParenthesis()
-        {
-            CheckMatch("abcde", "(a(b)(c(de)))");
-        }
+        public void TestDeepNestedParenthesis() => CheckMatch("abcde", "(a(b)(c(de)))");
 
         [Test]
-        public void TestEscapedCharacters()
-        {
-            CheckMatch("++++", "\\++");
-        }
+        public void TestEscapedCharacters() => CheckMatch("++++", "\\++");
 
         [Test]
-        public void TestDigit()
-        {
-            CheckMatch("123", "\\d+");
-        }
+        public void TestDigit() => CheckMatch("123", "\\d+");
 
         [Test]
-        public void TestRange()
-        {
-            CheckMatch("abcde", "[a-e]+");
-        }
+        public void TestRange() => CheckMatch("abcde", "[a-e]+");
 
         [Test]
-        public void TestMultipleRanges()
-        {
-            CheckMatch("abcdePOPP", "[a-eA-Z]+");
-        }
+        public void TestMultipleRanges() => CheckMatch("abcdePOPP", "[a-eA-Z]+");
 
         [Test]
-        public void TestAnyCharacter()
-        {
-            CheckMatch("XHXas!!a.A", "X.X.*\\.A");
-        }
+        public void TestAnyCharacter() => CheckMatch("XHXas!!a.A", "X.X.*\\.A");
 
         [Test]
         public void TestZeroOrOnce()
@@ -124,22 +85,13 @@ namespace Piglet.Tests.Lexer.Construction
         }
 
         [Test]
-        public void TestEscapedParenthesis()
-        {
-            CheckMatch("(b)", "\\((a|b)\\)");
-        }
+        public void TestEscapedParenthesis() => CheckMatch("(b)", "\\((a|b)\\)");
 
         [Test]
-        public void TestParenthesis()
-        {
-            CheckMatch("a", "(a)");
-        }
+        public void TestParenthesis() => CheckMatch("a", "(a)");
 
         [Test]
-        public void TestParenthesisWithRepeat()
-        {
-            CheckMatch("a", "(a)+");
-        }
+        public void TestParenthesisWithRepeat() => CheckMatch("a", "(a)+");
 
         [Test]
         public void TestParenthesisWithAlternate()
@@ -149,16 +101,10 @@ namespace Piglet.Tests.Lexer.Construction
         }
 
         [Test]
-        public void TestNegateCharacterClass()
-        {
-            CheckMatch("abcd", "[^ABCD]+");
-        }
+        public void TestNegateCharacterClass() => CheckMatch("abcd", "[^ABCD]+");
 
         [Test]
-        public void TestNegateInWrongPosition()
-        {
-            CheckMatch("^", "[x^]");
-        }
+        public void TestNegateInWrongPosition() => CheckMatch("^", "[x^]");
 
         [Test]
         public void SpecialCharactersAreNotThatSpecialInsideAClass()
@@ -184,22 +130,13 @@ nextLine");
         }
 
         [Test]
-        public void TestNonDigitEscaped()
-        {
-            CheckMatch("abcde", "\\D+");
-        }
+        public void TestNonDigitEscaped() => CheckMatch("abcde", "\\D+");
 
         [Test]
-        public void TestMatchWhitespace()
-        {
-            CheckMatch(" \t\n\r", "\\s+");
-        }
+        public void TestMatchWhitespace() => CheckMatch(" \t\n\r", "\\s+");
 
         [Test]
-        public void TestMatchNonWhitespace()
-        {
-            CheckMatch("jfsdhsd", "\\S+");
-        }
+        public void TestMatchNonWhitespace() => CheckMatch("jfsdhsd", "\\S+");
 
         [Test]
         [TestCase("abcdefghijklmnopqrstuvwxyz")]
@@ -208,17 +145,11 @@ nextLine");
         [TestCase("_")]
         [TestCase("01234567890")]
         [TestCase("\x16C8\x16C1\x16B7\x16DA\x16D6\x16CF")]//Piglet in Runic
-        public void TestMatchWordCharactersInclude(string input)
-        {
-            CheckMatch(input, "\\w+");
-        }
+        public void TestMatchWordCharactersInclude(string input) => CheckMatch(input, "\\w+");
 
         [Test]
         [TestCase("-!\\\"#€%&/()='|<>,.*^¨`´?+;:@$")]
-        public void TestMatchWordCharactersExclude(string input)
-        {
-            CheckMatchFail(input, "\\w+");
-        }
+        public void TestMatchWordCharactersExclude(string input) => CheckMatchFail(input, "\\w+");
 
         [Test]
         public void TestGreedyOr()
@@ -228,28 +159,16 @@ nextLine");
         }
 
         [Test]
-        public void TestMatchNonAlphanumeric()
-        {
-            CheckMatch(" \n!@#", "\\W+");
-        }
+        public void TestMatchNonAlphanumeric() => CheckMatch(" \n!@#", "\\W+");
 
         [Test]
-        public void TestMatchLiteral()
-        {
-            CheckMatch("ABC", "ABC");
-        }
+        public void TestMatchLiteral() => CheckMatch("ABC", "ABC");
 
         [Test]
-        public void TestEscapedSlash()
-        {
-            CheckMatch("\\\\", "\\\\+");
-        }
+        public void TestEscapedSlash() => CheckMatch("\\\\", "\\\\+");
 
         [Test]
-        public void TestBracketInCharacterClass()
-        {
-            CheckMatch("[][][]", @"[\]\[ab]+");
-        }
+        public void TestBracketInCharacterClass() => CheckMatch("[][][]", @"[\]\[ab]+");
 
         [Test]
         public void TestExactNumberedRepetition()
@@ -276,16 +195,10 @@ nextLine");
         }
 
         [Test]
-        public void TestMultipleParenthesis()
-        {
-            CheckMatch("abcd", "(ab)(cd)");
-        }
+        public void TestMultipleParenthesis() => CheckMatch("abcd", "(ab)(cd)");
 
         [Test]
-        public void TestNumberedRepetitionWithParenthesis()
-        {
-            CheckMatch("coolcoolcool", "(cool){3}");
-        }
+        public void TestNumberedRepetitionWithParenthesis() => CheckMatch("coolcoolcool", "(cool){3}");
 
         [Test]
         public void TestNumberedRepetitionWithMaxValue()

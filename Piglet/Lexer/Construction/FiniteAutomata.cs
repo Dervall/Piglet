@@ -25,7 +25,7 @@ namespace Piglet.Lexer.Construction
         {
             int i = 0;
 
-            foreach (var state in States)
+            foreach (TState state in States)
                 if (state != StartState)
                     state.StateNumber = ++i;
 
@@ -35,8 +35,8 @@ namespace Piglet.Lexer.Construction
 
 		public void DistinguishValidInputs()
         {
-			var ranges = new List<CharRange>(Transitions.SelectMany(f => f.ValidInput.Ranges));
-			var beginningsAndEnds = ranges.Select(f => f.From).Concat(ranges.Select(f => f.To == char.MaxValue ? f.To : (char)(f.To+1))).ToArray();
+            List<CharRange> ranges = new List<CharRange>(Transitions.SelectMany(f => f.ValidInput.Ranges));
+            char[] beginningsAndEnds = ranges.Select(f => f.From).Concat(ranges.Select(f => f.To == char.MaxValue ? f.To : (char)(f.To+1))).ToArray();
 			Array.Sort(beginningsAndEnds);
 			int pivot = 0;
 
@@ -46,7 +46,7 @@ namespace Piglet.Lexer.Construction
 
             ++pivot;
 
-			var distinguishedRanges = new List<CharRange>(pivot * 2);
+            List<CharRange> distinguishedRanges = new List<CharRange>(pivot * 2);
 
 			for(int i = 1; i < pivot; ++i)
                 distinguishedRanges.Add(new CharRange
@@ -55,7 +55,7 @@ namespace Piglet.Lexer.Construction
                     To = beginningsAndEnds[i]
                 });
 
-            foreach (var transition in Transitions)
+            foreach (Transition<TState> transition in Transitions)
                 transition.ValidInput = new CharSet(transition.ValidInput.Ranges.SelectMany(range => FindNewRanges(range, distinguishedRanges)));
         }
 
@@ -117,14 +117,14 @@ namespace Piglet.Lexer.Construction
 
     	public StimulateResult<TState> Stimulate(string input)
         {
-            var activeStates = Closure(new[] {StartState}).ToList();
-            var matchedString = new StringBuilder();
+            List<TState> activeStates = Closure(new[] {StartState}).ToList();
+            StringBuilder matchedString = new StringBuilder();
 
-            foreach (var c in input)
+            foreach (char c in input)
             {
-                var toStates = new HashSet<TState>();
+                HashSet<TState> toStates = new HashSet<TState>();
 
-                foreach (var activeState in activeStates)
+                foreach (TState activeState in activeStates)
                     toStates.UnionWith(from t in Transitions
                                        where t.From == activeState
                                        where t.ValidInput.ContainsChar(c)

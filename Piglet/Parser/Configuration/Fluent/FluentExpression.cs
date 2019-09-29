@@ -9,15 +9,9 @@ namespace Piglet.Parser.Configuration.Fluent
         private Terminal<object> terminal;
         private string regex;
 
-        public FluentExpression(ParserConfigurator<object> configurator)
-        {
-            this.configurator = configurator;
-        }
+        public FluentExpression(ParserConfigurator<object> configurator) => this.configurator = configurator;
 
-        public FluentExpression(ITerminal<object> terminal)
-        {
-            this.terminal = (Terminal<object>) terminal;
-        }
+        public FluentExpression(ITerminal<object> terminal) => this.terminal = (Terminal<object>)terminal;
 
         public Terminal<object> Terminal
         {
@@ -33,7 +27,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public void ThatMatches<TExpressionType>()
         {
-            var type = typeof (TExpressionType);
+            Type type = typeof (TExpressionType);
             if (type == typeof(int))
             {
                 ThatMatches(@"\d+").AndReturns(f => int.Parse(f));
@@ -62,10 +56,8 @@ namespace Piglet.Parser.Configuration.Fluent
             return this;
         }
 
-        public void AndReturns(Func<string, object> func)
-        {
+        public void AndReturns(Func<string, object> func) =>
             // Create the terminal now to ensure that the tokens will be created in the right order
-            terminal = (Terminal<object>) configurator.CreateTerminal(regex, func);
-        }
+            terminal = (Terminal<object>)configurator.CreateTerminal(regex, func);
     }
 }

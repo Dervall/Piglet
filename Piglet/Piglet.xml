@@ -558,6 +558,12 @@
             </summary>
             <param name="symbols">Symbols to set associativity on</param>
         </member>
+        <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.SetStartSymbol(Piglet.Parser.Configuration.INonTerminal{`0})">
+            <summary>
+            Sets the given non-terminal symbol as start symbol
+            </summary>
+            <param name="start">Non-terminal symbol</param>
+        </member>
         <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.CreateParser">
             <summary>
             Creates a parser based on the inputted configuration. If a lexer has been desired as well, this method will also create the lexer.

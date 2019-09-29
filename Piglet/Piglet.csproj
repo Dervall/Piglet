@@ -1,14 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;net45;netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netcoreapp3.0</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Version>1.2.0</Version>
     <Company>Per Dervall</Company>
     <Product>Piglet</Product>
     <Authors>Per Dervall</Authors>
-    <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.
-Fork from https://github.com/Dervall/Piglet
-    </Description>
+    <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.</Description>
     <RepositoryUrl>https://github.com/unknown6656/Piglet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseUrl>https://github.com/unknown6656/Piglet/blob/master/LICENSE.txt</PackageLicenseUrl>

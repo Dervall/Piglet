@@ -39,9 +39,9 @@ namespace Piglet.Tests.Lexer.Construction
                 var lexerInstance = lexer.Begin(new StringReader(input));
                 try
                 {
-                    Tuple<int, string> token = lexerInstance.Next();
-                    Assert.AreEqual(0, token.Item1);
-                    Assert.AreEqual(matchedInput, token.Item2);
+                    var token = lexerInstance.Next();
+                    Assert.AreEqual(0, token.index);
+                    Assert.AreEqual(matchedInput, token.value);
                     Assert.IsTrue(shouldMatch);
                 }
                 catch (LexerException)
@@ -125,8 +125,8 @@ namespace Piglet.Tests.Lexer.Construction
 
             var lexerInstance = lexer.Begin(@"; this is a comment
 nextLine");
-            Assert.AreEqual("; this is a comment\r\n", lexerInstance.Next().Item2);
-            Assert.AreEqual("nextLine%", lexerInstance.Next().Item2);
+            Assert.AreEqual("; this is a comment\r\n", lexerInstance.Next().value);
+            Assert.AreEqual("nextLine%", lexerInstance.Next().value);
         }
 
         [Test]

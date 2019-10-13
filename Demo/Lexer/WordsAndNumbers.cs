@@ -24,13 +24,13 @@ namespace Piglet.Demo.Lexer
             string input = "10 piglets 5 boars 1 big sow";
             foreach (var token in lexer.Tokenize(input))
             {
-                if (token.Item2 is int)
+                if (token.value is int)
                 {
-                    Console.WriteLine("Lexer found an integer {0}", token.Item2);
+                    Console.WriteLine("Lexer found an integer {0}", token.value);
                 }
                 else
                 {
-                    Console.WriteLine("Lexer found a string {0}", token.Item2);
+                    Console.WriteLine("Lexer found a string {0}", token.value);
                 }
             }
         }

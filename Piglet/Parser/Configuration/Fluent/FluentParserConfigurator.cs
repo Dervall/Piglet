@@ -1,7 +1,7 @@
-using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+
 using Piglet.Lexer.Configuration;
 
 namespace Piglet.Parser.Configuration.Fluent
@@ -9,7 +9,7 @@ namespace Piglet.Parser.Configuration.Fluent
     internal sealed class FluentParserConfigurator
         : IFluentParserConfigurator
     {
-        private readonly Dictionary<Tuple<IRule, string>, NonTerminal<object>> _listRules;
+        private readonly Dictionary<(IRule rule, string separator), NonTerminal<object>> _listRules;
         private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> _optionalRules;
         private readonly ParserConfigurator<object> _configurator;
         private readonly List<FluentRule> _rules;
@@ -46,7 +46,7 @@ namespace Piglet.Parser.Configuration.Fluent
         {
             _configurator = configurator;
             _rules = new List<FluentRule>();
-            _listRules = new Dictionary<Tuple<IRule, string>, NonTerminal<object>>();
+            _listRules = new Dictionary<(IRule, string), NonTerminal<object>>();
             _optionalRules = new Dictionary<NonTerminal<object>, NonTerminal<object>>();
             _ignored = new List<string>();
         }
@@ -94,7 +94,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)
         {
-            Tuple<IRule, string> t = new Tuple<IRule, string>(rule, separator);
+            (IRule rule, string separator) t = (rule, separator);
 
             if (_listRules.ContainsKey(t))
                 return _listRules[t];

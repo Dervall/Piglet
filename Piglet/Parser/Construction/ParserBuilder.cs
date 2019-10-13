@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Piglet.Common;
+using System;
+
 using Piglet.Parser.Configuration;
+using Piglet.Common;
 
 namespace Piglet.Parser.Construction
 {
@@ -12,7 +13,6 @@ namespace Piglet.Parser.Construction
         // the second part at least, the other is for indexing them while making the table.
         private readonly List<Tuple<IProductionRule<T>, ReductionRule<T>>> _reductionRules;
         private readonly IGrammar<T> _grammar;
-
 
 
         public ParserBuilder(IGrammar<T> grammar)
@@ -131,12 +131,12 @@ namespace Piglet.Parser.Construction
 
             // A nullable symbol is a symbol that may consist of only epsilon transitions
             HashSet<NonTerminal<T>> nullable = new HashSet<NonTerminal<T>>();
-
             bool nullableSetChanged;
 
             do
             {
                 nullableSetChanged = false;
+
                 foreach (NonTerminal<T> nonTerminal in _grammar.AllSymbols.OfType<NonTerminal<T>>())
                 {
                     // No need to reevaluate things we know to be nullable.

@@ -29,6 +29,6 @@ namespace Piglet.Lexer
         /// </summary>
         /// <param name="source">Input string to tokenize</param>
         /// <returns></returns>
-        IEnumerable<Tuple<int, T>> Tokenize(string source);
+        IEnumerable<(int number, T value)> Tokenize(string source);
     }
 }

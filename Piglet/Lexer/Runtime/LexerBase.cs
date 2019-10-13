@@ -17,15 +17,15 @@ namespace Piglet.Lexer.Runtime
 
         public ILexerInstance<T> Begin(string source) => Begin(new StringReader(source));
 
-        public IEnumerable<Tuple<int, T>> Tokenize(string source)
+        public IEnumerable<(int number, T value)> Tokenize(string source)
         {
             ILexerInstance<T> instance = Begin(source);
 
-            for (Tuple<int, T> token = instance.Next(); token.Item1 != -1; token = instance.Next())
+            for ((int number, T value) token = instance.Next(); token.number != -1; token = instance.Next())
                 yield return token;
         }
 
-        protected abstract Tuple<int, Func<string, T>> GetAction(TState state);
+        protected abstract (int number, Func<string, T>? action)? GetAction(TState state);
 
         protected abstract bool ReachedTermination(TState nextState);
 
@@ -57,7 +57,7 @@ namespace Piglet.Lexer.Runtime
                 _source = source;
             }
 
-            public Tuple<int, T> Next()
+            public (int number, T value) Next()
             {
                 _state = _lexer.GetInitialState();
                 _lexeme.Clear();
@@ -72,7 +72,7 @@ namespace Piglet.Lexer.Runtime
                         // If reading the end of file and the lexeme is empty, return end of stream token
                         // If the lexeme isn't empty, it must try to find out whatever it is in the lexeme.
                         if (_lexeme.Length == 0)
-                            return new Tuple<int, T>(_lexer._endOfInputTokenNumber, default);
+                            return (_lexer._endOfInputTokenNumber, default);
 
                         peek = 0;
                     }
@@ -86,13 +86,13 @@ namespace Piglet.Lexer.Runtime
                         // We have reached termination
                         // Two possibilities, current state accepts, if so return token ID
                         // else there is an error
-                        Tuple<int, Func<string, T>> action = _lexer.GetAction(_state);
+                        (int number, Func<string, T>? action)? action = _lexer.GetAction(_state);
 
                         if (action != null && _lexeme.Length > 0)
                         {
                             // If tokennumber is int.MinValue it is an ignored token, like typically whitespace.
                             // In that case, dont return, continue lexing with the reset parser to get the next token.
-                            if (action.Item1 == int.MinValue)
+                            if (action.Value.Item1 == int.MinValue)
                             {
                                 // Reset state
                                 _state = _lexer.GetInitialState();
@@ -101,7 +101,7 @@ namespace Piglet.Lexer.Runtime
                             }
                             else
                                 // Token completed. Return it
-                                return new Tuple<int, T>(action.Item1, action.Item2 is null ? default : action.Item2(_lexeme.ToString()));
+                                return (action.Value.Item1, action.Value.Item2 is null ? default : action.Value.Item2(_lexeme.ToString()));
                         }
                         else
                             // We get here if there is no action at the state where the lexer cannot continue given the input. This fails.

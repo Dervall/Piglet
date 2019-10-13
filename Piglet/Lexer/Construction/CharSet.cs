@@ -4,7 +4,7 @@ using System;
 
 namespace Piglet.Lexer.Construction
 {
-    internal class CharSet
+    internal sealed class CharSet
     {
         private readonly IList<CharRange> _ranges = new List<CharRange>();
 
@@ -39,27 +39,19 @@ namespace Piglet.Lexer.Construction
             }
 
             if (combine)
-            {
                 // See if there is an old range that contains the new from as the to in that case merge the ranges
-                CharRange range = _ranges.SingleOrDefault(f => f.To == from);
-
-                if (range != null)
+                if (_ranges.SingleOrDefault(f => f.To == from) is { } r1)
                 {
-                    range.To = to;
+                    r1.To = to;
 
                     return;
                 }
-
-                // To the same thing the other direction
-                range = _ranges.SingleOrDefault(f => f.From == to);
-
-                if (range != null)
+                else if (_ranges.SingleOrDefault(f => f.From == to) is { } r2) // To the same thing the other direction
                 {
-                    range.From = from;
+                    r2.From = from;
 
                     return;
                 }
-            }
 
             // Ranges are not mergeable. Add the range straight up
             _ranges.Add(new CharRange { From = from, To = to });

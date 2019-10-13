@@ -101,7 +101,7 @@ namespace Piglet.Lexer.Runtime
                             }
                             else
                                 // Token completed. Return it
-                                return new Tuple<int, T>(action.Item1, action.Item2 == null ? default : action.Item2(_lexeme.ToString()));
+                                return new Tuple<int, T>(action.Item1, action.Item2 is null ? default : action.Item2(_lexeme.ToString()));
                         }
                         else
                             // We get here if there is no action at the state where the lexer cannot continue given the input. This fails.

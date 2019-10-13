@@ -22,7 +22,7 @@ namespace Piglet.Common
                 bool found = true;
 
                 for (int j = 0; j < needle.Count; ++j)
-                    if (!haystack[i + j].Equals(needle[j]))
+                    if (!Equals(haystack[i + j], needle[j]))
                     {
                         found = false;
 

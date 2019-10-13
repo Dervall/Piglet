@@ -77,7 +77,7 @@ namespace Piglet.Parser.Construction
 
                             Lr1ItemSet<T> oldGotoSet = itemSets.FirstOrDefault(f => f.CoreEquals(gotoSet));
 
-                            if (oldGotoSet == null)
+                            if (oldGotoSet is null)
                             {
                                 itemSets.Add(gotoSet); // Add goto set to itemsets
                                 gotoSetTransitions.Add(new GotoSetTransition // Add a transition
@@ -318,11 +318,7 @@ namespace Piglet.Parser.Construction
                     // TODO: In bison this is apparently cool, it prefers to shift in this case. I don't know why, but this
                     // TODO: seems like a dangerous course of action to me.
                     if (shiftPrecedence is null || reducePrecedence is null)
-                        throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict.\nDid you forget to set an associativity/precedence?")
-                        {
-                            ShiftSymbol = shiftingTerminal,
-                            ReduceSymbol = productionRule.ResultSymbol,
-                        };
+                        throw new ShiftReduceConflictException<T>(shiftingTerminal, productionRule.ResultSymbol);
 
                     if (shiftPrecedence.Precedence < reducePrecedence.Precedence)
                         table[state, tokenNumber] = reduceValue; // Precedence of reduce is higher, choose to reduce
@@ -336,12 +332,8 @@ namespace Piglet.Parser.Construction
                         table[state, tokenNumber] = reduceValue; // Prefer reducing
                     else if (shiftPrecedence.Associativity == AssociativityDirection.Right)
                         table[state, tokenNumber] = shiftValue; // Prefer shifting
-                    else // if (shiftPrecedence.Associativity  == AssociativityDirection.NonAssociative) <- this is implied
-                        throw new ShiftReduceConflictException<T>("Grammar contains a shift reduce conflict (Nonassociative).\nDid you forget to set an associativity/precedence?")
-                        {
-                            ShiftSymbol = shiftingTerminal,
-                            ReduceSymbol = productionRule.ResultSymbol,
-                        };
+                    else // if (shiftPrecedence.Associativity == AssociativityDirection.NonAssociative) <- this is implied
+                        throw new ShiftReduceConflictException<T>(shiftingTerminal, productionRule.ResultSymbol);
                 }
                 catch (AmbiguousGrammarException ex)
                 {

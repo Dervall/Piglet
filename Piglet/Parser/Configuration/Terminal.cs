@@ -6,7 +6,7 @@ namespace Piglet.Parser.Configuration
         : Symbol<T>
         , ITerminal<T>
     {
-        public static readonly Func<string, T> DefaultFunc = f => default(T);
+        public static readonly Func<string, T> DefaultFunc = f => default;
 
         public string RegExp { get; private set; }
         public Func<string, T> OnParse { get; private set; }

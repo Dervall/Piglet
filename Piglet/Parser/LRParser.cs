@@ -96,7 +96,7 @@ namespace Piglet.Parser
                         state = parseStack.Peek();
                         parseStack.Push(errorTokenNumber);
                         parseStack.Push(parseTable.Action[state, errorTokenNumber]);
-                        valueStack.Push(default(T));
+                        valueStack.Push(default);
                         state = parseStack.Peek();
 
                         // We have now found a state where error recovery is enabled. This means that we 
@@ -140,7 +140,7 @@ namespace Piglet.Parser
                         // there is no real reason to do so, since all the normal rules will ignore it, and all the error rules are guaranteed
                         // to have the exception set prior to entering the reduction function.
                         System.Func<ParseException, T[], T> reduceFunc = reductionRule.OnReduce;
-                        valueStack.Push(reduceFunc == null ? default(T) : reduceFunc(exception, onReduceParams));
+                        valueStack.Push(reduceFunc == null ? default : reduceFunc(exception, onReduceParams));
                     }
                 }
             }

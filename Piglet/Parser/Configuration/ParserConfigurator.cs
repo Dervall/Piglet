@@ -47,7 +47,7 @@ namespace Piglet.Parser.Configuration
 
             // Create the Error token. This will create it as terminal 0, but in the end it will be the LAST terminal
             // second last is EndOfInput. This is sort of hackish and mainly due to the way the lexer is configured.
-            ErrorToken = CreateTerminal(null, s => default(T));
+            ErrorToken = CreateTerminal(null, s => default);
             ErrorToken.DebugName = "%ERROR%";
 
             // Set some default settings
@@ -164,7 +164,7 @@ namespace Piglet.Parser.Configuration
                 }
 
             // Add the end of input symbol
-            EndOfInputTerminal = (Terminal<T>) CreateTerminal(null, s => default(T));
+            EndOfInputTerminal = (Terminal<T>) CreateTerminal(null, s => default);
             EndOfInputTerminal.DebugName = "%EOF%";
 
             // Move the error symbol to the end of the list

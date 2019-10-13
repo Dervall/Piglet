@@ -24,10 +24,20 @@ namespace Piglet.Lexer.Configuration
         public ILexer<T> CreateLexer()
         {
             // For each token, create a NFA
-            IList<NFA> nfas = tokens.Select(token => NfaBuilder.Create(new ShuntingYard(new RegExLexer( new StringReader(token.Item1))))).ToList();
+            IList<NFA> nfas = tokens.Select(token =>
+            {
+                try
+                {
+                    return NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(token.Item1))));
+                }
+                catch (Exception ex)
+                {
+                    throw new LexerConstructionException($"Malformed regex '{token.Item1}'.", ex);
+                }
+            }).ToList();
             foreach (string ignoreExpr in ignore)
             {
-                nfas.Add(NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(ignoreExpr)))));
+                nfas.Add(NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(ignoreExpr)))));
             }
 
             // Create a merged NFA

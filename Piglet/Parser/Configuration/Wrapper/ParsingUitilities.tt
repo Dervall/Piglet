@@ -23,42 +23,52 @@ using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration.Wrapper
 {
-    public abstract class LexerConstructor
+    public abstract class ParserConstructor<X>
     {
         public IParserConfigurator<object> Configurator { get; }
+        private ParserWrapper? _parser = null;
         private int _ntcounter = 0;
 
 
-        public LexerConstructor()
+        public ParserConstructor()
             : this(ParserFactory.Configure<object>())
         {
         }
 
-        public LexerConstructor(IParserConfigurator<object> configurator)
-        {
-        }
+        public ParserConstructor(IParserConfigurator<object> configurator) => Configurator = configurator;
 
-        public NonTerminalWrapper<T> CreateNonTerminal<T>()
+        protected NonTerminalWrapper<T> CreateNonTerminal<T>(string name) => new NonTerminalWrapper<T>(Configurator.CreateNonTerminal(name));
+
+        protected NonTerminalWrapper<T> CreateNonTerminal<T>()
         {
             lock (this)
-                return new NonTerminalWrapper<T>(Configurator.CreateNonTerminal($"NT{++_ntcounter}"));
+                return CreateNonTerminal<T>($"NT{++_ntcounter}");
         }
 
-        public TerminalWrapper<T> CreateTerminal<T>(string regex, Func<string, T> func) => new TerminalWrapper<T>(Configurator.CreateTerminal(regex, s => func(s)));
+        protected TerminalWrapper<T> CreateTerminal<T>(string regex, Func<string, T> func) => new TerminalWrapper<T>(Configurator.CreateTerminal(regex, s => func(s)));
 
-        public TerminalWrapper<string> CreateTerminal<T>(string regex) => new TerminalWrapper<string>(Configurator.CreateTerminal(regex));
+        protected TerminalWrapper<string> CreateTerminal(string regex) => new TerminalWrapper<string>(Configurator.CreateTerminal(regex));
 
-        public void SetAssociativity(AssociativityDirection dir, params ITerminalWrapper[] symbol)
+        /// ascending!
+        protected void SetPrecedenceList(params (AssociativityDirection direction, ITerminalWrapper[] symbols)[] group)
+        {
+            foreach ((AssociativityDirection d, ITerminalWrapper[] s) in group)
+                SetAssociativity(d, s);
+        }
+
+        protected IPrecedenceGroup SetAssociativity(AssociativityDirection dir, params ITerminalWrapper[] symbol)
         {
             ITerminal<object>[] arr = symbol.Select(s => s.Symbol).ToArray();
 
             if (dir == AssociativityDirection.Left)
-                Configurator.LeftAssociative(arr);
+                return Configurator.LeftAssociative(arr);
             else if (dir == AssociativityDirection.Right)
-                Configurator.RightAssociative(arr);
+                return Configurator.RightAssociative(arr);
+            else
+                throw new ArgumentException();
         }
 
-        public void CreateProduction<T, S0>(NonTerminalWrapper<T> to, SymbolWrapper<S0> s) => to.AddProduction(s).SetReduceToFirst();
+        protected void CreateProduction<T, S0>(NonTerminalWrapper<T> to, SymbolWrapper<S0> s) => to.AddProduction(s).SetReduceToFirst();
 <#
     for (int i = 0; i < maxsize; ++i)
     {
@@ -68,24 +78,37 @@ namespace Piglet.Parser.Configuration.Wrapper
         string args = string.Concat(r(0, i).Select(x => $", SymbolWrapper<S{x}> s{x}"));
 #>
 
-        public void CreateProduction<T<#=types#>>(NonTerminalWrapper<T> to<#=args#>, Func<<#=ftypes#>T> func) => to.AddProduction(<#=names#>).SetReduceFunction(func);
+        protected ProductionWrapper<<#=ftypes#>T> CreateProduction<T<#=types#>>(NonTerminalWrapper<T> to<#=args#>, Func<<#=ftypes#>T> func) => to.AddProduction(<#=names#>).SetReduceFunction(func);
 <#
     }
 #>
 
-        public ParserWrapper<T> CreateParser<T>() => new ParserWrapper<T>(Configurator.CreateParser());
+        public ParserWrapper CreateParser()
+        {
+            if (_parser is null)
+            {
+                NonTerminalWrapper<X> nt = CreateNonTerminal<X>();
 
-        public abstract void Construct();
+                Construct(nt);
+
+                Configurator.SetStartSymbol((INonTerminal<object>)nt.Symbol);
+                _parser = new ParserWrapper(Configurator.CreateParser());
+            }
+
+            return _parser;
+        }
+
+        protected abstract void Construct(NonTerminalWrapper<X> start_symbol);
 
 
-        public sealed class ParserWrapper<T>
+        public sealed class ParserWrapper
         {
             public IParser<object> Parser { get; }
 
 
             internal ParserWrapper(IParser<object> parser) => Parser = parser;
 
-            public T Parse(string s) => (T)Parser.Parse(s);
+            public X Parse(string s) => (X)Parser.Parse(s);
         }
     }
 
@@ -101,11 +124,16 @@ namespace Piglet.Parser.Configuration.Wrapper
 
 
         public SymbolWrapper(ISymbol<object> symbol) => Symbol = symbol;
+
+        public override string ToString() => Symbol.ToString();
     }
 
     public sealed class TerminalWrapper<T>
         : SymbolWrapper<T>
+        , ITerminalWrapper
     {
+        ITerminal<object> ITerminalWrapper.Symbol => (ITerminal<object>)Symbol;
+
         public TerminalWrapper(ISymbol<object> symbol)
             : base(symbol)
         {
@@ -114,10 +142,7 @@ namespace Piglet.Parser.Configuration.Wrapper
 
     public sealed class NonTerminalWrapper<T>
         : SymbolWrapper<T>
-        , ITerminalWrapper
     {
-        ITerminal<object> ITerminalWrapper.Symbol => (ITerminal<object>)Symbol;
-
         public NonTerminalWrapper(ISymbol<object> symbol)
             : base(symbol)
         {
@@ -139,7 +164,8 @@ namespace Piglet.Parser.Configuration.Wrapper
 #>
     }
 
-    public abstract class ProductionWrapperBase
+    public abstract class ProductionWrapperBase<T>
+        where T : ProductionWrapperBase<T>
     {
         public IProduction<object> Production { get; }
 
@@ -158,9 +184,14 @@ namespace Piglet.Parser.Configuration.Wrapper
 #>
 
     public sealed class ProductionWrapper<<#=tstr#>>
-        : ProductionWrapperBase
+        : ProductionWrapperBase<ProductionWrapper<<#=tstr#>>>
     {
-        public void SetReduceFunction(Func<<#=tstr#>> f) => Production.SetReduceFunction(o => f(<#=string.Join(", ", types.Take(i - 1).Select((x, i) => $"({x})o[{i}]"))#>));
+        public ProductionWrapper<<#=tstr#>> SetReduceFunction(Func<<#=tstr#>> f)
+        {
+            Production.SetReduceFunction(o => f(<#=string.Join(", ", types.Take(i - 1).Select((x, i) => $"({x})o[{i}]"))#>));
+
+            return this;
+        }
 
         public ProductionWrapper(IProduction<object> production)
             : base(production)

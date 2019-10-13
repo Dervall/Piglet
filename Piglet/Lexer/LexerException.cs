@@ -5,7 +5,8 @@ namespace Piglet.Lexer
     /// <summary>
     /// LexerExceptions are thrown when the lexer cannot make sense of the current input.
     /// </summary>
-    public class LexerException : Exception
+    public sealed class LexerException
+        : Exception
     {
         /// <summary>
         /// The current line number of the document the lexer is scanning.
@@ -16,6 +17,12 @@ namespace Piglet.Lexer
         /// The contents of the current line so far of the current document
         /// </summary>
         public string LineContents { get; internal set; }
+
+        /// <summary>
+        /// The current character index (one-based).
+        /// </summary>
+        public int CharacterIndex { get; internal set; }
+
 
         /// <summary>
         /// Construct a new LexerException

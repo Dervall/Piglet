@@ -30,7 +30,7 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <param name="dfaString">Dot notation DFA graph</param>
         public static void GetDfaAndNfaGraphs(string regex, string input, bool minimize, out string nfaString, out string dfaString)
         {
-            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(regex))));
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(regex))));
             nfaString = nfa.AsDotNotation(input, "NFA");
             DFA dfa = DFA.Create(nfa);
             if (minimize)

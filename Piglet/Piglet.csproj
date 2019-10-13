@@ -1,50 +1,49 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netcoreapp3.0</TargetFrameworks>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Version>1.2.0</Version>
-    <Company>Per Dervall</Company>
-    <Product>Piglet</Product>
-    <Authors>Per Dervall</Authors>
-    <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.</Description>
-    <RepositoryUrl>https://github.com/unknown6656/Piglet</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseUrl>https://github.com/unknown6656/Piglet/blob/master/LICENSE.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/unknown6656/Piglet</PackageProjectUrl>
-    <PackageId>Piglet</PackageId>
-    <DocumentationFile>Piglet.xml</DocumentationFile>
-    <WarningLevel>4</WarningLevel>
-    <OutputPath>..\bin</OutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Parser\Configuration\Wrapper\ParsingUitilities.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ParsingUitilities.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Parser\Configuration\Wrapper\ParsingUitilities.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ParsingUitilities.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
+        <LangVersion>preview</LangVersion>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <Version>1.3.0</Version>
+        <Company>Per Dervall; Unknown6656</Company>
+        <Product>Piglet</Product>
+        <Authors>Per Dervall; Unknown6656</Authors>
+        <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.</Description>
+        <RepositoryUrl>https://github.com/unknown6656/Piglet</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseUrl>https://github.com/unknown6656/Piglet/blob/master/LICENSE.txt</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/unknown6656/Piglet</PackageProjectUrl>
+        <PackageId>Piglet</PackageId>
+        <DocumentationFile>Piglet.xml</DocumentationFile>
+        <WarningLevel>4</WarningLevel>
+        <OutputPath>..\bin</OutputPath>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Prefer32Bit>false</Prefer32Bit>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Update="Parser\Configuration\Wrapper\ParsingUitilities.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>ParsingUitilities.cs</LastGenOutput>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Parser\Configuration\Wrapper\ParsingUitilities.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>ParsingUitilities.tt</DependentUpon>
+        </Compile>
+    </ItemGroup>
 </Project>

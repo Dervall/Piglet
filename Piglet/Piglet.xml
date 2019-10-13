@@ -151,6 +151,13 @@
             </summary>
             <param name="message">Message to show</param>
         </member>
+        <member name="M:Piglet.Lexer.Construction.LexerConstructionException.#ctor(System.String,System.Exception)">
+            <summary>
+            Construct a new LexerConstructionException
+            </summary>
+            <param name="message">Message to show</param>
+            <param name="innerException">Inner exception</param>
+        </member>
         <member name="T:Piglet.Lexer.ILexer`1">
             <summary>
             A lexer that tokenizes input into tuples of tokennumber and semantic value. Lexers are not thread safe, but they are reentrant. You
@@ -225,6 +232,11 @@
         <member name="P:Piglet.Lexer.LexerException.LineContents">
             <summary>
             The contents of the current line so far of the current document
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.LexerException.CharacterIndex">
+            <summary>
+            The current character index (one-based).
             </summary>
         </member>
         <member name="M:Piglet.Lexer.LexerException.#ctor(System.String)">
@@ -650,6 +662,9 @@
             Construct a new parser configuration exception
             </summary>
             <param name="message">message to show user</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Wrapper.ParserConstructor`1.SetPrecedenceList(System.ValueTuple{Piglet.Parser.Construction.AssociativityDirection,Piglet.Parser.Configuration.Wrapper.ITerminalWrapper[]}[])">
+            ascending!
         </member>
         <member name="T:Piglet.Parser.Construction.AmbiguousGrammarException">
             <summary>

@@ -83,8 +83,8 @@ namespace Piglet.Parser.Configuration.Fluent
         public void Ignore(string ignoreExpression) => ignored.Add(ignoreExpression);
 
         public LexerRuntime Runtime {
-            get { return configurator.LexerSettings.Runtime; }
-            set { configurator.LexerSettings.Runtime = value; }
+            get => configurator.LexerSettings.Runtime;
+            set => configurator.LexerSettings.Runtime = value;
         }
 
         public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)

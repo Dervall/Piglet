@@ -30,6 +30,6 @@ namespace Piglet.Parser.Construction
         /// </summary>
         public ISymbol<T> ReduceSymbol { get; internal set; }
 
-        public override string Message => $"The grammar contains a shift-reduce conflict.\nShift symbol: {ShiftSymbol}\nReduce symbol: {ReduceSymbol}";
+        public override string Message => $"The grammar contains a shift-reduce conflict.\nShift symbol: {ShiftSymbol}\nReduce symbol: {ReduceSymbol}\nDid you forget to set an associativity/precedence?";
     }
 }

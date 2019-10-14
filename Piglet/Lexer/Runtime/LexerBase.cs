@@ -34,7 +34,6 @@ namespace Piglet.Lexer.Runtime
         protected abstract TState GetInitialState();
 
 
-
         private sealed class LexerStateImpl
             : ILexerInstance<T>
         {
@@ -83,10 +82,8 @@ namespace Piglet.Lexer.Runtime
 
                     if (reachedTermination)
                     {
-                        // We have reached termination
-                        // Two possibilities, current state accepts, if so return token ID
-                        // else there is an error
-
+                        // We have reached termination.
+                        // Two possibilities: current state accepts, if so return token ID otherwise there is an error
                         if (_lexer.GetAction(_state) is { } t && _lexeme.Length > 0)
                         {
                             // If tokennumber is int.MinValue it is an ignored token, like typically whitespace.
@@ -99,8 +96,7 @@ namespace Piglet.Lexer.Runtime
                                 _lexeme.Clear();
                             }
                             else
-                                // Token completed. Return it
-                                return (t.number, t.action is null ? default : t.action(_lexeme.ToString()));
+                                return (t.number, t.action is null ? default : t.action(_lexeme.ToString())); // Token completed. Return it
                         }
                         else
                             // We get here if there is no action at the state where the lexer cannot continue given the input. This fails.
@@ -113,8 +109,7 @@ namespace Piglet.Lexer.Runtime
                     }
                     else
                     {
-                        // Peek is still last char. If we are going to be switching lines
-                        // add to the line number and clear the current line buffer
+                        // Peek is still last char. If we are going to be switching lines add to the line number and clear the current line buffer
                         if (c == '\n')
                         {
                             CurrentLineNumber++;
@@ -123,8 +118,7 @@ namespace Piglet.Lexer.Runtime
                         else
                             _currentLine.Append(c);
 
-                        // Machine has not terminated.
-                        // Switch states, append character to lexeme.
+                        // Machine has not terminated. Switch states, append character to lexeme.
                         _state = nextState;
                         _lexeme.Append(c);
                         _source.Read();
@@ -132,6 +126,5 @@ namespace Piglet.Lexer.Runtime
                 }
             }
         }
-
     }
 }

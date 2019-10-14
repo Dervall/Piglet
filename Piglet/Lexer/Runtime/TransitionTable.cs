@@ -21,8 +21,7 @@ namespace Piglet.Lexer.Runtime
             // This will fill up the entire spectrum from 0 to max char
             // Sort these ranges so that they start with the lowest to highest start
             List<CharRange> allValidRanges =
-                nfas.Select(
-                    f =>
+                nfas.Select(f =>
                     f.Transitions.Aggregate(Enumerable.Empty<CharRange>(), (acc, a) => acc.Union(a.ValidInput.Ranges)))
                     .Aggregate((acc, a) => acc.Union(a))
                     .OrderBy(f => f.From)
@@ -33,8 +32,7 @@ namespace Piglet.Lexer.Runtime
             char start = allValidRanges.First().From;
 
             if (start != '\0')
-                // Add a range that goes from \0 to the character before start
-                allValidRanges.Insert(0, new CharRange { From = '\0', To = (char)(start - 1) });
+                allValidRanges.Insert(0, new CharRange { From = '\0', To = (char)(start - 1) }); // Add a range that goes from \0 to the character before start
 
             char end = allValidRanges.Last().To;
 
@@ -44,7 +42,7 @@ namespace Piglet.Lexer.Runtime
             // Create a 2D table
             // First dimension is the number of states found in the DFA
             // Second dimension is number of distinct character ranges
-            short[,] uncompressed = new short[dfa.States.Count(),allValidRanges.Count()];
+            short[,] uncompressed = new short[dfa.States.Count(), allValidRanges.Count()];
 
             // Fill table with -1
             for (int i = 0; i < dfa.States.Count(); ++i)

@@ -21,7 +21,7 @@ namespace Piglet.Lexer.Construction
         {
             if (ranges.Length % 2 != 0)
                 throw new ArgumentException("Number of chars in ranges must be an even number.");
-
+          
             for (int i = 0; i < ranges.Length; i += 2)
                 AddRange(ranges[i], ranges[i + 1], combine);
         }
@@ -114,7 +114,7 @@ namespace Piglet.Lexer.Construction
                 // Trim the edges of the range
                 if (to >= excludedRange.From && to <= excludedRange.To)
                     to = (char)(excludedRange.From - 1);
-
+              
                 if (from >= excludedRange.From && from <= excludedRange.To)
                     from = (char)(excludedRange.To + 1);
             }

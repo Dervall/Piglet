@@ -37,8 +37,9 @@ namespace Piglet.Lexer.Construction
         {
             List<CharRange> ranges = new List<CharRange>(Transitions.SelectMany(f => f.ValidInput.Ranges));
             char[] beginningsAndEnds = ranges.Select(f => f.From).Concat(ranges.Select(f => f.To == char.MaxValue ? f.To : (char)(f.To + 1))).ToArray();
-            Array.Sort(beginningsAndEnds);
             int pivot = 0;
+            
+            Array.Sort(beginningsAndEnds);
 
             for (int i = 1; i < beginningsAndEnds.Length; ++i)
                 if (beginningsAndEnds[i] != beginningsAndEnds[pivot])

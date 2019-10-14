@@ -5,7 +5,8 @@ namespace Piglet.Lexer.Construction
     /// <summary>
     /// Class of exceptions that may occur when creating a Lexer.
     /// </summary>
-    public class LexerConstructionException : Exception
+    public sealed class LexerConstructionException
+        : Exception
     {
         /// <summary>
         /// Construct a new LexerConstructionException

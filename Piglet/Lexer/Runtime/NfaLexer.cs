@@ -23,17 +23,16 @@ namespace Piglet.Lexer.Runtime
 
         protected override (int number, Func<string, T>? action)? GetAction(HashSet<NFA.State> state)
         {
-            // If none of the included states are accepting states we will return null to signal that there is no appropriate
-            // action to take
+            // If none of the included states are accepting states we will return null to signal that there is no appropriate action to take
             if (!state.Any(f => f.AcceptState))
                 return null;
 
-            // Get the first applicable action. This returns null of there is no action defined but there are accepting
-            // states. This is fine, this means an ignored token.
-            (NFA.State, (int number, Func<string, T>? action)?)? action = _actions.FirstOrDefault(f => state.Contains(f?.Item1));
+            // Get the first applicable action. This returns null if there is no action defined but there are accepting states.
+            // This is fine, this means an ignored token.
+            (NFA.State state, (int index, Func<string, T> function)) action = _actions.FirstOrDefault(f => state.Contains(f.state));
 
-            if (action?.Item2?.action is { })
-                return action.Value.Item2;
+            if (action.Item2.function is { })
+                return action.Item2;
 
             return (int.MinValue, null);
         }

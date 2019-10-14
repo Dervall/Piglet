@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Piglet.Parser.Configuration.Wrapper;
 using Piglet.Parser.Configuration;
 using Piglet.Parser.Construction;
@@ -56,7 +55,7 @@ namespace Piglet.Demo
                 SetPrecedenceList(
                     (AssociativityDirection.Left, new[] { t_add, t_sub }),
                     (AssociativityDirection.Left, new[] { t_mul, t_div, t_mod })
-                // (AssociativityDirection.Right, new[] { t_pow })
+                 // (AssociativityDirection.Right, new[] { t_pow })
                 );
 
                 var prec_b = SetAssociativity(AssociativityDirection.Left);

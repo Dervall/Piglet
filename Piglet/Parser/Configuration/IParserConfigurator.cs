@@ -20,7 +20,7 @@ namespace Piglet.Parser.Configuration
     	/// <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
     	/// <param name="topPrecedence">If true, this terminal takes precedence over previously created terminals</param>
     	/// <returns>A terminal symbol</returns>
-    	ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null, bool topPrecedence = false);
+    	ITerminal<T> CreateTerminal(string regExp, Func<string, T>? onParse = null, bool topPrecedence = false);
         
         /// <summary>
         /// Create a new NonTerminal. Production actions may be specified directly, or deferred until later. The

@@ -56,11 +56,16 @@ namespace Piglet.Lexer.Runtime
 
         protected override HashSet<NFA.State> GetInitialState()
         {
-            HashSet<NFA.State> initialState = new HashSet<NFA.State>();
-            
-            initialState.UnionWith(_nfa.Closure(new[] { _nfa.StartState }));
-            
-            return initialState;
+            if (_nfa.StartState is NFA.State start)
+            {
+                HashSet<NFA.State> initialState = new HashSet<NFA.State>();
+
+                initialState.UnionWith(_nfa.Closure(new[] { start }));
+
+                return initialState;
+            }
+            else
+                throw new InvalidOperationException("The start state must not be null.");
         }
     }
 }

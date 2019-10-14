@@ -15,8 +15,8 @@ namespace Piglet.Parser.Configuration.Fluent
         private readonly List<FluentRule> _rules;
         private readonly List<string> _ignored;
         
-        private IExpressionConfigurator _quotedString;
-        private IExpressionConfigurator _errorToken;
+        private IExpressionConfigurator? _quotedString;
+        private IExpressionConfigurator? _errorToken;
 
 
         public LexerRuntime Runtime

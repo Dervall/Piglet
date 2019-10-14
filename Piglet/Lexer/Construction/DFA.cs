@@ -1,13 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Piglet.Lexer.Construction
 {
-    internal class DFA
+    internal sealed class DFA
         : FiniteAutomata<DFA.State>
     {
-        public class State
+        public sealed class State
             : BaseState
         {
             public ISet<NFA.State> NfaStates { get; private set; }
@@ -20,7 +20,7 @@ namespace Piglet.Lexer.Construction
                 fromTransitions.SelectMany(f => f.ValidInput.Ranges).Distinct();
 
             // Purely for debugging purposes
-            public override string ToString() => $"{StateNumber} {{{String.Join(", ", NfaStates)}}}";
+            public override string ToString() => $"{StateNumber} {{{string.Join(", ", NfaStates)}}}";
 
             public override bool AcceptState
             {
@@ -40,27 +40,25 @@ namespace Piglet.Lexer.Construction
 
             // Get the closure set of S0
             DFA dfa = new DFA();
+
             dfa.States.Add(new State(closures[nfa.StartState]));
             
             while (true)
             {
                 // Get an unmarked state in dfaStates
                 State t = dfa.States.FirstOrDefault(f => !f.Mark);
-                if (null == t)
-                {
-                    // We're done!
-                    break;
-                }
+
+                if (t is null)
+                    break; // We're done!
 
                 t.Mark = true;
 
                 // Get the move states by stimulating this DFA state with
                 // all possible characters.
                 Transition<NFA.State>[] fromTransitions = nfa.Transitions.Where(f => t.NfaStates.Contains(f.From)).ToArray();
-
                 Dictionary<CharRange, List<NFA.State>> moveDestinations = new Dictionary<CharRange, List<NFA.State>>();
+
                 foreach (Transition<NFA.State> fromTransition in fromTransitions)
-                {
                     foreach (CharRange range in fromTransition.ValidInput.Ranges)
                     {
                         if (!moveDestinations.TryGetValue(range, out List<NFA.State> destList))
@@ -71,7 +69,6 @@ namespace Piglet.Lexer.Construction
 
                         destList.Add(fromTransition.To);
                     }
-                }
 
                 foreach (CharRange c in t.LegalMoves(fromTransitions))
                 {
@@ -149,8 +146,7 @@ namespace Piglet.Lexer.Construction
             foreach (Transition<State> transition in Transitions)
                 allValidInputs.UnionWith(transition.ValidInput.Ranges);
 
-            // For every distinct pair of states, if one of them is an accepting state
-            // and the other one is not set the distinct 
+            // For every distinct pair of states, if one of them is an accepting state and the other one is not set the distinct 
             distinctStatePairs((p, q) =>
             {
                 bool pIsAcceptState = p.AcceptState;
@@ -168,20 +164,17 @@ namespace Piglet.Lexer.Construction
                     {
                         foreach (NFA.State pAcceptState in pAcceptStates)
                             if (!qAcceptStates.Contains(pAcceptState))
-                                // Since the accepting states differ, its not cool to merge these two states.
-                                distinct[p, q] = int.MaxValue;
+                                distinct[p, q] = int.MaxValue; // Since the accepting states differ, its not cool to merge these two states.
                     }
                     else
-                        // Not the same number of states, not cool to merge
-                        distinct[p, q] = int.MaxValue;
+                        distinct[p, q] = int.MaxValue; // Not the same number of states, not cool to merge
                 }
 
                 if (pIsAcceptState ^ bIsAcceptState)
                     distinct[p, q] = int.MaxValue;
             });
 
-            // Make a dictionary of from transitions. This is well worth the time, since
-            // this gets accessed lots of times.
+            // Make a dictionary of from transitions. This is well worth the time, since this gets accessed lots of times.
             Dictionary<State, Dictionary<CharRange, State>> targetDict = new Dictionary<State, Dictionary<CharRange, State>>();
             foreach (Transition<State> transition in Transitions)
             {
@@ -227,8 +220,7 @@ namespace Piglet.Lexer.Construction
                                 break;
                             }
                             
-                            // If both are null, then we carry on.
-                            // The other one is null implictly since we have XOR checked it earlier
+                            // If both are null, then we carry on. The other one is null implictly since we have XOR checked it earlier
                             if (qa is null)
                                 continue;
 
@@ -256,8 +248,7 @@ namespace Piglet.Lexer.Construction
                 if (distinct[p, q] != -1)
                     return;
 
-                // These two states are supposed to merge!
-                // See if p or q is already part of a merge list!
+                // These two states are supposed to merge! See if p or q is already part of a merge list!
                 ISet<State>? pMergeSet = findMergeList(p);
                 ISet<State>? qMergeSet = findMergeList(q);
 
@@ -345,6 +336,6 @@ namespace Piglet.Lexer.Construction
             AssignStateNumbers();
         }
 
-        public override IEnumerable<State> Closure(State[] states, ISet<State> visitedStates = null) => states;
+        public override IEnumerable<State> Closure(State[] states, ISet<State>? visitedStates = null) => states;
     }
 }

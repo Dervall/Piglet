@@ -12,14 +12,13 @@ namespace Piglet.Parser.Configuration.Fluent
         , IOptionalAsConfigurator
         , IMaybeListNamed
     {
-        private readonly FluentParserConfigurator configurator;
-        private readonly NonTerminal<object> nonTerminal;
-        private readonly List<List<ProductionElement>> productionList;
-        private readonly List<Func<dynamic, object>> funcList;
+        private readonly FluentParserConfigurator _configurator;
+        private readonly NonTerminal<object> _nonTerminal;
+        private readonly List<List<ProductionElement>> _productionList;
+        private readonly List<Func<dynamic, object>?> _funcList;
 
 
-
-        private List<ProductionElement> CurrentProduction => productionList[productionList.Count - 1];
+        private List<ProductionElement> CurrentProduction => _productionList[_productionList.Count - 1];
 
         public IListItemConfigurator Optional
         {
@@ -31,16 +30,16 @@ namespace Piglet.Parser.Configuration.Fluent
             }
         }
 
-        public INonTerminal<object> NonTerminal => nonTerminal;
+        public INonTerminal<object> NonTerminal => _nonTerminal;
 
         public IRuleByConfigurator Or
         {
             get
             {
                 // Finish the current rule
-                productionList.Add(new List<ProductionElement>());
+                _productionList.Add(new List<ProductionElement>());
 
-                funcList.Add(null);
+                _funcList.Add(null);
                 
                 return this;
             }
@@ -55,10 +54,10 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public FluentRule(FluentParserConfigurator configurator, INonTerminal<object> nonTerminal)
         {
-            this.configurator = configurator;
-            this.nonTerminal = (NonTerminal<object>)nonTerminal;
-            productionList = new List<List<ProductionElement>> { new List<ProductionElement>() };
-            funcList = new List<Func<dynamic, object>> { null };
+            _configurator = configurator;
+            _nonTerminal = (NonTerminal<object>)nonTerminal;
+            _productionList = new List<List<ProductionElement>> { new List<ProductionElement>() };
+            _funcList = new List<Func<dynamic, object>?> { null };
         }
 
         public IOptionalAsConfigurator By(string literal)
@@ -69,7 +68,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public IOptionalAsConfigurator By<TExpressionType>()
         {
-            IExpressionConfigurator e = configurator.Expression();
+            IExpressionConfigurator e = _configurator.Expression();
             e.ThatMatches<TExpressionType>();
             CurrentProduction.Add(new ProductionElement { Symbol = e });
             return this;
@@ -97,7 +96,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public IMaybeNewRuleConfigurator WhenFound(Func<dynamic, object> func)
         {
-            funcList[funcList.Count - 1] = func;
+            _funcList[_funcList.Count - 1] = func;
             return this;
         }
 
@@ -127,9 +126,9 @@ namespace Piglet.Parser.Configuration.Fluent
             // and sends that to the other configuration interface.
             // Use the nonterminal to configure the production
 
-            for (int productionIndex = 0; productionIndex < productionList.Count; ++productionIndex)
+            for (int productionIndex = 0; productionIndex < _productionList.Count; ++productionIndex)
             {
-                List<ProductionElement> production = productionList[productionIndex];
+                List<ProductionElement> production = _productionList[productionIndex];
                 bool isErrorRule = false;
 
                 for (int i = 0; i < production.Count; ++i)
@@ -140,10 +139,10 @@ namespace Piglet.Parser.Configuration.Fluent
                     {
                         // This will create new rules, we want to reduce production[i] 
                         ListOfRule listRule = (ListOfRule)part;
-                        NonTerminal<object> listNonTerminal = listRule.MakeListRule(configurator);
+                        NonTerminal<object> listNonTerminal = listRule.MakeListRule(_configurator);
 
                         if (listRule.Optional)
-                            listNonTerminal = configurator.MakeOptionalRule(listNonTerminal);
+                            listNonTerminal = _configurator.MakeOptionalRule(listNonTerminal);
 
                         production[i].Symbol = listNonTerminal;
                     }
@@ -153,22 +152,22 @@ namespace Piglet.Parser.Configuration.Fluent
                         // Do nothing, this is already handled.
                     }
                     else if (part.Symbol is FluentRule)
-                        production[i].Symbol = ((FluentRule)part.Symbol).nonTerminal;
+                        production[i].Symbol = ((FluentRule)part.Symbol)._nonTerminal;
                     else if (part.Symbol is FluentExpression)
                     {
-                        isErrorRule |= part.Symbol == configurator.Error;
+                        isErrorRule |= part.Symbol == _configurator.Error;
                         production[i].Symbol = ((FluentExpression)part.Symbol).Terminal;
                     }
                     else
                         throw new ParserConfigurationException("Unknown entity found in production rule list. This should never happen");
                 }
 
-                IProduction<object> newProduction = nonTerminal.AddProduction(production.Select(f => f.Symbol).ToArray());
+                IProduction<object> newProduction = _nonTerminal.AddProduction(production.Select(f => f.Symbol).ToArray());
 
                 // If there is no specific rule specified.
-                Func<dynamic, object> func = funcList[productionIndex];
+                Func<dynamic, object>? func = _funcList[productionIndex];
 
-                if (func == null)
+                if (func is null)
                 {
                     if (production.Count == 1)
                         // Use default rule where all rules of length 1 will autoreduce to the

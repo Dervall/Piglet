@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace Piglet.Parser.Construction.Debug
@@ -13,12 +11,7 @@ namespace Piglet.Parser.Construction.Debug
             graph.Append("digraph goto {");
 
             foreach (ParserBuilder<T>.GotoSetTransition transition in transitions)
-            {
-                graph.Append(string.Format("\t\"I{0}\" -> \"I{1}\" [label=\"{2}\"]\n",
-                    itemSets.IndexOf(transition.From),
-                    itemSets.IndexOf(transition.To),
-                    (transition.OnSymbol.DebugName??"").Replace("\\", "\\\\").Replace("\"", "\\\"")));
-            }
+                graph.Append($"\t\"I{itemSets.IndexOf(transition.From)}\" -> \"I{itemSets.IndexOf(transition.To)}\" [label=\"{(transition.OnSymbol.DebugName ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"")}\"]\n");
 
             graph.Append("}");
 

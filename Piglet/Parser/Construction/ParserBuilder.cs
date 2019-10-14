@@ -21,13 +21,6 @@ namespace Piglet.Parser.Construction
             _reductionRules = new List<(IProductionRule<T>, ReductionRule<T>)>();
         }
 
-        internal sealed class GotoSetTransition
-        {
-            public Lr1ItemSet<T> From { get; set; }
-            public Lr1ItemSet<T> To { get; set; }
-            public ISymbol<T> OnSymbol { get; set; }
-        }
-
         internal IParser<T> CreateParser()
         {
             // First order of business is to create the canonical list of LR1 states, or at least we are going to go through them as we merge the sets together.
@@ -80,12 +73,7 @@ namespace Piglet.Parser.Construction
                             if (oldGotoSet is null)
                             {
                                 itemSets.Add(gotoSet); // Add goto set to itemsets
-                                gotoSetTransitions.Add(new GotoSetTransition // Add a transition
-                                {
-                                    From = itemSet,
-                                    OnSymbol = symbol,
-                                    To = gotoSet
-                                });
+                                gotoSetTransitions.Add(new GotoSetTransition(itemSet, gotoSet, symbol)); // Add a transition
 
                                 added = true;
                             }
@@ -96,12 +84,7 @@ namespace Piglet.Parser.Construction
                                 oldGotoSet.MergeLookaheads(gotoSet);
 
                                 // Add a transition if it already isn't there
-                                GotoSetTransition nt = new GotoSetTransition
-                                {
-                                    From = itemSet,
-                                    OnSymbol = symbol,
-                                    To = oldGotoSet
-                                };
+                                GotoSetTransition nt = new GotoSetTransition(itemSet, oldGotoSet, symbol);
 
                                 if (!gotoSetTransitions.Any(a => a.From == nt.From && a.OnSymbol == nt.OnSymbol && a.To == nt.To))
                                     gotoSetTransitions.Add(nt);
@@ -462,6 +445,22 @@ namespace Piglet.Parser.Construction
             }
 
             return closure;
+        }
+
+
+        internal sealed class GotoSetTransition
+        {
+            public Lr1ItemSet<T> From { get; }
+            public Lr1ItemSet<T> To { get; }
+            public ISymbol<T> OnSymbol { get; }
+
+
+            public GotoSetTransition(Lr1ItemSet<T> from, Lr1ItemSet<T> to, ISymbol<T> onSymbol)
+            {
+                From = from;
+                To = to;
+                OnSymbol = onSymbol;
+            }
         }
     }
 }

@@ -23,14 +23,13 @@ namespace Piglet.Parser.Configuration
 
         public IEnumerable<IProductionRule<T>> ProductionRules => productions;
 
-        public IProduction<T> AddProduction(params object[] parts)
+        public IProduction<T> AddProduction(params object?[] parts)
         {
             if (parts.Any(part => !(part is string || part is ISymbol<T>)))
-            {
-                throw new ArgumentException("Only string and ISymbol are valid arguments.", "parts");
-            }
+                throw new ArgumentException("Only string and ISymbol are valid arguments.", nameof(parts));
 
             NonTerminalProduction nonTerminalProduction = new NonTerminalProduction(configurator, this, parts);
+
             productions.Add(nonTerminalProduction);
 
             return nonTerminalProduction;
@@ -40,50 +39,45 @@ namespace Piglet.Parser.Configuration
             $"{DebugName} --> {string.Join(" | ", from r in ProductionRules select string.Join(" ", from s in r.Symbols select s is ITerminal<T> ? $"'{s.DebugName}'" : s.DebugName))}";
 
 
-        internal class NonTerminalProduction
+        internal sealed class NonTerminalProduction
             : IProduction<T>
             , IProductionRule<T>
         {
-            private readonly ISymbol<T>[] symbols;
-            private readonly INonTerminal<T> resultSymbol;
+            private readonly INonTerminal<T> _resultSymbol;
 
-            public ISymbol<T>[] Symbols => symbols;
-            public ISymbol<T> ResultSymbol => resultSymbol;
+            public ISymbol<T>[] Symbols { get; }
+            public ISymbol<T> ResultSymbol => _resultSymbol;
             public Func<ParseException, T[], T> ReduceAction { get; private set; }
             public IPrecedenceGroup ContextPrecedence { get; private set; }
 
 
-            public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object[] symbols)
+            public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object?[] symbols)
             {
-                this.resultSymbol = resultSymbol;
+                _resultSymbol = resultSymbol;
 
                 // Move production symbols to the list
-                this.symbols = new ISymbol<T>[symbols.Length];
-                int i = 0;
-                foreach (object part in symbols)
-                {
-                    if (part is string)
-                    {
-                        string regex = (string)part;
-                        if (configurator.LexerSettings.EscapeLiterals)
-                        {
-                            regex = Regex.Escape(regex);
-                        }
+                Symbols = new ISymbol<T>[symbols.Length];
 
-                        this.symbols[i] = configurator.CreateTerminal(regex, null, true);
-                        this.symbols[i].DebugName = (string)part;   // Set debug name to unescaped string, so it's easy on the eyes.
+                int i = 0;
+
+                foreach (object? part in symbols)
+                {
+                    if (part is string regex)
+                    {
+                        if (configurator.LexerSettings.EscapeLiterals)
+                            regex = Regex.Escape(regex);
+
+                        Symbols[i] = configurator.CreateTerminal(regex, null, true);
+                        Symbols[i].DebugName = (string)part;   // Set debug name to unescaped string, so it's easy on the eyes.
                     }
                     else
-                    {
-                        this.symbols[i] = (ISymbol<T>)symbols[i];
-                    }
+                        Symbols[i] = (ISymbol<T>)symbols[i];
+
                     ++i;
                 }
             }
 
-            public void SetReduceFunction(Func<T[], T> action) =>
-                // This creates a little lambda that ignores the exception
-                ReduceAction = (e, f) => action(f);
+            public void SetReduceFunction(Func<T[], T> action) => ReduceAction = (e, f) => action(f);// This creates a little lambda that ignores the exception
 
             public void SetReduceToFirst() => SetReduceFunction(f => f[0]);
 
@@ -97,7 +91,7 @@ namespace Piglet.Parser.Configuration
             {
                 string tstr<U>(ISymbol<U> s) => s is ITerminal<U> ? $"'{s.DebugName}'" : s.DebugName;
                 
-                return $"{string.Join(" ", symbols.Select(tstr))} --> {tstr(ResultSymbol)}";
+                return $"{string.Join(" ", Symbols.Select(tstr))} --> {tstr(ResultSymbol)}";
             }
         }
     }

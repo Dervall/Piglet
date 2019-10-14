@@ -640,7 +640,7 @@
             </summary>
             <typeparam name="T">Semantic token value type</typeparam>
         </member>
-        <member name="P:Piglet.Parser.Configuration.ITerminal`1.RegExp">
+        <member name="P:Piglet.Parser.Configuration.ITerminal`1.Regex">
             <summary>
             Regular expression this terminal recognizes
             </summary>

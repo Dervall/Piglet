@@ -50,10 +50,9 @@ namespace Piglet.Lexer.Construction
             return newNFA;
         }
 
-        public override IEnumerable<State> Closure(State[] states, ISet<State> visitedStates = null)
+        public override IEnumerable<State> Closure(State[] states, ISet<State>? visitedStates = null)
         {
-            if (visitedStates is null)
-                visitedStates = new HashSet<State>();
+            visitedStates ??= new HashSet<State>();
 
             foreach (State state in states)
                 visitedStates.Add(state);

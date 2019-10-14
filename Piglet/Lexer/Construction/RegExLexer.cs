@@ -254,7 +254,7 @@ namespace Piglet.Lexer.Construction
             return EscapedCharToAcceptCharRange(c);
         }
 
-        public RegexToken NextToken()
+        public RegexToken? NextToken()
         {
             // These keeps track of classes
             CharacterClassState classState = new CharacterClassState();

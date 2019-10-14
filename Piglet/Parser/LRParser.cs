@@ -67,48 +67,6 @@ namespace Piglet.Parser
                     string[] expectedTokens = GetExpectedTokenNames(state).ToArray();
 
                     // Create an exception that either might be thrown or may be handed to the error handling routine.
-                    exception = new ParseException($"Illegal token '{_terminalDebugNames[input.index]}', Expected '{string.Join(",", expectedTokens)}'.")
-                    {
-                        LexerState = lexerInstance,
-                        FoundToken = _terminalDebugNames[input.index],
-                        ExpectedTokens = expectedTokens,
-                        FoundTokenId = input.index,
-                        ParserState = state
-                    };
-
-                    // Go for error recovery!
-                    while (_parseTable.Action[parseStack.Peek(), _errorTokenNumber] == short.MinValue)
-                    {
-                        // If we run out of stack while searching for the error handler, throw the exception
-                        // This is what happens when there is no error handler defined at all.
-                        if (parseStack.Count <= 2)
-                            throw exception;
-
-                        parseStack.Pop(); // Pop state
-                        parseStack.Pop(); // Pop token
-                        valueStack.Pop(); // Pop whatever value
-                    }
-
-                    // Shift the error token unto the stack
-                    state = parseStack.Peek();
-
-                    parseStack.Push(_errorTokenNumber);
-                    parseStack.Push(_parseTable.Action[state, _errorTokenNumber]);
-                    valueStack.Push(default);
-
-                    state = parseStack.Peek();
-
-                    // We have now found a state where error recovery is enabled. This means that we 
-                    // continue to scan the input stream looking for something which is accepted.
-                    // End of input will cause the exception to be thrown
-                    for (; _parseTable.Action[state, input.index] == short.MinValue && input.index != _endOfInputTokenNumber; input = lexerInstance.Next())
-                        ; // nom nom nom
-
-                    // Ran out of file looking for the end of the error rule
-                    if (input.index == _endOfInputTokenNumber)
-                        throw exception;
-                        
-                    // Create an exception that either might be thrown or may be handed to the error handling routine.
                     exception = new ParseException($"Illegal token '{_terminalDebugNames[input.number]}', Expected '{string.Join(",", expectedTokens)}'.")
                     {
                         LexerState = lexerInstance,
@@ -129,39 +87,15 @@ namespace Piglet.Parser
                         parseStack.Pop(); // Pop state
                         parseStack.Pop(); // Pop token
                         valueStack.Pop(); // Pop whatever value
-                        
-                        // Get the right reduction rule to apply
-                        IReductionRule<T> reductionRule = _parseTable.ReductionRules[-(action + 1)];
-
-                        for (int i = 0; i < reductionRule.NumTokensToPop * 2; ++i)
-                            parseStack.Pop();
-
-                        // Transfer to state found in goto table
-                        int stateOnTopOfStack = parseStack.Peek();
-
-                        parseStack.Push(reductionRule.TokenToPush);
-                        parseStack.Push(_parseTable.Goto[stateOnTopOfStack, reductionRule.TokenToPush]);
-
-                        // Get tokens off the value stack for the OnReduce function to run on
-                        T[] onReduceParams = new T[reductionRule.NumTokensToPop];
-
-                        // Need to do it in reverse since thats how the stack is organized
-                        for (int i = reductionRule.NumTokensToPop - 1; i >= 0; --i)
-                            onReduceParams[i] = valueStack.Pop();
-
-                        // This calls the reduction function with the possible exception set. The exception could be cleared here, but
-                        // there is no real reason to do so, since all the normal rules will ignore it, and all the error rules are guaranteed
-                        // to have the exception set prior to entering the reduction function.
-                        Func<ParseException, T[], T> reduceFunc = reductionRule.OnReduce;
-
-                        valueStack.Push(reduceFunc == null ? default : reduceFunc(exception, onReduceParams));
                     }
 
                     // Shift the error token unto the stack
                     state = parseStack.Peek();
+
                     parseStack.Push(_errorTokenNumber);
                     parseStack.Push(ParseTable.Action[state, _errorTokenNumber]);
                     valueStack.Push(default);
+
                     state = parseStack.Peek();
 
                     // We have now found a state where error recovery is enabled. This means that we 

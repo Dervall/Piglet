@@ -87,11 +87,10 @@ namespace Piglet.Tests.Lexer
                 c.Ignore(" *");
             });
             var li = lexer.Begin(new StringReader("    abb   bbbbbbbbb"));
-
-            (int, string) tuple = li.Next();
+            var tuple = li.Next();
             Assert.AreEqual("ABB", tuple.Item2);
             tuple = li.Next();
-            Assert.AreEqual("A*B+", tuple.value);
+            Assert.AreEqual("A*B+", tuple.Item2);
         }
 
         [Test]
@@ -104,14 +103,14 @@ namespace Piglet.Tests.Lexer
                                                                           c.EndOfInputTokenNumber = -1;
                                                                       });
             var li = lexer.Begin("bbbbbbaaabbbaaaaabbbb");
-            (int, string) lexVal = li.Next();
+            var lexVal = li.Next();
             Assert.AreEqual(0, lexVal.Item1);
             Assert.AreEqual("aaa", lexVal.Item2);
             lexVal = li.Next();
-            Assert.AreEqual(0, lexVal.index);
-            Assert.AreEqual("aaaaa", lexVal.value);
+            Assert.AreEqual(0, lexVal.Item1);
+            Assert.AreEqual("aaaaa", lexVal.Item2);
             lexVal = li.Next();
-            Assert.AreEqual(-1, lexVal.index);
+            Assert.AreEqual(-1, lexVal.Item1);
             Assert.AreEqual(null, lexVal.value);
         }
 

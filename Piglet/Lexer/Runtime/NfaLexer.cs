@@ -10,7 +10,7 @@ namespace Piglet.Lexer.Runtime
         : LexerBase<T, HashSet<NFA.State>>
     {
         private readonly NFA _nfa;
-        private readonly (NFA.State, (int number, Func<string, T>? action)?)?[] _actions;
+        private readonly (NFA.State state, (int number, Func<string, T>? action)? action)?[] _actions;
 
 
         public NfaLexer(NFA nfa, IEnumerable<NFA> nfas, List<(string regex, Func<string, T> action)> tokens, int endOfInputTokenNumber)
@@ -29,10 +29,10 @@ namespace Piglet.Lexer.Runtime
 
             // Get the first applicable action. This returns null if there is no action defined but there are accepting states.
             // This is fine, this means an ignored token.
-            (NFA.State state, (int index, Func<string, T> function)) action = _actions.FirstOrDefault(f => state.Contains(f.state));
+            (NFA.State state, (int index, Func<string, T> action)? action)? action = _actions.FirstOrDefault(f => state.Contains(f.Value.state));
 
-            if (action.Item2.function is { })
-                return action.Item2;
+            if (action?.action?.action is { })
+                return action.Value.action;
 
             return (int.MinValue, null);
         }

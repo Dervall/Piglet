@@ -11,17 +11,17 @@ namespace Piglet.Parser.Construction
         /// <summary>
         /// Get the action table for this parser
         /// </summary>
-        ITable2D Action { get; }
+        ITable2D? Action { get; }
 
         /// <summary>
         /// Get the goto table for this parser
         /// </summary>
-        ITable2D Goto { get; }
+        ITable2D? Goto { get; }
 
         /// <summary>
         /// Get the reduction rules
         /// </summary>
-        IReductionRule<T>[] ReductionRules { get; set; }
+        IReductionRule<T>[]? ReductionRules { get; set; }
 
         /// <summary>
         /// Total number of states used by the parser

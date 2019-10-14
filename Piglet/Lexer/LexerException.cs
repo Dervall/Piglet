@@ -23,6 +23,7 @@ namespace Piglet.Lexer
         /// </summary>
         public int CharacterIndex { get; internal set; }
 
+
         /// <summary>
         /// Construct a new LexerException
         /// </summary>

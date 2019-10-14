@@ -7,29 +7,27 @@ namespace Piglet.Parser.Construction
     /// ambiguous in such a way that the parser cannot decide if to shift another token or to reduce
     /// by a given rule.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class ShiftReduceConflictException<T>
+    public sealed class ShiftReduceConflictException<T>
         : AmbiguousGrammarException
     {
         /// <summary>
-        /// Construct a new shift reduce exception
-        /// </summary>
-        /// <param name="message">Exception message</param>
-        public ShiftReduceConflictException(string message)
-            : base(message)
-        {
-        }
-
-        /// <summary>
         /// The shift symbol in the conflict
         /// </summary>
-        public ISymbol<T> ShiftSymbol { get; internal set; }
+        public ISymbol<T> ShiftSymbol { get; }
 
         /// <summary>
         /// The reduce symbol in the conflict
         /// </summary>
-        public ISymbol<T> ReduceSymbol { get; internal set; }
+        public ISymbol<T> ReduceSymbol { get; }
 
-        public override string Message => $"The grammar contains a shift-reduce conflict.\nShift symbol: {ShiftSymbol}\nReduce symbol: {ReduceSymbol}\nDid you forget to set an associativity/precedence?";
+        /// <summary>
+        /// Construct a new shift reduce exception
+        /// </summary>
+        public ShiftReduceConflictException(ISymbol<T> shift, ISymbol<T> reduce)
+            : base($"The grammar contains a shift-reduce conflict.\nShift symbol: {shift}\nReduce symbol: {reduce}\nDid you forget to set an associativity/precedence?")
+        {
+            ShiftSymbol = shift;
+            ReduceSymbol = reduce;
+        }
     }
 }

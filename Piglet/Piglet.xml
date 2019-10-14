@@ -640,7 +640,7 @@
             </summary>
             <typeparam name="T">Semantic token value type</typeparam>
         </member>
-        <member name="P:Piglet.Parser.Configuration.ITerminal`1.RegExp">
+        <member name="P:Piglet.Parser.Configuration.ITerminal`1.Regex">
             <summary>
             Regular expression this terminal recognizes
             </summary>
@@ -809,13 +809,6 @@
             ambiguous in such a way that the parser cannot decide if to shift another token or to reduce
             by a given rule.
             </summary>
-            <typeparam name="T"></typeparam>
-        </member>
-        <member name="M:Piglet.Parser.Construction.ShiftReduceConflictException`1.#ctor(System.String)">
-            <summary>
-            Construct a new shift reduce exception
-            </summary>
-            <param name="message">Exception message</param>
         </member>
         <member name="P:Piglet.Parser.Construction.ShiftReduceConflictException`1.ShiftSymbol">
             <summary>
@@ -825,6 +818,11 @@
         <member name="P:Piglet.Parser.Construction.ShiftReduceConflictException`1.ReduceSymbol">
             <summary>
             The reduce symbol in the conflict
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Construction.ShiftReduceConflictException`1.#ctor(Piglet.Parser.Configuration.ISymbol{`0},Piglet.Parser.Configuration.ISymbol{`0})">
+            <summary>
+            Construct a new shift reduce exception
             </summary>
         </member>
         <member name="T:Piglet.Parser.IParser`1">

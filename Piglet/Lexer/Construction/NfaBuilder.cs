@@ -9,31 +9,31 @@ namespace Piglet.Lexer.Construction
         {
             Stack<NFA> stack = new Stack<NFA>();
 
-            foreach (RegExToken token in yard.ShuntedTokens())
+            foreach (RegexToken token in yard.ShuntedTokens())
             {
                 switch (token.Type)
                 {
-                    case RegExToken.TokenType.OperatorMul:
+                    case RegexTokenType.OperatorMul:
                         stack.Push(RepeatZeroOrMore(stack.Pop()));
 
                         break;
-                    case RegExToken.TokenType.OperatorQuestion:
+                    case RegexTokenType.OperatorQuestion:
                         stack.Push(RepeatZeroOrOnce(stack.Pop()));
 
                         break;
-                    case RegExToken.TokenType.OperatorOr:
+                    case RegexTokenType.OperatorOr:
                         stack.Push(Or(stack.Pop(), stack.Pop()));
 
                         break;
-                    case RegExToken.TokenType.OperatorPlus:
+                    case RegexTokenType.OperatorPlus:
                         stack.Push(RepeatOnceOrMore(stack.Pop()));
 
                         break;
-                    case RegExToken.TokenType.Accept:
+                    case RegexTokenType.Accept:
                         stack.Push(Accept(token.Characters));
 
                         break;
-                    case RegExToken.TokenType.OperatorConcat:
+                    case RegexTokenType.OperatorConcat:
                         // & is not commutative, and the stack is reversed.
                         NFA second = stack.Pop();
                         NFA first = stack.Pop();
@@ -41,7 +41,7 @@ namespace Piglet.Lexer.Construction
                         stack.Push(And(first, second));
 
                         break;
-                    case RegExToken.TokenType.NumberedRepeat:
+                    case RegexTokenType.NumberedRepeat:
                         stack.Push(NumberedRepeat(stack.Pop(), token.MinRepetitions, token.MaxRepetitions));
 
                         break;

@@ -39,7 +39,7 @@ namespace Piglet.Demo.Lexer
 
             foreach (var token in lexer.Tokenize("up down left right right north west left north up"))
             {
-                Console.WriteLine("{0} Current position is {1},{2}", token.Item2, positionX, positionY);
+                Console.WriteLine("{0} Current position is {1},{2}", token.value, positionX, positionY);
             }
 
             Console.WriteLine(System.DateTime.Now.Ticks - ticks);

@@ -11,6 +11,6 @@ namespace Piglet.Parser.Configuration
         /// Setting the debug name gives an easier-to-read error reporting when a parser
         /// configuration fails, but it is entirely optional to set this.
         /// </summary>
-        string DebugName { get; set; }
+        string? DebugName { get; set; }
     }
 }

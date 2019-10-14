@@ -2,7 +2,7 @@ using System;
 
 namespace Piglet.Lexer.Runtime
 {
-    internal class TabularLexer<T>
+    internal sealed class TabularLexer<T>
         : LexerBase<T, int>
     {
         private readonly TransitionTable<T> _transitionTable;
@@ -15,7 +15,7 @@ namespace Piglet.Lexer.Runtime
 
         protected override int GetNextState(int state, char c) => _transitionTable[state, c];
 
-        protected override (int index, Func<string, T> function)? GetAction(int state) => _transitionTable.GetAction(state);
+        protected override (int number, Func<string, T>? action)? GetAction(int state) => _transitionTable.GetAction(state);
 
         protected override int GetInitialState() => 0;
     }

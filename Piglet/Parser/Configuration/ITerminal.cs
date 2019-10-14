@@ -8,12 +8,13 @@ namespace Piglet.Parser.Configuration
     /// expressions.
     /// </summary>
     /// <typeparam name="T">Semantic token value type</typeparam>
-    public interface ITerminal<T> : ISymbol<T>
+    public interface ITerminal<T>
+        : ISymbol<T>
     {
         /// <summary>
         /// Regular expression this terminal recognizes
         /// </summary>
-        string RegExp { get; }
+        string? Regex { get; }
         
         /// <summary>
         /// OnParse action to take. The input is a string which is the parsed lexeme guaranteed to match

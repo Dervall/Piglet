@@ -45,9 +45,9 @@ namespace Piglet.Lexer
                 System.Collections.Generic.List<ITerminal<T>> terminals = grammar.AllSymbols.OfType<ITerminal<T>>().ToList();
                 foreach (ITerminal<T> terminal in terminals)
                 {
-                    if (terminal.RegExp != null)
+                    if (terminal.Regex != null)
                     {
-                        c.Token(terminal.RegExp, terminal.OnParse);
+                        c.Token(terminal.Regex, terminal.OnParse);
                     }
                 }
                 c.EndOfInputTokenNumber = terminals.FindIndex(f => f == grammar.EndOfInputTerminal);

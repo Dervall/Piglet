@@ -39,9 +39,9 @@ namespace Piglet.Tests.Lexer.Construction
                 var lexerInstance = lexer.Begin(new StringReader(input));
                 try
                 {
-                    var token = lexerInstance.Next();
-                    Assert.AreEqual(0, token.index);
-                    Assert.AreEqual(matchedInput, token.value);
+                    (int, string) token = lexerInstance.Next();
+                    Assert.AreEqual(0, token.Item1);
+                    Assert.AreEqual(matchedInput, token.Item2);
                     Assert.IsTrue(shouldMatch);
                 }
                 catch (LexerException)

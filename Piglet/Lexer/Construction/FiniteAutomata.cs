@@ -9,8 +9,8 @@ namespace Piglet.Lexer.Construction
         where TState : FiniteAutomata<TState>.BaseState
     {
         public IList<TState> States { get; set; }
-        public IList<Transition<TState>>  Transitions { get; set; }
-        public TState StartState { get; set; }
+        public IList<Transition<TState>> Transitions { get; set; }
+        public TState? StartState { get; set; }
 
 
         protected FiniteAutomata()
@@ -19,7 +19,7 @@ namespace Piglet.Lexer.Construction
             Transitions = new List<Transition<TState>>();
         }
 
-        public abstract IEnumerable<TState> Closure(TState[] states, ISet<TState> visitedStates = null);
+        public abstract IEnumerable<TState> Closure(TState[] states, ISet<TState>? visitedStates = null);
 
         public void AssignStateNumbers()
         {
@@ -36,9 +36,10 @@ namespace Piglet.Lexer.Construction
         public void DistinguishValidInputs()
         {
             List<CharRange> ranges = new List<CharRange>(Transitions.SelectMany(f => f.ValidInput.Ranges));
-            char[] beginningsAndEnds = ranges.Select(f => f.From).Concat(ranges.Select(f => f.To == char.MaxValue ? f.To : (char)(f.To+1))).ToArray();
-            Array.Sort(beginningsAndEnds);
+            char[] beginningsAndEnds = ranges.Select(f => f.From).Concat(ranges.Select(f => f.To == char.MaxValue ? f.To : (char)(f.To + 1))).ToArray();
             int pivot = 0;
+            
+            Array.Sort(beginningsAndEnds);
 
             for (int i = 1; i < beginningsAndEnds.Length; ++i)
                 if (beginningsAndEnds[i] != beginningsAndEnds[pivot])
@@ -85,7 +86,7 @@ namespace Piglet.Lexer.Construction
 
             int a2 = startIndex;
             int b2 = distinguishedRanges.Count;
-            char c = range.To == char.MaxValue ? range.To : (char) (range.To + 1);
+            char c = range.To == char.MaxValue ? range.To : (char)(range.To + 1);
 
             while (true)
             {
@@ -117,7 +118,7 @@ namespace Piglet.Lexer.Construction
 
         public StimulateResult<TState> Stimulate(string input)
         {
-            List<TState> activeStates = Closure(new[] {StartState}).ToList();
+            List<TState> activeStates = Closure(new[] { StartState }).ToList();
             StringBuilder matchedString = new StringBuilder();
 
             foreach (char c in input)
@@ -153,10 +154,10 @@ namespace Piglet.Lexer.Construction
         }
     }
 
-    internal class StimulateResult<TState>
+    internal sealed class StimulateResult<TState>
         where TState : FiniteAutomata<TState>.BaseState
     {
-        public string Matched { get; set; }
-        public IEnumerable<TState> ActiveStates { get; set; }
+        public string? Matched { get; set; }
+        public IEnumerable<TState>? ActiveStates { get; set; }
     }
 }

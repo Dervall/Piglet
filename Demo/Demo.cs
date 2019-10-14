@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography.X509Certificates;
-using Piglet.Demo.Lexer;
-using Piglet.Demo.Parser;
-using Piglet.Parser.Configuration;
 using Piglet.Parser.Configuration.Wrapper;
+using Piglet.Parser.Configuration;
 using Piglet.Parser.Construction;
+using Piglet.Demo.Parser;
+using Piglet.Demo.Lexer;
 
 namespace Piglet.Demo
 {

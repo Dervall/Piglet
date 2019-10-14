@@ -20,9 +20,10 @@ namespace Piglet.Tests.Lexer
                                                    c.Token("a*b+", f => "A*B+");
                                                });
             var li = lexer.Begin(new StringReader("abb"));
-            var tuple = li.Next();
-            Assert.AreEqual(1, tuple.index);
-            Assert.AreEqual("ABB", tuple.value);
+          
+            (int, string) tuple = li.Next();
+            Assert.AreEqual(1, tuple.Item1);
+            Assert.AreEqual("ABB", tuple.Item2);
         }
 
         [Test]
@@ -36,9 +37,9 @@ namespace Piglet.Tests.Lexer
                 c.Runtime = LexerRuntime.Dfa;
             });
             var li = lexer.Begin(new StringReader("abb"));
-            var tuple = li.Next();
-            Assert.AreEqual(1, tuple.index);
-            Assert.AreEqual("ABB", tuple.value);
+            (int, string) tuple = li.Next();
+            Assert.AreEqual(1, tuple.Item1);
+            Assert.AreEqual("ABB", tuple.Item2);
         }
 
         [Test]
@@ -52,9 +53,9 @@ namespace Piglet.Tests.Lexer
                 c.Runtime = LexerRuntime.Nfa;
             });
             var li = lexer.Begin(new StringReader("abb"));
-            var tuple = li.Next();
-            Assert.AreEqual(1, tuple.index);
-            Assert.AreEqual("ABB", tuple.value);
+            (int, string) tuple = li.Next();
+            Assert.AreEqual(1, tuple.Item1);
+            Assert.AreEqual("ABB", tuple.Item2);
         }
 
         [Test]
@@ -86,11 +87,10 @@ namespace Piglet.Tests.Lexer
                 c.Ignore(" *");
             });
             var li = lexer.Begin(new StringReader("    abb   bbbbbbbbb"));
-
             var tuple = li.Next();
-            Assert.AreEqual("ABB", tuple.value);
+            Assert.AreEqual("ABB", tuple.Item2);
             tuple = li.Next();
-            Assert.AreEqual("A*B+", tuple.value);
+            Assert.AreEqual("A*B+", tuple.Item2);
         }
 
         [Test]
@@ -104,13 +104,13 @@ namespace Piglet.Tests.Lexer
                                                                       });
             var li = lexer.Begin("bbbbbbaaabbbaaaaabbbb");
             var lexVal = li.Next();
-            Assert.AreEqual(0, lexVal.index);
-            Assert.AreEqual("aaa", lexVal.value);
+            Assert.AreEqual(0, lexVal.Item1);
+            Assert.AreEqual("aaa", lexVal.Item2);
             lexVal = li.Next();
-            Assert.AreEqual(0, lexVal.index);
-            Assert.AreEqual("aaaaa", lexVal.value);
+            Assert.AreEqual(0, lexVal.Item1);
+            Assert.AreEqual("aaaaa", lexVal.Item2);
             lexVal = li.Next();
-            Assert.AreEqual(-1, lexVal.index);
+            Assert.AreEqual(-1, lexVal.Item1);
             Assert.AreEqual(null, lexVal.value);
         }
 
@@ -124,7 +124,7 @@ namespace Piglet.Tests.Lexer
             });
             var li = lexer.Begin(new StringReader("    123   42"));
 
-            var tuple = li.Next();
+            (int _, int value) tuple = li.Next();
             Assert.AreEqual(123, tuple.value);
             tuple = li.Next();
             Assert.AreEqual(42, tuple.value);
@@ -216,20 +216,20 @@ namespace Piglet.Tests.Lexer
         [Test]
         public void TestCreateDFA()
         {
-            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a|b*cd"))));
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a|b*cd"))));
             DFA dfa = DFA.Create(nfa);
         }
 
         [Test]
         public void TestCreateDFA2()
         {
-            DFA dfa = DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a|b|c")))));
+            DFA dfa = DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a|b|c")))));
         }
 
         [Test]
         public void TestOneOrMoreDFA()
         {
-            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader("a+"))));
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a+"))));
             DFA dfa = DFA.Create(nfa);
         }
     }

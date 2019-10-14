@@ -45,6 +45,6 @@ namespace Piglet.Lexer.Runtime
                                                                                    where t.ValidInput.Ranges.Any(r => r.From <= input && r.To >= input)
                                                                                    select t.To).SingleOrDefault();
 
-        protected override DFA.State GetInitialState() => _dfa.StartState;
+        protected override DFA.State? GetInitialState() => _dfa.StartState;
     }
 }

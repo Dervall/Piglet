@@ -1,6 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+
 using Piglet.Lexer.Construction;
 
 namespace Piglet.Lexer.Runtime
@@ -9,14 +10,14 @@ namespace Piglet.Lexer.Runtime
         : LexerBase<T, HashSet<NFA.State>>
     {
         private readonly NFA _nfa;
-        private readonly Tuple<NFA.State, (int number, Func<string, T>? action)?>[] _actions;
+        private readonly (NFA.State, (int number, Func<string, T>? action)?)?[] _actions;
 
 
         public NfaLexer(NFA nfa, IEnumerable<NFA> nfas, List<(string regex, Func<string, T> action)> tokens, int endOfInputTokenNumber)
             : base(endOfInputTokenNumber)
         {
             _nfa = nfa;
-            _actions = nfas.Select((n, i) => new Tuple<NFA.State, (int, Func<string, T>?)?>(n.States.Single(f => f.AcceptState), (i,
+            _actions = nfas.Select((n, i) => ((NFA.State, (int, Func<string, T>?)?)?)(n.States.Single(f => f.AcceptState), (i,
                 i < tokens.Count ? tokens[i].action : null))).ToArray();
         }
 
@@ -29,10 +30,10 @@ namespace Piglet.Lexer.Runtime
 
             // Get the first applicable action. This returns null of there is no action defined but there are accepting
             // states. This is fine, this means an ignored token.
-            Tuple<NFA.State, (int number, Func<string, T>? action)?> action = _actions.FirstOrDefault(f => state.Contains(f.Item1));
+            (NFA.State, (int number, Func<string, T>? action)?)? action = _actions.FirstOrDefault(f => state.Contains(f?.Item1));
 
             if (action?.Item2?.action is { })
-                return action.Item2;
+                return action.Value.Item2;
 
             return (int.MinValue, null);
         }

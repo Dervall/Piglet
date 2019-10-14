@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Text;
+using System.IO;
+using System;
 
 namespace Piglet.Lexer.Runtime
 {
@@ -86,13 +86,12 @@ namespace Piglet.Lexer.Runtime
                         // We have reached termination
                         // Two possibilities, current state accepts, if so return token ID
                         // else there is an error
-                        (int number, Func<string, T>? action)? action = _lexer.GetAction(_state);
 
-                        if (action != null && _lexeme.Length > 0)
+                        if (_lexer.GetAction(_state) is { } t && _lexeme.Length > 0)
                         {
                             // If tokennumber is int.MinValue it is an ignored token, like typically whitespace.
                             // In that case, dont return, continue lexing with the reset parser to get the next token.
-                            if (action.Value.Item1 == int.MinValue)
+                            if (t.number == int.MinValue)
                             {
                                 // Reset state
                                 _state = _lexer.GetInitialState();
@@ -101,7 +100,7 @@ namespace Piglet.Lexer.Runtime
                             }
                             else
                                 // Token completed. Return it
-                                return (action.Value.Item1, action.Value.Item2 is null ? default : action.Value.Item2(_lexeme.ToString()));
+                                return (t.number, t.action is null ? default : t.action(_lexeme.ToString()));
                         }
                         else
                             // We get here if there is no action at the state where the lexer cannot continue given the input. This fails.

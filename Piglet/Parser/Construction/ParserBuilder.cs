@@ -11,14 +11,14 @@ namespace Piglet.Parser.Construction
     {
         // Holds the generated reduction rules, which we'll feed the table at the end of this method
         // the second part at least, the other is for indexing them while making the table.
-        private readonly List<Tuple<IProductionRule<T>, ReductionRule<T>>> _reductionRules;
+        private readonly List<(IProductionRule<T>, ReductionRule<T>)> _reductionRules;
         private readonly IGrammar<T> _grammar;
 
 
         public ParserBuilder(IGrammar<T> grammar)
         {
             _grammar = grammar;
-            _reductionRules = new List<Tuple<IProductionRule<T>, ReductionRule<T>>>();
+            _reductionRules = new List<(IProductionRule<T>, ReductionRule<T>)>();
         }
 
         internal sealed class GotoSetTransition
@@ -213,15 +213,13 @@ namespace Piglet.Parser.Construction
                                     break; // Found it, it's already created
 
                             if (numReductionRules == reductionRule)
-                            {
                                 // Need to create a new reduction rule
-                                _reductionRules.Add(new Tuple<IProductionRule<T>, ReductionRule<T>>(lr1Item.ProductionRule, new ReductionRule<T>
+                                _reductionRules.Add((lr1Item.ProductionRule, new ReductionRule<T>
                                 {
                                     NumTokensToPop = lr1Item.ProductionRule.Symbols.Count(),
                                     OnReduce = lr1Item.ProductionRule.ReduceAction,
                                     TokenToPush = ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber - firstNonTerminalTokenNumber
                                 }));
-                            }
 
                             foreach (Terminal<T> lookahead in lr1Item.Lookaheads)
                                 try

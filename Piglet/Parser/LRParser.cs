@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
+using System;
 
 using Piglet.Parser.Construction;
+using Piglet.Lexer.Runtime;
 using Piglet.Lexer;
 
 namespace Piglet.Parser
@@ -27,15 +28,15 @@ namespace Piglet.Parser
             _terminalDebugNames = terminalDebugNames;
         }
 
-        private T Parse(ILexerInstance<T> lexerInstance)
+        private LexedToken<T> Parse(ILexerInstance<T> lexerInstance)
         {
-            Stack<T> valueStack = new Stack<T>();
+            Stack<LexedToken<T>> valueStack = new Stack<LexedToken<T>>();
             Stack<int> parseStack = new Stack<int>();
 
             // Push default state onto the parse stack. Default state is always 0
             parseStack.Push(0);
 
-            (int number, T value) input = lexerInstance.Next();
+            (int number, LexedToken<T> token) input = lexerInstance.Next();
 
             // This holds the last exception we found when parsing, since we
             // will need to pass this to an error handler once the proper handler has been found
@@ -56,7 +57,7 @@ namespace Piglet.Parser
                     parseStack.Push(action);        // Push state unto stack
 
                     // Shift token value unto value stack
-                    valueStack.Push(input.value);
+                    valueStack.Push(input.token);
 
                     // Lex next token
                     input = lexerInstance.Next();
@@ -67,7 +68,7 @@ namespace Piglet.Parser
                     string[] expectedTokens = GetExpectedTokenNames(state).ToArray();
 
                     // Create an exception that either might be thrown or may be handed to the error handling routine.
-                    exception = new ParseException($"Illegal token '{_terminalDebugNames[input.number]}', Expected '{string.Join(",", expectedTokens)}'.")
+                    exception = new ParseException($"Illegal token '{_terminalDebugNames[input.number]}', expected {{'{string.Join("', '", expectedTokens)}'}} at ({lexerInstance.CurrentLineNumber}:{lexerInstance.CurrentCharacterIndex}).")
                     {
                         LexerState = lexerInstance,
                         FoundToken = _terminalDebugNames[input.number],
@@ -94,7 +95,7 @@ namespace Piglet.Parser
 
                     parseStack.Push(_errorTokenNumber);
                     parseStack.Push(ParseTable.Action[state, _errorTokenNumber]);
-                    valueStack.Push(default);
+                    valueStack.Push(new LexedToken<T>(default, lexerInstance.CurrentAbsoluteIndex, lexerInstance.CurrentLineNumber, lexerInstance.CurrentCharacterIndex, 0, true));
 
                     state = parseStack.Peek();
 
@@ -114,38 +115,39 @@ namespace Piglet.Parser
                 else
                 {
                     // Get the right reduction rule to apply
-                    IReductionRule<T> reductionRule = ParseTable.ReductionRules[-(action + 1)];
+                    IReductionRule<T> rule = ParseTable.ReductionRules[-(action + 1)];
 
-                    for (int i = 0; i < reductionRule.NumTokensToPop * 2; ++i)
+                    for (int i = 0; i < rule.NumTokensToPop * 2; ++i)
                         parseStack.Pop();
 
                     // Transfer to state found in goto table
                     int stateOnTopOfStack = parseStack.Peek();
 
-                    parseStack.Push(reductionRule.TokenToPush);
-                    parseStack.Push(ParseTable.Goto[stateOnTopOfStack, reductionRule.TokenToPush]);
+                    parseStack.Push(rule.TokenToPush);
+                    parseStack.Push(ParseTable.Goto[stateOnTopOfStack, rule.TokenToPush]);
 
                     // Get tokens off the value stack for the OnReduce function to run on
-                    T[] onReduceParams = new T[reductionRule.NumTokensToPop];
+                    LexedToken<T>[] tokens = new LexedToken<T>[rule.NumTokensToPop];
 
                     // Need to do it in reverse since thats how the stack is organized
-                    for (int i = reductionRule.NumTokensToPop - 1; i >= 0; --i)
-                        onReduceParams[i] = valueStack.Pop();
+                    for (int i = rule.NumTokensToPop - 1; i >= 0; --i)
+                        tokens[i] = valueStack.Pop();
 
                     // This calls the reduction function with the possible exception set. The exception could be cleared here, but
                     // there is no real reason to do so, since all the normal rules will ignore it, and all the error rules are guaranteed
                     // to have the exception set prior to entering the reduction function.
-                    System.Func<ParseException, T[], T> reduceFunc = reductionRule.OnReduce;
+                    Func<ParseException, LexedToken<T>[], T> reduceFunc = rule.OnReduce;
+                    T result = reduceFunc == null ? default : reduceFunc(exception, tokens);
 
-                    valueStack.Push(reduceFunc == null ? default : reduceFunc(exception, onReduceParams));
+                    valueStack.Push(new LexedNonTerminal<T>(result, rule.ReductionSymbol, tokens));
                 }
             }
         }
 
         private IEnumerable<string> GetExpectedTokenNames(int state) => _terminalDebugNames.Where((t, i) => ParseTable.Action[state, i] != short.MinValue);
 
-        public T Parse(string input) => Parse(Lexer.Begin(input));
+        public LexedToken<T> ParseTokens(string input) => Parse(Lexer.Begin(input));
 
-        public T Parse(TextReader input) => Parse(Lexer.Begin(input));
+        public T Parse(string input) => ParseTokens(input).SymbolValue;
     }
 }

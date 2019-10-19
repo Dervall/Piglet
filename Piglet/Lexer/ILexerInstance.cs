@@ -1,4 +1,4 @@
-using System;
+using Piglet.Lexer.Runtime;
 
 namespace Piglet.Lexer
 {
@@ -16,6 +16,6 @@ namespace Piglet.Lexer
         /// end of input is reached the lexer will return the configuration given end of input token number and default(T) as the
         /// semantic value</returns>
         /// <throws>LexerException if illegal characters are detected</throws>
-        (int number, T value) Next();
+        (int number, LexedToken<T> token) Next();
     }
 }

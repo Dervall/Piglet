@@ -1,6 +1,6 @@
-using System;
 using Piglet.Parser.Configuration;
 using Piglet.Parser.Configuration.Fluent;
+
 
 namespace Piglet.Parser
 {

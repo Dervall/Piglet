@@ -49,7 +49,7 @@ namespace Piglet.Parser.Configuration.Wrapper
 
         protected TerminalWrapper<string> CreateTerminal(string regex) => new TerminalWrapper<string>(Configurator.CreateTerminal(regex));
 
-        /// ascending!
+        /// <summary>ascending precedence!</summary>
         protected void SetPrecedenceList(params (AssociativityDirection direction, ITerminalWrapper[] symbols)[] group)
         {
             foreach ((AssociativityDirection d, ITerminalWrapper[] s) in group)

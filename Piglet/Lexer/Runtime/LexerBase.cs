@@ -17,11 +17,11 @@ namespace Piglet.Lexer.Runtime
 
         public ILexerInstance<T> Begin(string source) => Begin(new StringReader(source));
 
-        public IEnumerable<(int number, T value)> Tokenize(string source)
+        public IEnumerable<(int number, LexedToken<T> token)> Tokenize(string source)
         {
             ILexerInstance<T> instance = Begin(source);
 
-            for ((int number, T value) token = instance.Next(); token.number != -1; token = instance.Next())
+            for ((int number, LexedToken<T> token) token = instance.Next(); token.number != -1; token = instance.Next())
                 yield return token;
         }
 
@@ -45,6 +45,7 @@ namespace Piglet.Lexer.Runtime
 
 
             public int CurrentLineNumber { get; private set; } = 1;
+            public int CurrentAbsoluteIndex { get; private set; } = 0;
             public int CurrentCharacterIndex => _currentLine.Length;
             public string CurrentLine => _currentLine.ToString();
             public string LastLexeme => _lexeme.ToString();
@@ -54,9 +55,10 @@ namespace Piglet.Lexer.Runtime
             {
                 _lexer = lexer;
                 _source = source;
+                CurrentAbsoluteIndex = 0;
             }
 
-            public (int number, T value) Next()
+            public (int number, LexedToken<T> token) Next()
             {
                 _state = _lexer.GetInitialState();
                 _lexeme.Clear();
@@ -65,13 +67,15 @@ namespace Piglet.Lexer.Runtime
                 {
                     int peek = _source.Peek();
 
+                    ++CurrentAbsoluteIndex;
+
                     // Replace EOF with 0, or we will read outside of the table.
                     if (peek == -1)
                     {
                         // If reading the end of file and the lexeme is empty, return end of stream token
                         // If the lexeme isn't empty, it must try to find out whatever it is in the lexeme.
                         if (_lexeme.Length == 0)
-                            return (_lexer._endOfInputTokenNumber, default);
+                            return (_lexer._endOfInputTokenNumber, new LexedToken<T>(default, "", CurrentAbsoluteIndex, CurrentLineNumber, CurrentCharacterIndex, true));
 
                         peek = 0;
                     }
@@ -96,7 +100,13 @@ namespace Piglet.Lexer.Runtime
                                 _lexeme.Clear();
                             }
                             else
-                                return (t.number, t.action is null ? default : t.action(_lexeme.ToString())); // Token completed. Return it
+                            {
+                                string str = _lexeme.ToString();
+                                T value = t.action is null ? default : t.action(str);
+                                LexedToken<T> lx = new LexedToken<T>(value, str, CurrentAbsoluteIndex, CurrentLineNumber, CurrentCharacterIndex, true);
+
+                                return (t.number, lx); // Token completed. Return it
+                            }
                         }
                         else
                             // We get here if there is no action at the state where the lexer cannot continue given the input. This fails.

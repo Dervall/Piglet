@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Piglet.Lexer.Runtime;
 using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
@@ -47,7 +48,7 @@ namespace Piglet.Parser.Configuration
 
             public ISymbol<T>[] Symbols { get; }
             public ISymbol<T> ResultSymbol => _resultSymbol;
-            public Func<ParseException, T[], T> ReduceAction { get; private set; }
+            public Func<ParseException, LexedToken<T>[], T> ReduceAction { get; private set; }
             public IPrecedenceGroup ContextPrecedence { get; private set; }
 
 
@@ -77,7 +78,9 @@ namespace Piglet.Parser.Configuration
                 }
             }
 
-            public void SetReduceFunction(Func<T[], T> action) => ReduceAction = (e, f) => action(f);// This creates a little lambda that ignores the exception
+            public void SetReduceFunction(Func<LexedToken<T>[], T> action) => ReduceAction = (e, f) => action(f);// This creates a little lambda that ignores the exception
+
+            public void SetReduceFunction(Func<T[], T> action) => SetReduceFunction(t => action(t.Select(t => t.SymbolValue).ToArray()));
 
             public void SetReduceToFirst() => SetReduceFunction(f => f[0]);
 
@@ -85,7 +88,7 @@ namespace Piglet.Parser.Configuration
 
             public void SetPrecedence(IPrecedenceGroup precedenceGroup) => ContextPrecedence = precedenceGroup;
 
-            public void SetErrorFunction(Func<ParseException, T[], T> errorHandler) => ReduceAction = errorHandler;
+            public void SetErrorFunction(Func<ParseException, LexedToken<T>[], T> errorHandler) => ReduceAction = errorHandler;
 
             public override string ToString()
             {

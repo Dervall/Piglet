@@ -17,8 +17,7 @@ namespace Piglet.Lexer.Runtime
             : base(endOfInputTokenNumber)
         {
             _nfa = nfa;
-            _actions = nfas.Select((n, i) => ((NFA.State, (int, Func<string, T>?)?)?)(n.States.Single(f => f.AcceptState), (i,
-                i < tokens.Count ? tokens[i].action : null))).ToArray();
+            _actions = nfas.Select((n, i) => ((NFA.State, (int, Func<string, T>?)?)?)(n.States.Single(f => f.AcceptState), (i, i < tokens.Count ? tokens[i].action : null))).ToArray();
         }
 
         protected override (int number, Func<string, T>? action)? GetAction(HashSet<NFA.State> state)

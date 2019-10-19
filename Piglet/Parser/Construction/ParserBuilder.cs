@@ -150,8 +150,7 @@ namespace Piglet.Parser.Construction
             LRParseTable<T> table = new LRParseTable<T>();
 
             // Create a temporary uncompressed action table. This is what we will use to create
-            // the compressed action table later on. This could probably be improved upon to save
-            // memory if needed.
+            // the compressed action table later on. This could probably be improved upon to save memory if needed.
             short[,] uncompressedActionTable = new short[itemSets.Count, _grammar.AllSymbols.OfType<Terminal<T>>().Count()];
 
             for (int i = 0; i < itemSets.Count(); ++i)
@@ -197,12 +196,12 @@ namespace Piglet.Parser.Construction
 
                             if (numReductionRules == reductionRule)
                                 // Need to create a new reduction rule
-                                _reductionRules.Add((lr1Item.ProductionRule, new ReductionRule<T>
-                                {
-                                    NumTokensToPop = lr1Item.ProductionRule.Symbols.Count(),
-                                    OnReduce = lr1Item.ProductionRule.ReduceAction,
-                                    TokenToPush = ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber - firstNonTerminalTokenNumber
-                                }));
+                                _reductionRules.Add((lr1Item.ProductionRule, new ReductionRule<T>(
+                                    (INonTerminal<T>)lr1Item.ProductionRule.ResultSymbol,
+                                    lr1Item.ProductionRule.Symbols.Count(),
+                                    ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber - firstNonTerminalTokenNumber,
+                                    lr1Item.ProductionRule.ReduceAction
+                                )));
 
                             foreach (Terminal<T> lookahead in lr1Item.Lookaheads)
                                 try
@@ -214,6 +213,7 @@ namespace Piglet.Parser.Construction
                                     // Augment exception with correct symbols for the poor user
                                     e.PreviousReduceSymbol = _reductionRules[-(1 + e.PreviousValue)].Item1.ResultSymbol;
                                     e.NewReduceSymbol = _reductionRules[reductionRule].Item1.ResultSymbol;
+                                    e._message = $"Grammar contains a reduce-reduce conflict: previous reduce symbol '{e.PreviousReduceSymbol}', new reduce symbol: '{e.NewReduceSymbol}'.\nDid you forget to set an associativity/precedence?";
 
                                     throw;
                                 }
@@ -258,7 +258,7 @@ namespace Piglet.Parser.Construction
                 {
                     if (oldValue < 0 && value < 0)
                         // Both values are reduce. Throw a reduce reduce conflict. This is not solveable
-                        throw new ReduceReduceConflictException<T>("Grammar contains a reduce reduce conflict.\nDid you forget to set an associativity/precedence?");
+                        throw new ReduceReduceConflictException<T>("Grammar contains a reduce-reduce conflict.\nDid you forget to set an associativity/precedence?");
 
                     int shiftTokenNumber = tokenNumber;
                     int reduceRuleNumber;
@@ -296,8 +296,7 @@ namespace Piglet.Parser.Construction
                         _grammar.GetPrecedence(productionRule.Symbols.Reverse().OfType<ITerminal<T>>().FirstOrDefault());
 
                     // If either rule has no precedence this is not a legal course of action.
-                    // TODO: In bison this is apparently cool, it prefers to shift in this case. I don't know why, but this
-                    // TODO: seems like a dangerous course of action to me.
+                    // TODO: In bison this is apparently cool, it prefers to shift in this case. I don't know why, but this seems like a dangerous course of action to me.
                     if (shiftPrecedence is null || reducePrecedence is null)
                         throw new ShiftReduceConflictException<T>(shiftingTerminal, productionRule.ResultSymbol);
 

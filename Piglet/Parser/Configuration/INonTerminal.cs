@@ -1,12 +1,11 @@
-using System;
-
 namespace Piglet.Parser.Configuration
 {
     /// <summary>
     /// A non terminal in a given grammar, which may be configured to have productions.
     /// </summary>
     /// <typeparam name="T">Semantic value of tokens in the grammar</typeparam>
-    public interface INonTerminal<T> : ISymbol<T>
+    public interface INonTerminal<T>
+        : ISymbol<T>
     {
         /// <summary>
         /// Creates a production on a given nonterminal. The parts parameter may contains either

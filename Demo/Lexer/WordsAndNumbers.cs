@@ -1,5 +1,6 @@
 ﻿using System;
 using Piglet.Lexer;
+using Piglet.Lexer.Runtime;
 
 namespace Piglet.Demo.Lexer
 {
@@ -22,17 +23,9 @@ namespace Piglet.Demo.Lexer
 
             // Run the lexer
             string input = "10 piglets 5 boars 1 big sow";
-            foreach (var token in lexer.Tokenize(input))
-            {
-                if (token.value is int)
-                {
-                    Console.WriteLine("Lexer found an integer {0}", token.value);
-                }
-                else
-                {
-                    Console.WriteLine("Lexer found a string {0}", token.value);
-                }
-            }
+
+            foreach ((int number, LexedToken<object> token) in lexer.Tokenize(input))
+                Console.WriteLine($"Lexer found {(token.SymbolValue is int ? "an integer" : "a string")} {token.SymbolValue}");
         }
     }
 }

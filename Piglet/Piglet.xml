@@ -206,7 +206,17 @@
         </member>
         <member name="P:Piglet.Lexer.ILexerState.CurrentLineNumber">
             <summary>
-            The current line number in the input text
+            The current line number in the input text (one-based).
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.ILexerState.CurrentAbsoluteIndex">
+            <summary>
+            The current character index in the input text (zero-based).
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.ILexerState.CurrentCharacterIndex">
+            <summary>
+            The current character index inside the current line (one-based).
             </summary>
         </member>
         <member name="P:Piglet.Lexer.ILexerState.CurrentLine">
@@ -266,6 +276,46 @@
             <param name="grammar">Grammar to generate lexers from</param>
             <param name="lexerSettings">Additional lexing settings</param>
             <returns>A lexer compatibe with the given grammars tokenizing rules</returns>
+        </member>
+        <member name="T:Piglet.Lexer.Runtime.LexedToken`1">
+            <summary>
+            Represents a lexed (accepted) token.
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedToken`1.SymbolValue">
+            <summary>
+            Returns the lexed symbol.
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedToken`1.LexedString">
+            <summary>
+            Returns the string associated with the lexed symbol.
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedToken`1.AbsoluteIndex">
+            <summary>
+            The token's absolute index in the input string (zero-based).
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedToken`1.StartLineNumber">
+            <summary>
+            The token's starting line number (one-based).
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedToken`1.StartCharacterIndex">
+            <summary>
+            The token's starting index inside the starting line (one-based).
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedToken`1.Length">
+            <summary>
+            The token's length (in characters).
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedToken`1.IsTerminal">
+            <summary>
+            Determines whether the token is a terminal token
+            </summary>
         </member>
         <member name="T:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator">
             <summary>
@@ -588,6 +638,13 @@
             </summary>
             <typeparam name="T">Semantic type of tokens</typeparam>
         </member>
+        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetReduceFunction(System.Func{Piglet.Lexer.Runtime.LexedToken{`0}[],`0})">
+            <summary>
+            Specifies a reduction function to be performed when parsing applies the production rule
+            </summary>
+            <param name="action">Function that takes each of the elements in the given rule and returns a new element. Elements in
+            input array are ordered the same way as in the production.</param>
+        </member>
         <member name="M:Piglet.Parser.Configuration.IProduction`1.SetReduceFunction(System.Func{`0[],`0})">
             <summary>
             Specifies a reduction function to be performed when parsing applies the production rule
@@ -612,7 +669,7 @@
             </summary>
             <param name="precedenceGroup">Precedence level to use</param>
         </member>
-        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetErrorFunction(System.Func{Piglet.Parser.ParseException,`0[],`0})">
+        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetErrorFunction(System.Func{Piglet.Parser.ParseException,Piglet.Lexer.Runtime.LexedToken{`0}[],`0})">
             <summary>
             Set the error reporting function. This is only valid if the rule in question catches
             the Error token as predefined by the configurator.
@@ -664,7 +721,7 @@
             <param name="message">message to show user</param>
         </member>
         <member name="M:Piglet.Parser.Configuration.Wrapper.ParserConstructor`1.SetPrecedenceList(System.ValueTuple{Piglet.Parser.Construction.AssociativityDirection,Piglet.Parser.Configuration.Wrapper.ITerminalWrapper[]}[])">
-            ascending!
+            <summary>ascending precedence!</summary>
         </member>
         <member name="T:Piglet.Parser.Construction.AmbiguousGrammarException">
             <summary>
@@ -760,24 +817,28 @@
         </member>
         <member name="T:Piglet.Parser.Construction.IReductionRule`1">
             <summary>
-            A rule which can be applied on a reduction
+            A rule which can be applied on a reduction.
             </summary>
             <typeparam name="T">Parser value type</typeparam>
         </member>
+        <member name="P:Piglet.Parser.Construction.IReductionRule`1.ReductionSymbol">
+            <summary>
+            The non-terminal symbol, to which the current rule will be reduced.
+            </summary>
+        </member>
         <member name="P:Piglet.Parser.Construction.IReductionRule`1.NumTokensToPop">
             <summary>
-            Number of tokens to pop from the parsing stack when rule is applied
+            Number of tokens to pop from the parsing stack when rule is applied.
             </summary>
         </member>
         <member name="P:Piglet.Parser.Construction.IReductionRule`1.TokenToPush">
             <summary>
-            The token number of the resulting symbol to push on the parse stack
+            The token number of the resulting symbol to push on the parse stack.
             </summary>
         </member>
         <member name="P:Piglet.Parser.Construction.IReductionRule`1.OnReduce">
             <summary>
-            The reduction function to apply. This may also handle an exception in the case
-            of error recovery. The exception parameter will be null if no error has occurred.
+            The reduction function to apply. This may also handle an exception in the case of error recovery. The exception parameter will be null if no error has occurred.
             </summary>
         </member>
         <member name="T:Piglet.Parser.Construction.ReduceReduceConflictException`1">
@@ -786,12 +847,6 @@
             at the same points. This is usually indicative of a serious grammar error.
             </summary>
             <typeparam name="T">Semantic value of symbols used in the grammar</typeparam>
-        </member>
-        <member name="M:Piglet.Parser.Construction.ReduceReduceConflictException`1.#ctor(System.String)">
-            <summary>
-            Create a new reduce reduce conflict exception
-            </summary>
-            <param name="message">Exception message</param>
         </member>
         <member name="P:Piglet.Parser.Construction.ReduceReduceConflictException`1.PreviousReduceSymbol">
             <summary>
@@ -802,6 +857,12 @@
             <summary>
             The reduce symbol that the parser generator tried to apply.
             </summary>
+        </member>
+        <member name="M:Piglet.Parser.Construction.ReduceReduceConflictException`1.#ctor(System.String)">
+            <summary>
+            Create a new reduce reduce conflict exception
+            </summary>
+            <param name="message">Exception message</param>
         </member>
         <member name="T:Piglet.Parser.Construction.ShiftReduceConflictException`1">
             <summary>
@@ -849,14 +910,6 @@
             <param name="input">Input string to parse</param>
             <returns>The resulting semantic value symbol</returns>
         </member>
-        <member name="M:Piglet.Parser.IParser`1.Parse(System.IO.TextReader)">
-            <summary>
-            Parse an input string, returning the resulting semantic value type that is left on the parse
-            stack.
-            </summary>
-            <param name="input">Input stream to parse</param>
-            <returns>The resulting semantic value symbol</returns>
-        </member>
         <member name="T:Piglet.Parser.ParseException">
             <summary>
             ParseExceptions are thrown when the parser detects an illegal token according to the given
@@ -887,6 +940,16 @@
         <member name="P:Piglet.Parser.ParseException.FoundTokenId">
             <summary>
             The token ID of the token that was found.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.ParseException.CurrentLineNumber">
+            <summary>
+            The current line number in the input text
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.ParseException.CurrentLine">
+            <summary>
+            The contents so far of the current line
             </summary>
         </member>
         <member name="M:Piglet.Parser.ParseException.#ctor(System.String)">

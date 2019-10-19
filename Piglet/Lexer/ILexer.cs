@@ -1,7 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+
+using Piglet.Lexer.Runtime;
 
 namespace Piglet.Lexer
 {
@@ -29,6 +29,6 @@ namespace Piglet.Lexer
         /// </summary>
         /// <param name="source">Input string to tokenize</param>
         /// <returns></returns>
-        IEnumerable<(int number, T value)> Tokenize(string source);
+        IEnumerable<(int number, LexedToken<T> token)> Tokenize(string source);
     }
 }

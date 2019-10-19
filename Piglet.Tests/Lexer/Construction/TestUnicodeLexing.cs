@@ -19,8 +19,8 @@ namespace Piglet.Tests.Lexer.Construction
             });
             var lexerInstance = lexer.Begin("خنزير صغير" + " nasse");
             
-            Assert.AreEqual("arabic", lexerInstance.Next().value);
-            Assert.AreEqual("swedish", lexerInstance.Next().value);
+            Assert.AreEqual("arabic", lexerInstance.Next().token.SymbolValue);
+            Assert.AreEqual("swedish", lexerInstance.Next().token.SymbolValue);
 
         }
 
@@ -36,8 +36,8 @@ namespace Piglet.Tests.Lexer.Construction
             });
             var lexerInstance = lexer.Begin("خنزير صغير" + " nasse");
 
-            Assert.AreEqual("arabic", lexerInstance.Next().value);
-            Assert.AreEqual("swedish", lexerInstance.Next().value);
+            Assert.AreEqual("arabic", lexerInstance.Next().token.SymbolValue);
+            Assert.AreEqual("swedish", lexerInstance.Next().token.SymbolValue);
 
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Piglet.Lexer;
+using Piglet.Lexer.Runtime;
 
 namespace Piglet.Demo.Lexer
 {
@@ -37,9 +38,9 @@ namespace Piglet.Demo.Lexer
                 configurator.Ignore(@"\s+");
             });
 
-            foreach (var token in lexer.Tokenize("up down left right right north west left north up"))
+            foreach ((int number, LexedToken<string> token) in lexer.Tokenize("up down left right right north west left north up"))
             {
-                Console.WriteLine("{0} Current position is {1},{2}", token.value, positionX, positionY);
+                Console.WriteLine("{0} Current position is {1},{2}", token.SymbolValue, positionX, positionY);
             }
 
             Console.WriteLine(System.DateTime.Now.Ticks - ticks);

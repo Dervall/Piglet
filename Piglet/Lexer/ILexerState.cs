@@ -6,9 +6,19 @@ namespace Piglet.Lexer
     public interface ILexerState
     {
         /// <summary>
-        /// The current line number in the input text
+        /// The current line number in the input text (one-based).
         /// </summary>
         int CurrentLineNumber { get; }
+
+        /// <summary>
+        /// The current character index in the input text (zero-based).
+        /// </summary>
+        int CurrentAbsoluteIndex { get; }
+
+        /// <summary>
+        /// The current character index inside the current line (one-based).
+        /// </summary>
+        int CurrentCharacterIndex { get; }
 
         /// <summary>
         /// The contents so far of the current line

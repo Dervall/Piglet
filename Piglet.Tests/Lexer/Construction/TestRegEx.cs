@@ -39,9 +39,9 @@ namespace Piglet.Tests.Lexer.Construction
                 var lexerInstance = lexer.Begin(new StringReader(input));
                 try
                 {
-                    (int, string) token = lexerInstance.Next();
+                    var token = lexerInstance.Next();
                     Assert.AreEqual(0, token.Item1);
-                    Assert.AreEqual(matchedInput, token.Item2);
+                    Assert.AreEqual(matchedInput, token.Item2.SymbolValue);
                     Assert.IsTrue(shouldMatch);
                 }
                 catch (LexerException)
@@ -116,17 +116,15 @@ namespace Piglet.Tests.Lexer.Construction
         [Test]
         public void TestCommentRegex()
         {
-            var lexer = LexerFactory<string>.Configure(
-                f =>
-                    {
-                        f.Token(@";[^\n]*\n", a => a);
-                        f.Token("nextLine", a => a + "%" );
-                    });
-
+            var lexer = LexerFactory<string>.Configure(f => {
+                f.Token(@";[^\n]*\n", a => a);
+                f.Token("nextLine", a => a + "%" );
+            });
             var lexerInstance = lexer.Begin(@"; this is a comment
 nextLine");
-            Assert.AreEqual("; this is a comment\r\n", lexerInstance.Next().value);
-            Assert.AreEqual("nextLine%", lexerInstance.Next().value);
+
+            Assert.AreEqual("; this is a comment\r\n", lexerInstance.Next().token.SymbolValue);
+            Assert.AreEqual("nextLine%", lexerInstance.Next().token.SymbolValue);
         }
 
         [Test]

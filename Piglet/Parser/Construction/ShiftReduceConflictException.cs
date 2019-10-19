@@ -20,6 +20,7 @@ namespace Piglet.Parser.Construction
         /// </summary>
         public ISymbol<T> ReduceSymbol { get; }
 
+
         /// <summary>
         /// Construct a new shift reduce exception
         /// </summary>

@@ -7,7 +7,8 @@ namespace Piglet.Parser
     /// ParseExceptions are thrown when the parser detects an illegal token according to the given
     /// grammar.
     /// </summary>
-    public class ParseException : Exception
+    public sealed class ParseException
+        : Exception
     {
         /// <summary>
         /// Current state of the lexer.
@@ -34,12 +35,25 @@ namespace Piglet.Parser
         /// The token ID of the token that was found.
         /// </summary>
         public int FoundTokenId { get; set; }
-       
+
+        /// <summary>
+        /// The current line number in the input text
+        /// </summary>
+        public int CurrentLineNumber => LexerState.CurrentLineNumber;
+
+        /// <summary>
+        /// The contents so far of the current line
+        /// </summary>
+        public string CurrentLine => LexerState.CurrentLine;
+
+        public int CurrentCharacterIndex => LexerState.CurrentCharacterIndex;
+
+
         /// <summary>
         /// Construct a new ParseException
         /// </summary>
         /// <param name="message"></param>
-        public ParseException(string message)
+        internal ParseException(string message)
             : base(message)
         {
         }

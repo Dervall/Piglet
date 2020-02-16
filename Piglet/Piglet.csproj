@@ -3,19 +3,21 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard1.6;net40;net45</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Version>1.1.0</Version>
+    <Version>1.5.0</Version>
     <Company>Per Dervall</Company>
     <Product>Piglet</Product>
-    <Authors>Per Dervall</Authors>
+    <Authors>Per Dervall;harrison314</Authors>
     <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.
-Fork from https://github.com/Dervall/Piglet
     </Description>
     <RepositoryUrl>https://github.com/harrison314/Piglet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageLicenseUrl>https://github.com/harrison314/Piglet/blob/master/LICENSE.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/harrison314/Piglet</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Dervall/Piglet</PackageProjectUrl>
     <PackageId>Piglet</PackageId>
     <DocumentationFile>Piglet.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">

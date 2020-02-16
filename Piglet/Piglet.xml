@@ -1,0 +1,898 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Piglet</name>
+    </assembly>
+    <members>
+        <member name="T:Piglet.Common.ITable2D">
+            <summary>
+            This abstracts a table with two dimenstions
+            </summary>
+        </member>
+        <member name="P:Piglet.Common.ITable2D.Item(System.Int32,System.Int32)">
+            <summary>
+            Gets an entry from the table.
+            </summary>
+            <param name="state">State to get for</param>
+            <param name="input">Input to get for</param>
+            <returns>Table value</returns>
+        </member>
+        <member name="T:Piglet.Common.SublistSearch">
+            <summary>
+            Extension methods for finding the index of a sublist
+            </summary>
+        </member>
+        <member name="M:Piglet.Common.SublistSearch.IndexOf``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IList{``0})">
+            <summary>
+            Get the index of the a sublist
+            </summary>
+            <typeparam name="T">Type of list</typeparam>
+            <param name="haystack">List to search</param>
+            <param name="needle">List to find</param>
+            <returns>Index of start of sublist, or -1 if not found</returns>
+        </member>
+        <member name="T:Piglet.Lexer.Configuration.ILexerConfigurator`1">
+            <summary>
+            ILexerConfigurator is the main configuration interface used to configure the lexer behaviour programmatically. This
+            is used inside the LexerFactory.Configure method and should not be retained after the lexer has been created.
+            Further modifying the LexerConfigurator after a lexer has been created will not result in modifications to the lexer.
+            </summary>
+            <typeparam name="T">The output type of semantic values given by the token action method</typeparam>
+        </member>
+        <member name="M:Piglet.Lexer.Configuration.ILexerConfigurator`1.Token(System.String,System.Func{System.String,`0})">
+            <summary>
+            Register a token in the lexer. The tokens will be recognized in order of declaration, i.e.
+            an earlier declare token will be recognized over one that is declared later.
+            </summary>
+            <param name="regEx">The regular expression to match</param>
+            <param name="action">Action to run when a token is matched. Input to action is matched lexeme, output should be object of T</param>
+        </member>
+        <member name="M:Piglet.Lexer.Configuration.ILexerConfigurator`1.Ignore(System.String)">
+            <summary>
+            Adds a regex to the list of ignored expressions. The lexer will always favour the normal tokens over ignored expressions.
+            Ignored expressions are never reported from the Next function of the lexer.
+            </summary>
+            <param name="regEx">Expression to ignore</param>
+        </member>
+        <member name="P:Piglet.Lexer.Configuration.ILexerConfigurator`1.EndOfInputTokenNumber">
+            <summary>
+            Set the token number that will be reported when the lexer reached the end of the input stream.
+            Default is -1
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Configuration.ILexerConfigurator`1.MinimizeDfa">
+            <summary>
+            Should the resulting DFA be minimized?
+            The default is true, and it should normally be kept that way
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Configuration.ILexerConfigurator`1.Runtime">
+            <summary>
+            Gets and sets the lexer runtime, which is the method that the resulting lexer will be constructed with.
+            </summary>
+        </member>
+        <member name="T:Piglet.Lexer.Configuration.LexerRuntime">
+            <summary>
+            This enumeration specifies what runtime the lexer should use. This is a tradeoff between construction speed
+            and runtime speed.    
+            </summary>
+        </member>
+        <member name="F:Piglet.Lexer.Configuration.LexerRuntime.Tabular">
+            <summary>
+            Tabular is the slowest to construct but the fastest to run. Lexers built this way will use an internal table
+            to perform lookups. Use this method if you only construct your lexer once and reuse it continually or parsing very large texts.
+            Time complexity is O(1) - regardless of input size or grammar size. Memory usage is constant, but might incur a larger memory use than other methods for small grammars.
+            </summary>
+        </member>
+        <member name="F:Piglet.Lexer.Configuration.LexerRuntime.Nfa">
+            <summary>
+            Nfa means that the lexer will run as a non-finite automata. This method of constructing is VERY fast but slower to run.
+            Also, the lexing performance is not linear and will vary based on the configuration of your grammar. Initially uses less memory
+            than a tabular approach, but might increase memory usage as the lexing proceeds.
+            </summary>
+        </member>
+        <member name="F:Piglet.Lexer.Configuration.LexerRuntime.Dfa">
+            <summary>
+            Runs the lexing algorithm as a deterministic finite automata. This method of construction is slower than NFA, but faster than Tabular.
+            It runs in finite memory and has a complexity of O(1) but a slower run time and more memory usage than a tabular lexer.
+            </summary>
+        </member>
+        <member name="T:Piglet.Lexer.Construction.DotNotation.DotNotation">
+            <summary>
+            This is a debug class for obtaining dot notation graphviz graphs for lexer components.
+            </summary>
+        </member>
+        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.GetDfaAndNfaGraphs(System.String,System.Boolean,System.String@,System.String@)">
+            <summary>
+            Get the DFA and NFA graphs for a given regular expression
+            </summary>
+            <param name="regex">Regular expression</param>
+            <param name="minimize">Minimize the resulting DFA</param>
+            <param name="nfaString">Dot notation NFA graph</param>
+            <param name="dfaString">Dot notation DFA graph</param>
+        </member>
+        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.GetDfaAndNfaGraphs(System.String,System.String,System.Boolean,System.String@,System.String@)">
+            <summary>
+            Get the DFA and NFA graphs for a given regular expression and highlight active
+            states for a given input string
+            </summary>
+            <param name="regex">Regular expression</param>
+            <param name="input">Input string</param>
+            <param name="minimize">Minimize the resulting DFA</param>
+            <param name="nfaString">Dot notation NFA graph</param>
+            <param name="dfaString">Dot notation DFA graph</param>
+        </member>
+        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.AsDotNotation``1(Piglet.Lexer.Construction.FiniteAutomata{``0},System.String,System.String)">
+            <summary>
+            Print the state machine as DOT notation suitable for drawing graphs.
+            This is a useful debug functionality!!
+            </summary>
+            <param name="automata">Automata to generate graph for</param>
+            <param name="input">Input to highlight the current state with</param>
+            <param name="graphName">Graph name as specified in notation</param>
+            <returns></returns>
+        </member>
+        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.TransitionLabel``1(Piglet.Lexer.Construction.Transition{``0})">
+            <summary>
+            DOT language label name for transitions
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="transition"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Piglet.Lexer.Construction.LexerConstructionException">
+            <summary>
+            Class of exceptions that may occur when creating a Lexer.
+            </summary>
+        </member>
+        <member name="M:Piglet.Lexer.Construction.LexerConstructionException.#ctor(System.String)">
+            <summary>
+            Construct a new LexerConstructionException
+            </summary>
+            <param name="message">Message to show</param>
+        </member>
+        <member name="T:Piglet.Lexer.ILexer`1">
+            <summary>
+            A lexer that tokenizes input into tuples of tokennumber and semantic value. Lexers are not thread safe, but they are reentrant. You
+            can reuse the same lexer by setting a new character source.
+            </summary>
+            <typeparam name="T">The semantic value type</typeparam>
+        </member>
+        <member name="M:Piglet.Lexer.ILexer`1.Begin(System.IO.TextReader)">
+            <summary>
+            Begin lexing a text
+            </summary>
+            <param name="reader">TextReader to read from</param>
+        </member>
+        <member name="M:Piglet.Lexer.ILexer`1.Begin(System.String)">
+            <summary>
+            Begin lexing a string. This method is the same as writing Begin(new StringReader(source))
+            </summary>
+            <param name="source">Source string to read from</param>
+        </member>
+        <member name="M:Piglet.Lexer.ILexer`1.Tokenize(System.String)">
+            <summary>
+            Tokenize a string
+            </summary>
+            <param name="source">Input string to tokenize</param>
+            <returns></returns>
+        </member>
+        <member name="T:Piglet.Lexer.ILexerInstance`1">
+            <summary>
+            A running instance of a lexer containing the lexer state
+            </summary>
+            <typeparam name="T">Return type of the lexer tokens</typeparam>
+        </member>
+        <member name="M:Piglet.Lexer.ILexerInstance`1.Next">
+            <summary>
+            Gets the next token from the input stream.
+            </summary>
+            <returns>A tuple where firstitem is token number, and second item is the tokens semantic value. If the 
+            end of input is reached the lexer will return the configuration given end of input token number and default(T) as the
+            semantic value</returns>
+            <throws>LexerException if illegal characters are detected</throws>
+        </member>
+        <member name="T:Piglet.Lexer.ILexerState">
+            <summary>
+            Current state of the lexer
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.ILexerState.CurrentLineNumber">
+            <summary>
+            The current line number in the input text
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.ILexerState.CurrentLine">
+            <summary>
+            The contents so far of the current line
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.ILexerState.LastLexeme">
+            <summary>
+            Get the last lexeme found by the lexer.
+            </summary>
+        </member>
+        <member name="T:Piglet.Lexer.LexerException">
+            <summary>
+            LexerExceptions are thrown when the lexer cannot make sense of the current input.
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.LexerException.LineNumber">
+            <summary>
+            The current line number of the document the lexer is scanning.
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.LexerException.LineContents">
+            <summary>
+            The contents of the current line so far of the current document
+            </summary>
+        </member>
+        <member name="M:Piglet.Lexer.LexerException.#ctor(System.String)">
+            <summary>
+            Construct a new LexerException
+            </summary>
+            <param name="message">Message to display</param>
+        </member>
+        <member name="T:Piglet.Lexer.LexerFactory`1">
+            <summary>
+            The lexer factory is the main way of obtaining lexers in Piglet. 
+            </summary>
+            <typeparam name="T">Semantic value class of tokens recognized</typeparam>
+        </member>
+        <member name="M:Piglet.Lexer.LexerFactory`1.Configure(System.Action{Piglet.Lexer.Configuration.ILexerConfigurator{`0}})">
+            <summary>
+            Configure and create a lexer in code using a configure function.
+            </summary>
+            <param name="configureAction">Actions needed to configure the lexer</param>
+            <returns>A lexer implementing the configuration specified</returns>
+            <throws>LexerConfigurationException for errors</throws>
+        </member>
+        <member name="M:Piglet.Lexer.LexerFactory`1.ConfigureFromGrammar(Piglet.Parser.Construction.IGrammar{`0},Piglet.Parser.Configuration.ILexerSettings)">
+            <summary>
+            This is the method used by Piglets parserfactory to obtain preconfigured lexers.
+            </summary>
+            <param name="grammar">Grammar to generate lexers from</param>
+            <param name="lexerSettings">Additional lexing settings</param>
+            <returns>A lexer compatibe with the given grammars tokenizing rules</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator">
+            <summary>
+            A configuration object for creating fluently configured parsers.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.Rule">
+            <summary>
+            Create a new rule
+            </summary>
+            <returns>A new rule</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.Expression">
+            <summary>
+            Create a new expression
+            </summary>
+            <returns>A new expression</returns>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.QuotedString">
+            <summary>
+            Ready-made expression for quoted strings.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.Error">
+            <summary>
+            The error token, use in a rule to signal an error accepting rule.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.CreateParser">
+            <summary>
+            Create the parser based on the configuration used
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.LeftAssociative(System.Object[])">
+            <summary>
+            Group a selection of expressions as left associative
+            </summary>
+            <param name="p">expressions</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.RightAssociative(System.Object[])">
+            <summary>
+            Group a selection of expressions as right associative
+            </summary>
+            <param name="p">expressions</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.NonAssociative(System.Object[])">
+            <summary>
+            Group a selection of expressions as non associative
+            </summary>
+            <param name="p">expressions</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.Ignore(System.String)">
+            <summary>
+            Ignores an expression. Text matching this regular expression will never be reported. This is suitable
+            for comments and stripping text.
+            </summary>
+            <param name="ignoreExpression">Regular expression to ignore</param>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator.Runtime">
+            <summary>
+            Gets and sets the runtime of the constructed lexer. See the enumeration LexerRuntime for an
+            explanation of the valid values.
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Fluent.IRule">
+            <summary>
+            A rule is a configurable rule entity.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IRule.IsMadeUp">
+            <summary>
+            Specify what this rule is made up by
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Fluent.IExpressionConfigurator">
+            <summary>
+            An expression is a terminal token, and this is the configurator object for setting what the expression should match
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IExpressionConfigurator.ThatMatches``1">
+            <summary>
+            Match a type
+            </summary>
+            <typeparam name="TExpressionType">Type to match, most built-in primitive types are supported.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IExpressionConfigurator.ThatMatches(System.String)">
+            <summary>
+            Match a regular expression
+            </summary>
+            <param name="regex">Regular expression to match</param>
+            <returns>Next part of the configuration</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Fluent.IExpressionReturnConfigurator">
+            <summary>
+            Allows you to specify the return of the expression
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IExpressionReturnConfigurator.AndReturns(System.Func{System.String,System.Object})">
+            <summary>
+            Specify what the expression, when matched should return.
+            </summary>
+            <param name="func">Function to apply when matched. Input is the matched string, output is an object which
+            will be available as the result of the rule part.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IRuleByConfigurator.By(System.String)">
+            <summary>
+            By a literal
+            </summary>
+            <param name="literal">Literal to match. This is a strict literal, not a regex</param>
+            <returns>Next</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IRuleByConfigurator.By``1">
+            <summary>
+            By a type. Not all types are supported yet, most primitives are
+            </summary>
+            <typeparam name="TExpressionType">The type to follow</typeparam>
+            <returns>Next</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IRuleByConfigurator.By(Piglet.Parser.Configuration.Fluent.IExpressionConfigurator)">
+            <summary>
+            By an expression. The expression doesn't need to be configured when
+            this is called
+            </summary>
+            <param name="expression">An expression</param>
+            <returns>Next</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IRuleByConfigurator.By(Piglet.Parser.Configuration.Fluent.IRule)">
+            <summary>
+            By another rule
+            </summary>
+            <param name="rule">Rule to use. This may be the same rule as the rule called
+            on. (recursive rules)</param>
+            <returns>Next</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IRuleByConfigurator.ByListOf``1(Piglet.Parser.Configuration.Fluent.IRule)">
+            <summary>
+            By a list of another rule.
+            </summary>
+            <typeparam name="TListType">The type that the rule used to build the list returns. This will enable
+            getting a correctly typed IList</typeparam>
+            <param name="listElement">Element that should be repeated</param>
+            <returns>Next configurator</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IRuleByConfigurator.ByListOf(Piglet.Parser.Configuration.Fluent.IRule)">
+            <summary>
+            By a list of another rule. Return type of this element will be a List&lt;object&gt;
+            </summary>
+            <param name="listElement">Element that should be repeated</param>
+            <returns>Next configurator</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IOptionalAsConfigurator.As(System.String)">
+            <summary>
+            Specify a rule part name, which makes it accessible for 
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IMaybeNewRuleConfigurator.Or">
+            <summary>
+            Begin the configuration of an alternate rule
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IRuleSequenceConfigurator.Followed">
+            <summary>
+            State what the rule is followed by
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IRuleSequenceConfigurator.WhenFound(System.Func{System.Object,System.Object})">
+            <summary>
+            Specify what should happen when this rule is matched this way
+            </summary>
+            <param name="func">Function that will be called. The dynamic 
+            parameter will contain the named parameters of the preceeding rule. Return an object
+            that will be available as a result to whoever uses this rule</param>
+            <returns>Next configurator</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IMaybeListNamed.As(System.String)">
+            <summary>
+            Set the name of the element, which will add it to the dynamic parameter of the
+            WhenFound function
+            </summary>
+            <param name="name">Name of member. This should be a valid C# property name</param>
+            <returns>Next configurator</returns>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IListRuleSequenceConfigurator.ThatIs">
+            <summary>
+            Specify additional options on the rule element
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Fluent.IListItemConfigurator.SeparatedBy(System.String)">
+            <summary>
+            Specify a list separator
+            </summary>
+            <param name="separator">Separator, interpreted as a string literal</param>
+            <returns>Next configurator</returns>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Fluent.IListItemConfigurator.Optional">
+            <summary>
+            Specify that the preceeding element may be missing
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.ILexerSettings">
+            <summary>
+            Set additional settings for the lexer
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ILexerSettings.CreateLexer">
+            <summary>
+            Set to false if you do not desire a lexer. You will need to supply a lexer manually. Defaults to true
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ILexerSettings.EscapeLiterals">
+            <summary>
+            Should all literals in parsing rules be automatically escaped? Defaults to true
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ILexerSettings.Ignore">
+            <summary>
+            Set the list of regular expressions to ignore. The default is to ignore all kinds of whitespace.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ILexerSettings.Runtime">
+            <summary>
+            Gets and sets the runtime of the constructed lexer. See the enumeration LexerRuntime for an
+            explanation of the valid values.
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.INonTerminal`1">
+            <summary>
+            A non terminal in a given grammar, which may be configured to have productions.
+            </summary>
+            <typeparam name="T">Semantic value of tokens in the grammar</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.INonTerminal`1.AddProduction(System.Object[])">
+            <summary>
+            Creates a production on a given nonterminal. The parts parameter may contains either
+            previously declared symbols of the grammar or strings, which are interpreted as terminals
+            which may be given unescaped as per the lexer settings of the main configurator object.
+            If an empty rule is desired you may pass no parameters to the Production. Null must not be passed.
+            </summary>
+            <param name="parts">Parts of rule to configure the production</param>
+            <returns>A production configurator for the created production, for addition configuration.</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.IParserConfigurator`1">
+            <summary>
+            This interface is the main interface for configuring a new parser in code. It is only valid in the context that is is
+            obtained, typically in ParserFactory. If methods are called after the parser has been created no changes will be applied
+            to the already created parser.
+            </summary>
+            <typeparam name="T">Semantic value of tokens</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.CreateTerminal(System.String,System.Func{System.String,`0},System.Boolean)">
+            <summary>
+            Create a new Terminal. If using the built in lexer terminals will be recognized in the order
+            of declaration, unless the topPrecedence is set. A top precedence will be recognized before all other
+            declared terminals. A terminal may not be redefined using different onParse actions.
+            </summary>
+            <param name="regExp">Regular expression to match</param>
+            <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
+            <param name="topPrecedence">If true, this terminal takes precedence over previously created terminals</param>
+            <returns>A terminal symbol</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.CreateNonTerminal">
+            <summary>
+            Create a new NonTerminal. Production actions may be specified directly, or deferred until later. The
+            latter is more typical since rules are often recursive in their nature.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.IParserConfigurator`1.LexerSettings">
+            <summary>
+            Additional lexer settings in addition to the settings provided by the declared terminals.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.IParserConfigurator`1.ErrorToken">
+            <summary>
+            The error token, used for catching errors in the parsing process.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.LeftAssociative(Piglet.Parser.Configuration.ITerminal{`0}[])">
+            <summary>
+            Makes a group of tokens left associative at a given precedence level. If you require two or more tokens
+            to have the same precedence you must pass both at the same time to the precedence call. If you pass
+            the same token to a precedence function more than once you will get a ParserConfigurationException.
+            </summary>
+            <param name="symbols">Symbols to set associativity on</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.RightAssociative(Piglet.Parser.Configuration.ITerminal{`0}[])">
+            <summary>
+            Makes a group of tokens right associative at a given precedence level. If you require two or more tokens
+            to have the same precedence you must pass both at the same time to the precedence call. If you pass
+            the same token to a precedence function more than once you will get a ParserConfigurationException.
+            </summary>
+            <param name="symbols">Symbols to set associativity on</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.NonAssociative(Piglet.Parser.Configuration.ITerminal{`0}[])">
+            <summary>
+            Makes a group of tokens non-associative at a given precedence level. If you require two or more tokens
+            to have the same precedence you must pass both at the same time to the precedence call. If you pass
+            the same token to a precedence function more than once you will get a ParserConfigurationException.
+            </summary>
+            <param name="symbols">Symbols to set associativity on</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.CreateParser">
+            <summary>
+            Creates a parser based on the inputted configuration. If a lexer has been desired as well, this method will also create the lexer.
+            </summary>
+            <returns>The created parser</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.IProduction`1">
+            <summary>
+            Fluent configuration interface for productions
+            </summary>
+            <typeparam name="T">Semantic type of tokens</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetReduceFunction(System.Func{`0[],`0})">
+            <summary>
+            Specifies a reduction function to be performed when parsing applies the production rule
+            </summary>
+            <param name="action">Function that takes each of the elements in the given rule and returns a new element. Elements in
+            input array are ordered the same way as in the production.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetReduceToFirst">
+            <summary>
+            Reduces to the first element in the production rule. Equivalent to SetReduceFunction(f => f[0])
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetReduceToIndex(System.Int32)">
+            <summary>
+            Reduces to an indexed parameter. Equivalent to SetReduceFunction(f => f[index])
+            </summary>
+            <param name="index"></param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetPrecedence(Piglet.Parser.Construction.IPrecedenceGroup)">
+            <summary>
+            Sets context dependent precedence on this rule to make it the same precedence as the given level
+            </summary>
+            <param name="precedenceGroup">Precedence level to use</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.IProduction`1.SetErrorFunction(System.Func{Piglet.Parser.ParseException,`0[],`0})">
+            <summary>
+            Set the error reporting function. This is only valid if the rule in question catches
+            the Error token as predefined by the configurator.
+            </summary>
+            <param name="errorHandler">Error handler function</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.ISymbol`1">
+            <summary>
+            Base class of symbols in the grammar
+            </summary>
+            <typeparam name="T">Semantic token value type</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ISymbol`1.DebugName">
+            <summary>
+            DebugName is exclusively used for debugging purposes, as the name implies.
+            Setting the debug name gives an easier-to-read error reporting when a parser
+            configuration fails, but it is entirely optional to set this.
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.ITerminal`1">
+            <summary>
+            A terminal symbol in the grammar. A terminal symbol may not contain production rules.
+            If a lexer is desired, Piglet will generate lexer definitions based on the regular
+            expressions.
+            </summary>
+            <typeparam name="T">Semantic token value type</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ITerminal`1.RegExp">
+            <summary>
+            Regular expression this terminal recognizes
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ITerminal`1.OnParse">
+            <summary>
+            OnParse action to take. The input is a string which is the parsed lexeme guaranteed to match
+            the regular expression of this terminal. Output should be an object of this parsers value
+            type.
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.ParserConfigurationException">
+            <summary>
+            This exception is thrown for illegal parser configurations
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.ParserConfigurationException.#ctor(System.String)">
+            <summary>
+            Construct a new parser configuration exception
+            </summary>
+            <param name="message">message to show user</param>
+        </member>
+        <member name="T:Piglet.Parser.Construction.AmbiguousGrammarException">
+            <summary>
+            Base class for exceptions thrown by the parser generator for ambiguous grammars.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.AmbiguousGrammarException.StateNumber">
+            <summary>
+            The state number in which the conflict occurred.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.AmbiguousGrammarException.TokenNumber">
+            <summary>
+            The token number that generated the conflict
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.AmbiguousGrammarException.PreviousValue">
+            <summary>
+            The previous value of the parsing table at the point of the conflict.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.AmbiguousGrammarException.NewValue">
+            <summary>
+            The new value that was attempted to be written into the parse table
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Construction.GotoTable.GotoTableValue">
+            <summary>
+            Only for input to the constructor
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Construction.AssociativityDirection">
+            <summary>
+            Defines the associativities that can be set for a given token type.
+            </summary>
+        </member>
+        <member name="F:Piglet.Parser.Construction.AssociativityDirection.Left">
+            <summary>
+            Left associative
+            </summary>
+        </member>
+        <member name="F:Piglet.Parser.Construction.AssociativityDirection.Right">
+            <summary>
+            Right associative
+            </summary>
+        </member>
+        <member name="F:Piglet.Parser.Construction.AssociativityDirection.NonAssociative">
+            <summary>
+            Non-associative
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Construction.IPrecedenceGroup">
+            <summary>
+            Represent a group of symbols that have a given precedence level and associativity set.
+            This interface is also the means to set context dependence precendence.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IPrecedenceGroup.Associativity">
+            <summary>
+            Get the associativity that the precedence group was created by
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IPrecedenceGroup.Precedence">
+            <summary>
+            Get the precedence level
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Construction.IParseTable`1">
+            <summary>
+            Abstracts a parse table for use with a LR parser
+            </summary>
+            <typeparam name="T">Type to parse</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IParseTable`1.Action">
+            <summary>
+            Get the action table for this parser
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IParseTable`1.Goto">
+            <summary>
+            Get the goto table for this parser
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IParseTable`1.ReductionRules">
+            <summary>
+            Get the reduction rules
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IParseTable`1.StateCount">
+            <summary>
+            Total number of states used by the parser
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Construction.IReductionRule`1">
+            <summary>
+            A rule which can be applied on a reduction
+            </summary>
+            <typeparam name="T">Parser value type</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IReductionRule`1.NumTokensToPop">
+            <summary>
+            Number of tokens to pop from the parsing stack when rule is applied
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IReductionRule`1.TokenToPush">
+            <summary>
+            The token number of the resulting symbol to push on the parse stack
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.IReductionRule`1.OnReduce">
+            <summary>
+            The reduction function to apply. This may also handle an exception in the case
+            of error recovery. The exception parameter will be null if no error has occurred.
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Construction.ReduceReduceConflictException`1">
+            <summary>
+            A reduce reduce conflict is thrown if the parser configuration is ambiguous so that multiple reduce actions are valid
+            at the same points. This is usually indicative of a serious grammar error.
+            </summary>
+            <typeparam name="T">Semantic value of symbols used in the grammar</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Construction.ReduceReduceConflictException`1.#ctor(System.String)">
+            <summary>
+            Create a new reduce reduce conflict exception
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="P:Piglet.Parser.Construction.ReduceReduceConflictException`1.PreviousReduceSymbol">
+            <summary>
+            The reduce symbol that existed in the parse table before the new reduce symbol was applied.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.ReduceReduceConflictException`1.NewReduceSymbol">
+            <summary>
+            The reduce symbol that the parser generator tried to apply.
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Construction.ShiftReduceConflictException`1">
+            <summary>
+            A shift reduce conflict exception is thrown by the parser generator when the grammar is
+            ambiguous in such a way that the parser cannot decide if to shift another token or to reduce
+            by a given rule.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Construction.ShiftReduceConflictException`1.#ctor(System.String)">
+            <summary>
+            Construct a new shift reduce exception
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="P:Piglet.Parser.Construction.ShiftReduceConflictException`1.ShiftSymbol">
+            <summary>
+            The shift symbol in the conflict
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Construction.ShiftReduceConflictException`1.ReduceSymbol">
+            <summary>
+            The reduce symbol in the conflict
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.IParser`1">
+            <summary>
+            This interface describes a Piglet generated parser.
+            </summary>
+            <typeparam name="T">The semantic token value type</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.IParser`1.Lexer">
+            <summary>
+            Gets or sets the lexer associated with the parser.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.IParser`1.ParseTable">
+            <summary>
+            Get the internal parse table for this parser.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.IParser`1.Parse(System.String)">
+            <summary>
+            Parse an input string, returning the resulting semantic value type that is left on the parse
+            stack.
+            </summary>
+            <param name="input">Input string to parse</param>
+            <returns>The resulting semantic value symbol</returns>
+        </member>
+        <member name="M:Piglet.Parser.IParser`1.Parse(System.IO.TextReader)">
+            <summary>
+            Parse an input string, returning the resulting semantic value type that is left on the parse
+            stack.
+            </summary>
+            <param name="input">Input stream to parse</param>
+            <returns>The resulting semantic value symbol</returns>
+        </member>
+        <member name="T:Piglet.Parser.ParseException">
+            <summary>
+            ParseExceptions are thrown when the parser detects an illegal token according to the given
+            grammar.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.ParseException.LexerState">
+            <summary>
+            Current state of the lexer.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.ParseException.ExpectedTokens">
+            <summary>
+            This is a list of tokens that would have been valid given the current state
+            when the parsing failed. This contains the debug name of the tokens.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.ParseException.FoundToken">
+            <summary>
+            The debug name of the token that was found instead.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.ParseException.ParserState">
+            <summary>
+            The state number of the parser when it failed
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.ParseException.FoundTokenId">
+            <summary>
+            The token ID of the token that was found.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.ParseException.#ctor(System.String)">
+            <summary>
+            Construct a new ParseException
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="T:Piglet.Parser.ParserFactory">
+            <summary>
+            The parserfactory is the main way of obtaining parsers from Piglet.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.ParserFactory.Configure``1">
+            <summary>
+            Create a code based configurator
+            </summary>
+            <typeparam name="T">Semantic value type of tokens</typeparam>
+            <returns>A configurator, ready for use</returns>
+        </member>
+        <member name="M:Piglet.Parser.ParserFactory.Fluent">
+            <summary>
+            Create a fluent configurator object.
+            </summary>
+            <returns>A fluent configurator</returns>
+        </member>
+    </members>
+</doc>

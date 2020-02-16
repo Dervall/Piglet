@@ -1,125 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1E23F251-94E1-4504-81E8-2618F5C9FEA3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Piglet</RootNamespace>
-    <AssemblyName>Piglet</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFrameworks>netstandard2.0;netstandard1.6;net40;net45</TargetFrameworks>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Version>1.1.0</Version>
+    <Company>Per Dervall</Company>
+    <Product>Piglet</Product>
+    <Authors>Per Dervall</Authors>
+    <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.
+Fork from https://github.com/Dervall/Piglet
+    </Description>
+    <RepositoryUrl>https://github.com/harrison314/Piglet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseUrl>https://github.com/harrison314/Piglet/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/harrison314/Piglet</PackageProjectUrl>
+    <PackageId>Piglet</PackageId>
+    <DocumentationFile>Piglet.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Piglet.XML</DocumentationFile>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\SharedAssemblyInfo.cs">
-      <Link>SharedAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="Common\CompressedTable.cs" />
-    <Compile Include="Common\SublistSearch.cs" />
-    <Compile Include="Lexer\Construction\CharRange.cs" />
-    <Compile Include="Lexer\Construction\CharSet.cs" />
-    <Compile Include="Lexer\ILexerInstance.cs" />
-    <Compile Include="Lexer\Runtime\DfaLexer.cs" />
-    <Compile Include="Lexer\Configuration\ILexerConfigurator.cs" />
-    <Compile Include="Lexer\Configuration\LexerConfigurator.cs" />
-    <Compile Include="Lexer\Configuration\LexerRuntime.cs" />
-    <Compile Include="Lexer\Runtime\LexerBase.cs" />
-    <Compile Include="Lexer\Runtime\NfaLexer.cs" />
-    <Compile Include="Lexer\Construction\DFA.cs" />
-    <Compile Include="Lexer\Construction\DotNotation\DotNotation.cs" />
-    <Compile Include="Lexer\Construction\FiniteAutomata.cs" />
-    <Compile Include="Lexer\Construction\LexerConstructionException.cs" />
-    <Compile Include="Lexer\Construction\NFA.cs" />
-    <Compile Include="Lexer\Construction\NfaBuilder.cs" />
-    <Compile Include="Lexer\Construction\RegExLexer.cs" />
-    <Compile Include="Lexer\Construction\RegExToken.cs" />
-    <Compile Include="Lexer\Construction\ShuntingYard.cs" />
-    <Compile Include="Lexer\Construction\Transition.cs" />
-    <Compile Include="Lexer\Construction\TriangularTable.cs" />
-    <Compile Include="Lexer\ILexer.cs" />
-    <Compile Include="Lexer\ILexerState.cs" />
-    <Compile Include="Lexer\Runtime\TabularLexer.cs" />
-    <Compile Include="Lexer\LexerException.cs" />
-    <Compile Include="Lexer\LexerFactory.cs" />
-    <Compile Include="Lexer\Runtime\TransitionTable.cs" />
-    <Compile Include="Parser\Configuration\Fluent\FluentExpression.cs" />
-    <Compile Include="Parser\Configuration\Fluent\FluentParserConfigurator.cs" />
-    <Compile Include="Parser\Configuration\Fluent\FluentRule.cs" />
-    <Compile Include="Parser\Configuration\Fluent\IHideObjectMembers.cs" />
-    <Compile Include="Parser\Configuration\IProduction.cs" />
-    <Compile Include="Parser\Configuration\ILexerSettings.cs" />
-    <Compile Include="Parser\Configuration\INonTerminal.cs" />
-    <Compile Include="Parser\Configuration\PrecedenceGroup.cs" />
-    <Compile Include="Parser\Construction\AmbiguousGrammarException.cs" />
-    <Compile Include="Parser\Construction\Debug\DotNotation.cs" />
-    <Compile Include="Parser\Construction\Debug\ParseTableToString.cs" />
-    <Compile Include="Parser\Construction\GotoTable.cs" />
-    <Compile Include="Parser\Construction\IGrammar.cs" />
-    <Compile Include="Parser\Configuration\IParserConfigurator.cs" />
-    <Compile Include="Parser\Construction\IParseTable.cs" />
-    <Compile Include="Parser\Construction\IProductionRule.cs" />
-    <Compile Include="Parser\Configuration\ISymbol.cs" />
-    <Compile Include="Parser\Configuration\ITerminal.cs" />
-    <Compile Include="Parser\Configuration\NonTerminal.cs" />
-    <Compile Include="Parser\Configuration\ParserConfigurationException.cs" />
-    <Compile Include="Parser\Configuration\ParserConfigurator.cs" />
-    <Compile Include="Parser\Construction\IReductionRule.cs" />
-    <Compile Include="Parser\Construction\Lr1Item.cs" />
-    <Compile Include="Parser\Construction\Lr1ItemSet.cs" />
-    <Compile Include="Parser\Configuration\Fluent\IFluentParserConfigurator.cs" />
-    <Compile Include="Parser\ParserFactory.cs" />
-    <Compile Include="Common\ITable2D.cs" />
-    <Compile Include="Parser\Construction\ParserBuilder.cs" />
-    <Compile Include="Parser\Configuration\Symbol.cs" />
-    <Compile Include="Parser\Configuration\Terminal.cs" />
-    <Compile Include="Parser\Construction\Lr0Item.cs" />
-    <Compile Include="Parser\Construction\ReduceReduceConflictException.cs" />
-    <Compile Include="Parser\Construction\ReductionRule.cs" />
-    <Compile Include="Parser\Construction\ShiftReduceConflictException.cs" />
-    <Compile Include="Parser\Construction\LRParseTable.cs" />
-    <Compile Include="Parser\Construction\TerminalSet.cs" />
-    <Compile Include="Parser\IParser.cs" />
-    <Compile Include="Parser\LRParser.cs" />
-    <Compile Include="Parser\ParseException.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

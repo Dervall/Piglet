@@ -14,14 +14,21 @@ namespace Piglet.Lexer
         public int LineNumber { get; internal set; }
 
         /// <summary>
-        /// The contents of the current line so far of the current document
+        /// The contents of the current line so far of the current document.
         /// </summary>
         public string LineContents { get; internal set; }
 
         /// <summary>
-        /// The current character index (one-based).
+        /// The current character index inside the current line (zero-based).
         /// </summary>
         public int CharacterIndex { get; internal set; }
+
+        /// <summary>
+        /// The current character index in the input text (zero-based).
+        /// </summary>
+        public int CurrentAbsoluteIndex { get; internal set; }
+
+        public string Input { get; internal set; }
 
 
         /// <summary>

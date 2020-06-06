@@ -1,18 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using Piglet.Parser.Configuration;
 
 namespace Piglet.Lexer.Runtime
 {
-    /// <summary>
-    /// Represents a lexed (accepted) token.
-    /// </summary>
-    public class LexedToken<T>
+    public abstract class LexedTokenBase
     {
-        /// <summary>
-        /// Returns the lexed symbol.
-        /// </summary>
-        public T SymbolValue { get; }
         /// <summary>
         /// Returns the string associated with the lexed symbol.
         /// </summary>
@@ -26,7 +20,7 @@ namespace Piglet.Lexer.Runtime
         /// </summary>
         public int StartLineNumber { get; }
         /// <summary>
-        /// The token's starting index inside the starting line (one-based).
+        /// The token's starting index inside the starting line (zero-based).
         /// </summary>
         public int StartCharacterIndex { get; }
         /// <summary>
@@ -39,12 +33,11 @@ namespace Piglet.Lexer.Runtime
         public bool IsTerminal { get; }
 
 
-        internal LexedToken(T value, int abs_index, int line, int char_index, int length, bool terminal)
-            : this(value, null, abs_index, line, char_index, terminal) => Length = length;
+        private protected LexedTokenBase(int abs_index, int line, int char_index, int length, bool terminal)
+            : this(null, abs_index, line, char_index, terminal) => Length = length;
 
-        internal LexedToken(T value, string? str, int abs_index, int line, int char_index, bool terminal)
+        private protected LexedTokenBase(string? str, int abs_index, int line, int char_index, bool terminal)
         {
-            SymbolValue = value;
             LexedString = str;
             Length = str?.Length ?? 0;
             AbsoluteIndex = abs_index;
@@ -52,6 +45,27 @@ namespace Piglet.Lexer.Runtime
             StartCharacterIndex = char_index;
             IsTerminal = terminal;
         }
+    }
+
+    /// <summary>
+    /// Represents a lexed (accepted) token.
+    /// </summary>
+    public class LexedToken<T>
+        : LexedTokenBase
+    {
+        /// <summary>
+        /// Returns the lexed symbol.
+        /// </summary>
+        public T SymbolValue { get; }
+
+
+        internal LexedToken(T value, int abs_index, int line, int char_index, int length, bool terminal)
+            : base(abs_index, line, char_index, length, terminal) => SymbolValue = value;
+
+        public LexedToken(T value, string? str, int abs_index, int line, int char_index, bool terminal)
+            : base(str, abs_index, line, char_index, terminal) => SymbolValue = value;
+
+        // public LexedToken<U> Cast<U>() => this is LexedNonTerminal<T> nt ? nt.Cast<U>() : new LexedToken<U>((U)(object)SymbolValue, LexedString, AbsoluteIndex, StartLineNumber, StartCharacterIndex, true);
 
         public override string ToString() => $"[{AbsoluteIndex}..{AbsoluteIndex + Length}] \"{LexedString}\" at ({StartLineNumber}:{StartCharacterIndex})";
     }
@@ -59,14 +73,14 @@ namespace Piglet.Lexer.Runtime
     public sealed class LexedNonTerminal<T>
         : LexedToken<T>
     {
-        public INonTerminal<T> NonTerminal { get; }
+        internal INonTerminal NonTerminal { get; }
         public LexedToken<T>[] ChildNodes { get; }
         public LexedToken<T> FirstChild => ChildNodes[0];
         public LexedToken<T> LastChild => ChildNodes[^1];
 
 
         private LexedNonTerminal(T value, LexedToken<T>[] children, bool dummy)
-            : base(value, children[0].AbsoluteIndex, children[0].StartLineNumber, children[0].StartLineNumber, children[^1].AbsoluteIndex - children[0].AbsoluteIndex + children[^1].Length, false)
+            : base(value, children[0].AbsoluteIndex, children[0].StartLineNumber, children[0].StartCharacterIndex, children[^1].AbsoluteIndex - children[0].AbsoluteIndex + children[^1].Length, false)
         {
             ChildNodes = dummy? new LexedToken<T>[0] : children;
         }
@@ -76,9 +90,11 @@ namespace Piglet.Lexer.Runtime
         {
         }
 
-        internal LexedNonTerminal(T value, INonTerminal<T> symbol, LexedToken<T>[] children)
+        internal LexedNonTerminal(T value, INonTerminal symbol, IEnumerable<LexedToken<T>> children)
             : this(value, children.OrderBy(c => c.AbsoluteIndex).ToArray()) => NonTerminal = symbol;
 
-        public override string ToString() => base.ToString();
+        // public new LexedNonTerminal<U> Cast<U>() => new LexedNonTerminal<U>((U)(object)SymbolValue, NonTerminal, ChildNodes as IEnumerable<LexedToken<U>>);
+
+        public override string ToString() => $"[{AbsoluteIndex}..{AbsoluteIndex + Length}] \"{NonTerminal.DebugName}\" : {SymbolValue}";
     }
 }

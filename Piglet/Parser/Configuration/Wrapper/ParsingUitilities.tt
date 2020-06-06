@@ -19,6 +19,7 @@ using System.Linq;
 using System;
 
 using Piglet.Parser.Construction;
+using Piglet.Lexer.Runtime;
 
 
 namespace Piglet.Parser.Configuration.Wrapper
@@ -108,8 +109,40 @@ namespace Piglet.Parser.Configuration.Wrapper
 
             internal ParserWrapper(IParser<object> parser) => Parser = parser;
 
-            public X Parse(string s) => (X)Parser.Parse(s);
+            public ParserResult<X> Parse(string s)
+            {
+                List<LexedToken<object>> tokens = new List<LexedToken<object>>();
+                void aggregate(LexedToken<object> token)
+                {
+                    tokens.Add(token);
+
+                    if (token is LexedNonTerminal<object> nt)
+                        foreach (LexedToken<object> child in nt.ChildNodes)
+                            aggregate(child);
+                }
+
+                aggregate(Parser.ParseTokens(s));
+
+                return new ParserResult<X>((X)tokens[0].SymbolValue, s.Split('\n'), tokens.ToArray());
+            }
         }
+    }
+
+    public sealed class ParserResult<X>
+    {
+        public X ParsedValue { get; }
+        public string[] SourceLines { get; }
+        public LexedToken<object>[] LexedTokens { get; }
+
+
+        internal ParserResult(X parsedValue, string[] sourceLines, LexedToken<object>[] lexedTokens)
+        {
+            ParsedValue = parsedValue;
+            SourceLines = sourceLines;
+            LexedTokens = lexedTokens;
+        }
+
+        public static implicit operator X(ParserResult<X> res) => res.ParsedValue;
     }
 
     public interface ITerminalWrapper

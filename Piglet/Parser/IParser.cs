@@ -1,4 +1,5 @@
 using Piglet.Parser.Construction;
+using Piglet.Lexer.Runtime;
 using Piglet.Lexer;
 
 namespace Piglet.Parser
@@ -26,5 +27,7 @@ namespace Piglet.Parser
         /// <param name="input">Input string to parse</param>
         /// <returns>The resulting semantic value symbol</returns>
         T Parse(string input);
+
+        LexedToken<T> ParseTokens(string input);
     }
 }

@@ -46,7 +46,15 @@ namespace Piglet.Parser
         /// </summary>
         public string CurrentLine => LexerState.CurrentLine;
 
+        /// <summary>
+        /// The current character index inside the current line (zero-based).
+        /// </summary>
         public int CurrentCharacterIndex => LexerState.CurrentCharacterIndex;
+
+        /// <summary>
+        /// The current character index in the input text (zero-based).
+        /// </summary>
+        public int CurrentAbsoluteIndex => LexerState.CurrentAbsoluteIndex;
 
 
         /// <summary>

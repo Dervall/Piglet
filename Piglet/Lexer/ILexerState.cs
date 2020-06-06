@@ -16,7 +16,7 @@ namespace Piglet.Lexer
         int CurrentAbsoluteIndex { get; }
 
         /// <summary>
-        /// The current character index inside the current line (one-based).
+        /// The current character index inside the current line (zero-based).
         /// </summary>
         int CurrentCharacterIndex { get; }
 

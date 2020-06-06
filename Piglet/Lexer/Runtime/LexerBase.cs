@@ -46,7 +46,7 @@ namespace Piglet.Lexer.Runtime
 
             public int CurrentLineNumber { get; private set; } = 1;
             public int CurrentAbsoluteIndex { get; private set; } = 0;
-            public int CurrentCharacterIndex => _currentLine.Length;
+            public int CurrentCharacterIndex { get; private set; }
             public string CurrentLine => _currentLine.ToString();
             public string LastLexeme => _lexeme.ToString();
 
@@ -56,6 +56,7 @@ namespace Piglet.Lexer.Runtime
                 _lexer = lexer;
                 _source = source;
                 CurrentAbsoluteIndex = 0;
+                CurrentCharacterIndex = 0;
             }
 
             public (int number, LexedToken<T> token) Next()
@@ -66,8 +67,6 @@ namespace Piglet.Lexer.Runtime
                 while (true)
                 {
                     int peek = _source.Peek();
-
-                    ++CurrentAbsoluteIndex;
 
                     // Replace EOF with 0, or we will read outside of the table.
                     if (peek == -1)
@@ -103,19 +102,25 @@ namespace Piglet.Lexer.Runtime
                             {
                                 string str = _lexeme.ToString();
                                 T value = t.action is null ? default : t.action(str);
-                                LexedToken<T> lx = new LexedToken<T>(value, str, CurrentAbsoluteIndex, CurrentLineNumber, CurrentCharacterIndex, true);
+                                LexedToken<T> lx = new LexedToken<T>(value, str, CurrentAbsoluteIndex - str.Length, CurrentLineNumber, CurrentCharacterIndex - str.Length, true);
 
                                 return (t.number, lx); // Token completed. Return it
                             }
                         }
                         else
+                        {
+                            string input = c == '\0' ? "NULL" : c.ToString();
+
                             // We get here if there is no action at the state where the lexer cannot continue given the input. This fails.
-                            throw new LexerException($"Unexpected character '{(c == '\0' ? "NULL" : c.ToString())}' in '{_currentLine.ToString().TrimStart()}{c} ...' at ({CurrentLineNumber}:{CurrentCharacterIndex})")
+                            throw new LexerException($"Unexpected character '{input}' in '{_currentLine.ToString().TrimStart()}{c} ...' at ({CurrentLineNumber}:{CurrentCharacterIndex})")
                             {
+                                Input = input,
                                 LineContents = CurrentLine,
                                 CharacterIndex = CurrentCharacterIndex,
+                                CurrentAbsoluteIndex = CurrentAbsoluteIndex,
                                 LineNumber = CurrentLineNumber
                             };
+                        }
                     }
                     else
                     {
@@ -123,12 +128,15 @@ namespace Piglet.Lexer.Runtime
                         if (c == '\n')
                         {
                             CurrentLineNumber++;
+                            CurrentCharacterIndex = 0;
                             _currentLine.Clear();
                         }
                         else
                             _currentLine.Append(c);
 
                         // Machine has not terminated. Switch states, append character to lexeme.
+                        CurrentCharacterIndex++;
+                        CurrentAbsoluteIndex++;
                         _state = nextState;
                         _lexeme.Append(c);
                         _source.Read();

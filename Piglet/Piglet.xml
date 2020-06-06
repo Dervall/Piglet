@@ -523,6 +523,9 @@
             Specify that the preceeding element may be missing
             </summary>
         </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.SetPrecedenceList(System.ValueTuple{Piglet.Parser.Construction.AssociativityDirection,Piglet.Parser.Configuration.Generic.ITerminalWrapper[]}[])">
+            <summary>ascending precedence!</summary>
+        </member>
         <member name="T:Piglet.Parser.Configuration.ILexerSettings">
             <summary>
             Set additional settings for the lexer
@@ -724,9 +727,6 @@
             Construct a new parser configuration exception
             </summary>
             <param name="message">message to show user</param>
-        </member>
-        <member name="M:Piglet.Parser.Configuration.Wrapper.ParserConstructor`1.SetPrecedenceList(System.ValueTuple{Piglet.Parser.Construction.AssociativityDirection,Piglet.Parser.Configuration.Wrapper.ITerminalWrapper[]}[])">
-            <summary>ascending precedence!</summary>
         </member>
         <member name="T:Piglet.Parser.Construction.AmbiguousGrammarException">
             <summary>

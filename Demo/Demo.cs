@@ -1,5 +1,5 @@
 ﻿using System;
-using Piglet.Parser.Configuration.Wrapper;
+using Piglet.Parser.Configuration.Generic;
 using Piglet.Parser.Configuration;
 using Piglet.Parser.Construction;
 using Piglet.Demo.Parser;
@@ -18,8 +18,7 @@ namespace Piglet.Demo
             var f = par.Parse(s);
 
             Console.WriteLine(s);
-            Console.WriteLine(f.Item1);
-            Console.WriteLine(f.Item2(2));
+            Console.WriteLine(f);
 
             return;
 

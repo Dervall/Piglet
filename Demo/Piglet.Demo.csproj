@@ -1,26 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-      <TargetFrameworks>netcoreapp3.0</TargetFrameworks>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Piglet.Demo</RootNamespace>
-    <AssemblyName>Piglet.Demo</AssemblyName>
-      <OutputPath>bin\Debug\</OutputPath>
-      <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DebugSymbols>false</DebugSymbols>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Piglet\Piglet.csproj"/>
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net5</TargetFramework>
+        <ProductVersion>8.0.30703</ProductVersion>
+        <SchemaVersion>2.0</SchemaVersion>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>Piglet.Demo</RootNamespace>
+        <AssemblyName>Piglet.Demo</AssemblyName>
+        <OutputPath>bin\Debug\</OutputPath>
+        <Prefer32Bit>false</Prefer32Bit>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Piglet\Piglet.csproj"/>
+    </ItemGroup>
 </Project>

@@ -3,107 +3,100 @@ using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    internal class ShuntingYard
+    internal sealed class ShuntingYard
     {
-        private readonly RegExLexer lexer;
+        private readonly RegexLexer _lexer;
 
-        public ShuntingYard(RegExLexer lexer)
+
+        public ShuntingYard(RegexLexer lexer) => _lexer = lexer;
+
+        private IEnumerable<RegexToken> TokensWithImplicitConcat()
         {
-            this.lexer = lexer;
-        }
+            RegexToken lastToken = null;
 
-
-        private IEnumerable<RegExToken> TokensWithImplicitConcat()
-        {
-            RegExToken lastToken = null;
-
-            for (var token = lexer.NextToken(); token != null; )
+            for (RegexToken token = _lexer.NextToken(); token != null;)
             {
-                // If the last token was accept and this new token is also accept we need to insert a concat operator
-                // between the two.
-                if (lastToken != null &&
-                    PreceedingTypeRequiresConcat(lastToken.Type) &&
-                    NextTypeRequiresConcat(token.Type))
-                {
-                    yield return new RegExToken { Type = RegExToken.TokenType.OperatorConcat };
-                }
+                // If the last token was accept and this new token is also accept we need to insert a concat operator  between the two.
+                if (lastToken != null && PreceedingTypeRequiresConcat(lastToken.Type) && NextTypeRequiresConcat(token.Type))
+                    yield return new RegexToken { Type = RegexTokenType.OperatorConcat };
 
                 yield return token;
 
                 lastToken = token;
-                token = lexer.NextToken();
+                token = _lexer.NextToken();
             }
         }
 
-        private bool PreceedingTypeRequiresConcat(RegExToken.TokenType type)
+        private static bool PreceedingTypeRequiresConcat(RegexTokenType type)
         {
             switch (type)
             {
-                case RegExToken.TokenType.OperatorMul:
-                case RegExToken.TokenType.OperatorQuestion:
-                case RegExToken.TokenType.OperatorPlus:
-                case RegExToken.TokenType.Accept:
-                case RegExToken.TokenType.OperatorCloseParanthesis:
-                case RegExToken.TokenType.NumberedRepeat:
+                case RegexTokenType.OperatorMul:
+                case RegexTokenType.OperatorQuestion:
+                case RegexTokenType.OperatorPlus:
+                case RegexTokenType.Accept:
+                case RegexTokenType.OperatorCloseParanthesis:
+                case RegexTokenType.NumberedRepeat:
                     return true;
             }
+
             return false;
         }
 
-        private bool NextTypeRequiresConcat(RegExToken.TokenType type)
+        private static bool NextTypeRequiresConcat(RegexTokenType type)
         {
             switch (type)
             {
-                case RegExToken.TokenType.Accept:
-                case RegExToken.TokenType.OperatorOpenParanthesis:
+                case RegexTokenType.Accept:
+                case RegexTokenType.OperatorOpenParanthesis:
                     return true;
-
             }
+
             return false;
         }
 
-        public IEnumerable<RegExToken> ShuntedTokens()
+        public IEnumerable<RegexToken> ShuntedTokens()
         {
-            var operatorStack = new Stack<RegExToken>();
+            Stack<RegexToken> operatorStack = new Stack<RegexToken>();
 
-            foreach (var token in TokensWithImplicitConcat())
+            foreach (RegexToken token in TokensWithImplicitConcat())
             {
                 switch (token.Type)
                 {
-                    case RegExToken.TokenType.Accept:
+                    case RegexTokenType.Accept:
                         yield return token;
-                        break;
 
-                    case RegExToken.TokenType.OperatorOpenParanthesis:
+                        break;
+                    case RegexTokenType.OperatorOpenParanthesis:
                         operatorStack.Push(token);
-                        break;
 
-                    case RegExToken.TokenType.OperatorCloseParanthesis:
-                        while (operatorStack.Any() && operatorStack.Peek().Type != RegExToken.TokenType.OperatorOpenParanthesis)
-                        {
+                        break;
+                    case RegexTokenType.OperatorCloseParanthesis:
+                        while (operatorStack.Any() && operatorStack.Peek().Type != RegexTokenType.OperatorOpenParanthesis)
                             yield return operatorStack.Pop();
-                        }
+
                         if (!operatorStack.Any())
                             // Mismatched parenthesis
                             throw new LexerConstructionException("Mismatched parenthesis in regular expression");
-                        operatorStack.Pop();
-                        break;
 
+                        operatorStack.Pop();
+
+                        break;
                     default:
                         while (operatorStack.Any() && token.Precedence <= operatorStack.Peek().Precedence)
-                        {
                             yield return operatorStack.Pop();
-                        }
+
                         operatorStack.Push(token);
+
                         break;
                 }
             }
 
             while (operatorStack.Any())
             {
-                var op = operatorStack.Pop();
+                RegexToken op = operatorStack.Pop();
 
-                if (op.Type == RegExToken.TokenType.OperatorOpenParanthesis)
+                if (op.Type == RegexTokenType.OperatorOpenParanthesis)
                     throw new LexerConstructionException("Mismatched parenthesis in regular expression");
 
                 yield return op;

@@ -1,36 +1,52 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.6;net40;net45</TargetFrameworks>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Version>1.5.0</Version>
-    <Company>Per Dervall</Company>
-    <Product>Piglet</Product>
-    <Authors>Per Dervall;harrison314</Authors>
-    <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.
-    </Description>
-    <RepositoryUrl>https://github.com/harrison314/Piglet</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/Dervall/Piglet</PackageProjectUrl>
-    <PackageId>Piglet</PackageId>
-    <DocumentationFile>Piglet.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup>
-      <PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-
+    <PropertyGroup>
+        <TargetFrameworks>net5</TargetFrameworks>
+        <LangVersion>preview</LangVersion>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <Version>1.6.0</Version>
+        <Company>Per Dervall; Unknown6656</Company>
+        <Product>Piglet</Product>
+        <Authors>Per Dervall; Unknown6656; harrison314</Authors>
+        <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.</Description>
+        <RepositoryUrl>https://github.com/unknown6656/Piglet</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/unknown6656/Piglet</PackageProjectUrl>
+        <PackageId>Piglet</PackageId>
+        <DocumentationFile>Piglet.xml</DocumentationFile>
+        <WarningLevel>4</WarningLevel>
+        <OutputPath>..\bin</OutputPath>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Prefer32Bit>false</Prefer32Bit>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
     <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
   </ItemGroup>
+    <ItemGroup>
+        <None Update="Parser\Configuration\Generic\ParsingUitilities.tt">
+            <Generator>TextTemplatingFileGenerator</Generator>
+            <LastGenOutput>ParsingUitilities.cs</LastGenOutput>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Parser\Configuration\Generic\ParsingUitilities.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>ParsingUitilities.tt</DependentUpon>
+        </Compile>
+    </ItemGroup>
 </Project>

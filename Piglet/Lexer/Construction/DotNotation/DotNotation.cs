@@ -17,10 +17,7 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <param name="minimize">Minimize the resulting DFA</param>
         /// <param name="nfaString">Dot notation NFA graph</param>
         /// <param name="dfaString">Dot notation DFA graph</param>
-        public static void GetDfaAndNfaGraphs(string regex, bool minimize, out string nfaString, out string dfaString)
-        {
-            GetDfaAndNfaGraphs(regex, null, minimize, out nfaString, out dfaString);
-        }
+        public static void GetDfaAndNfaGraphs(string regex, bool minimize, out string nfaString, out string dfaString) => GetDfaAndNfaGraphs(regex, null, minimize, out nfaString, out dfaString);
 
         /// <summary>
         /// Get the DFA and NFA graphs for a given regular expression and highlight active
@@ -33,9 +30,9 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <param name="dfaString">Dot notation DFA graph</param>
         public static void GetDfaAndNfaGraphs(string regex, string input, bool minimize, out string nfaString, out string dfaString)
         {
-            var nfa = NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(regex))));
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(regex))));
             nfaString = nfa.AsDotNotation(input, "NFA");
-            var dfa = DFA.Create(nfa);
+            DFA dfa = DFA.Create(nfa);
             if (minimize)
             {
                 dfa.Minimize();
@@ -63,7 +60,7 @@ namespace Piglet.Lexer.Construction.DotNotation
             //  1 -> 2 [label=a]
             //}
 
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
             sb.Append("digraph " + graphName + " {\n");
             sb.Append("\t[node shape=\"circle\"]\n");
@@ -75,7 +72,7 @@ namespace Piglet.Lexer.Construction.DotNotation
 
             if (!string.IsNullOrEmpty(input))
             {
-                var stimulateResult = automata.Stimulate(input);
+                StimulateResult<TState> stimulateResult = automata.Stimulate(input);
 
                 matchSuccessful = (input == stimulateResult.Matched);
                 
@@ -86,7 +83,7 @@ namespace Piglet.Lexer.Construction.DotNotation
                 currentStates = stimulateResult.ActiveStates;
             }
 
-            foreach (var transition in automata.Transitions)
+            foreach (Transition<TState> transition in automata.Transitions)
             {
                 sb.Append(string.Format("\t{0} -> {1} [label=\"{2}\"]\n", 
                     transition.From.StateNumber,
@@ -94,7 +91,7 @@ namespace Piglet.Lexer.Construction.DotNotation
                     transition.TransitionLabel().Replace("\\", "\\\\").Replace("\"", "\\\"")));
             }
 
-            foreach (var state in automata.States.Where(f => f.AcceptState || currentStates.Contains(f)))
+            foreach (TState state in automata.States.Where(f => f.AcceptState || currentStates.Contains(f)))
             {
                 sb.AppendFormat("\t{0} [{1}{2}]\n",
                     state.StateNumber,
@@ -116,9 +113,6 @@ namespace Piglet.Lexer.Construction.DotNotation
         /// <typeparam name="T"></typeparam>
         /// <param name="transition"></param>
         /// <returns></returns>
-        internal static string TransitionLabel<T>(this Transition<T> transition )
-        {
-            return transition.ValidInput.ToString();
-        }
+        internal static string TransitionLabel<T>(this Transition<T> transition) => transition.ValidInput.ToString();
     }
 }

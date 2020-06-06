@@ -11,10 +11,7 @@ namespace Piglet.Tests.Lexer.Construction
     [TestFixture]
     public class TestStateMinimization
     {
-        private static DFA CreateDfa(string expression)
-        {
-            return DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(expression)))));
-        }
+        private static DFA CreateDfa(string expression) => DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(expression)))));
 
         [Test]
         public void TestSimpleMinimization()

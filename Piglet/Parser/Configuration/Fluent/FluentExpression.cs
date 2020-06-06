@@ -1,71 +1,47 @@
-using System;
 using System.Globalization;
+using System;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
-    internal class FluentExpression : IExpressionConfigurator, IExpressionReturnConfigurator
+    internal sealed class FluentExpression
+        : IExpressionConfigurator
+        , IExpressionReturnConfigurator
     {
-        private readonly ParserConfigurator<object> configurator;
-        private Terminal<object> terminal;
-        private string regex;
+        private readonly ParserConfigurator<object> _configurator;
+        private Terminal<object> _terminal;
+        private string _regex;
 
-        public FluentExpression(ParserConfigurator<object> configurator)
-        {
-            this.configurator = configurator;
-        }
 
-        public FluentExpression(ITerminal<object> terminal)
-        {
-            this.terminal = (Terminal<object>) terminal;
-        }
+        public FluentExpression(ParserConfigurator<object> configurator) => _configurator = configurator;
 
-        public Terminal<object> Terminal
-        {
-            get
-            {
-                if (terminal == null)
-                {
-                    throw new ParserConfigurationException("An expression must be fully configured before use!");
-                }
-                return terminal;
-            }
-        }
+        public FluentExpression(ITerminal<object> terminal) => _terminal = (Terminal<object>)terminal;
+
+        public Terminal<object> Terminal => _terminal ?? throw new ParserConfigurationException("An expression must be fully configured before use!");
 
         public void ThatMatches<TExpressionType>()
         {
-            var type = typeof (TExpressionType);
+            Type type = typeof(TExpressionType);
+
             if (type == typeof(int))
-            {
                 ThatMatches(@"\d+").AndReturns(f => int.Parse(f));
-            }
             else if (type == typeof(double))
-            {
                 ThatMatches(@"\d+(\.\d+)?").AndReturns(f => double.Parse(f, CultureInfo.InvariantCulture));
-            }
             else if (type == typeof(float))
-            {
                 ThatMatches(@"\d+(\.\d+)?").AndReturns(f => float.Parse(f));
-            }
             else if (type == typeof(bool))
-            {
                 ThatMatches(@"((true)|(false))").AndReturns(f => bool.Parse(f));
-            }
             else
-            {
                 throw new ParserConfigurationException("Unknown type passed to ThatMatches.");
-            }
         }
 
         public IExpressionReturnConfigurator ThatMatches(string regex)
         {
-            this.regex = regex;
+            _regex = regex;
+
             return this;
         }
 
-        public void AndReturns(Func<string, object> func)
-        {
-            // Create the terminal now to ensure that the tokens will be created in the right order
-            terminal = (Terminal<object>) configurator.CreateTerminal(regex, func);
-        }
+        // Create the terminal now to ensure that the tokens will be created in the right order
+        public void AndReturns(Func<string, object> func) => _terminal = (Terminal<object>)_configurator.CreateTerminal(_regex, func);
     }
 }

@@ -16,9 +16,6 @@
             To = to;
         }
 
-        public override string ToString()
-        {
-            return string.Format("{0} ={1}=> {2}", From, To, ValidInput);
-        }
+        public override string ToString() => string.Format("{0} ={1}=> {2}", From, To, ValidInput);
     }
 }

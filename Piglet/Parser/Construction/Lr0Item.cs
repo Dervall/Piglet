@@ -26,7 +26,7 @@ namespace Piglet.Parser.Construction
         
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             sb.Append(ProductionRule.ResultSymbol.DebugName);
             sb.Append(" -> ");
             bool dotAdded = false;

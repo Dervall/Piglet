@@ -1,6 +1,6 @@
-using System.IO;
-using Piglet.Lexer;
 using Piglet.Parser.Construction;
+using Piglet.Lexer.Runtime;
+using Piglet.Lexer;
 
 namespace Piglet.Parser
 {
@@ -28,12 +28,6 @@ namespace Piglet.Parser
         /// <returns>The resulting semantic value symbol</returns>
         T Parse(string input);
 
-        /// <summary>
-        /// Parse an input string, returning the resulting semantic value type that is left on the parse
-        /// stack.
-        /// </summary>
-        /// <param name="input">Input stream to parse</param>
-        /// <returns>The resulting semantic value symbol</returns>
-        T Parse(TextReader input);
+        LexedToken<T> ParseTokens(string input);
     }
 }

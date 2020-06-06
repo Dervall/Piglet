@@ -1,8 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System;
+
 using Piglet.Lexer.Configuration;
 using Piglet.Parser.Configuration;
 using Piglet.Parser.Construction;
-using System.Linq;
 
 namespace Piglet.Lexer
 {
@@ -20,8 +22,10 @@ namespace Piglet.Lexer
         /// <throws>LexerConfigurationException for errors</throws>
         public static ILexer<T> Configure(Action<ILexerConfigurator<T>> configureAction)
         {
-            var lexerConfigurator = new LexerConfigurator<T>();
+            LexerConfigurator<T> lexerConfigurator = new LexerConfigurator<T>();
+
             configureAction(lexerConfigurator);
+
             return lexerConfigurator.CreateLexer();
         }
 
@@ -31,7 +35,7 @@ namespace Piglet.Lexer
         /// <param name="grammar">Grammar to generate lexers from</param>
         /// <param name="lexerSettings">Additional lexing settings</param>
         /// <returns>A lexer compatibe with the given grammars tokenizing rules</returns>
-        internal static ILexer<T> ConfigureFromGrammar(IGrammar<T> grammar, ILexerSettings lexerSettings)
+        internal static ILexer<T> ConfigureFromGrammar(IGrammar<T> grammar, ILexerSettings lexerSettings) => Configure(c =>
         {
             // This works because the grammar tokens will recieve the same token number
             // since they are assigned to this list in just the same way. AND BECAUSE the
@@ -39,25 +43,19 @@ namespace Piglet.Lexer
             // This might be considered dodgy later on, since it makes it kinda sorta hard to
             // use other lexers with Piglet. Let's see what happens, if anyone ever wants to write their
             // own lexer for Piglet.
-            return Configure(c =>
-            {
-                c.Runtime = lexerSettings.Runtime;
 
-                var terminals = grammar.AllSymbols.OfType<ITerminal<T>>().ToList();
-                foreach (var terminal in terminals)
-                {
-                    if (terminal.RegExp != null)
-                    {
-                        c.Token(terminal.RegExp, terminal.OnParse);
-                    }
-                }
-                c.EndOfInputTokenNumber = terminals.FindIndex(f => f == grammar.EndOfInputTerminal);
-                
-                foreach (var ignored in lexerSettings.Ignore)
-                {
-                    c.Ignore(ignored);
-                }
-            });
-        }
+            c.Runtime = lexerSettings.Runtime;
+
+            List<ITerminal<T>> terminals = grammar.AllSymbols.OfType<ITerminal<T>>().ToList();
+
+            foreach (ITerminal<T> terminal in terminals)
+                if (terminal.Regex is { } r)
+                    c.Token(r, terminal.OnParse);
+
+            c.EndOfInputTokenNumber = terminals.FindIndex(f => f == grammar.EndOfInputTerminal);
+
+            foreach (string ignored in lexerSettings.Ignore)
+                c.Ignore(ignored);
+        });
     }
 }

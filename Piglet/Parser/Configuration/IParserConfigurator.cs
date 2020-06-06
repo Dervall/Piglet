@@ -20,7 +20,7 @@ namespace Piglet.Parser.Configuration
     	/// <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
     	/// <param name="topPrecedence">If true, this terminal takes precedence over previously created terminals</param>
     	/// <returns>A terminal symbol</returns>
-    	ITerminal<T> CreateTerminal(string regExp, Func<string, T> onParse = null, bool topPrecedence = false);
+    	ITerminal<T> CreateTerminal(string regExp, Func<string, T>? onParse = null, bool topPrecedence = false);
         
         /// <summary>
         /// Create a new NonTerminal. Production actions may be specified directly, or deferred until later. The
@@ -64,9 +64,32 @@ namespace Piglet.Parser.Configuration
         IPrecedenceGroup NonAssociative(params ITerminal<T>[] symbols);
 
         /// <summary>
+        /// Sets the given non-terminal symbol as start symbol
+        /// </summary>
+        /// <param name="start">Non-terminal symbol</param>
+        void SetStartSymbol(INonTerminal<T> start);
+
+        /// <summary>
         /// Creates a parser based on the inputted configuration. If a lexer has been desired as well, this method will also create the lexer.
         /// </summary>
         /// <returns>The created parser</returns>
         IParser<T> CreateParser();
+    }
+
+    public static class Extensions
+    {
+        public static ITerminal<T> CreateTerminal<T>(this IParserConfigurator<T> conf, string regex, T val, bool tp = false) =>
+            conf.CreateTerminal(regex, _ => val, tp);
+
+        public static INonTerminal<T> CreateNonTerminal<T>(this IParserConfigurator<T> conf, string name)
+        {
+            INonTerminal<T> nter = conf.CreateNonTerminal();
+
+            nter.DebugName = name;
+
+            return nter;
+        }
+
+        public static void AddReduceProduction<T>(this INonTerminal<T> symb, params object[] args) => symb.AddProduction(args).SetReduceToFirst();
     }
 }

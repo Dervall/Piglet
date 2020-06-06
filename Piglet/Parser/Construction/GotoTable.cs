@@ -1,12 +1,13 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+
 using Piglet.Common;
 
 namespace Piglet.Parser.Construction
 {
-    internal class GotoTable : ITable2D
+    internal sealed class GotoTable
+        : ITable2D
     {
         /// <summary>
         /// Only for input to the constructor
@@ -18,28 +19,28 @@ namespace Piglet.Parser.Construction
             public int NewState;
         };
 
-        private readonly short[] stateDictionary;
-        private readonly short[] gotoValues;
+        private readonly short[] _stateDictionary;
+        private readonly short[] _gotoValues;
+
 
         public GotoTable(IList<GotoTableValue> gotos)
         {
             // Gather the most common gotos for each token.
-            var maxToken = gotos.Max(f => f.Token) + 1;
-            
-            // Get the most common gotos and store them in the start
-            var defaultGotos = GetMostCommonGotos(gotos, maxToken);
+            int maxToken = gotos.Max(f => f.Token) + 1;
 
-            // Iterate through the states, and find out where the default GOTOs are not applicable
-            // for those states, store an offset
-            stateDictionary = new short[gotos.Max(f => f.State) + 1]; // Need not store more than nStates+1 of the maximum referenced state
+            // Get the most common gotos and store them in the start
+            short[] defaultGotos = GetMostCommonGotos(gotos, maxToken);
+
+            // Iterate through the states, and find out where the default GOTOs are not applicable for those states, store an offset
+            _stateDictionary = new short[gotos.Max(f => f.State) + 1]; // Need not store more than nStates+1 of the maximum referenced state
 
             // Holds the gotos for a given state, allocated outside of loop for performance reasons.
-            var stateGotos = new short[maxToken];
+            short[] stateGotos = new short[maxToken];
             // Stategotos now holds only 0, which is what we want (every state points to defaultGotos)
 
-			var offsets = new List<short>(defaultGotos); // The offsets is where we will store the default gotos in the end
+            List<short> offsets = new List<short>(defaultGotos); // The offsets is where we will store the default gotos in the end
 
-            foreach ( var state in gotos.Select(f => f.State).Distinct())
+            foreach (int state in gotos.Select(f => f.State).Distinct())
             {
                 // Assemble the goto list
                 
@@ -49,17 +50,16 @@ namespace Piglet.Parser.Construction
                 // For each gotoitem, set the stateGoto appropritately.
                 int state1 = state;
 
-                var gotosForState = gotos.Where(f => f.State == state1).ToList();
-                foreach (var gotoItem in gotosForState)
-                {
-                    stateGotos[gotoItem.Token] = (short) gotoItem.NewState;
-                }
+                List<GotoTableValue> gotosForState = gotos.Where(f => f.State == state1).ToList();
+
+                foreach (GotoTableValue gotoItem in gotosForState)
+                    stateGotos[gotoItem.Token] = (short)gotoItem.NewState;
 
                 // Compare the state gotos to the default gotos. If they are the same, don't change a thing.
                 int firstMisMatchIndex = -1;
                 int lastMisMatchIndex = -1;
+
                 for (int i = 0; i < defaultGotos.Length; ++i)
-                {
                     if (stateGotos[i] != defaultGotos[i])
                     {
                         // Mismatch, we will need to create things in the gotoValues table
@@ -68,13 +68,13 @@ namespace Piglet.Parser.Construction
                         firstMisMatchIndex = gotosForState.Min(f => f.Token);
                         lastMisMatchIndex = gotosForState.Max(f => f.Token);
                     }
-                }
 
                 // If we have a mismatch we need to find a match for the sublist in question.
                 if (firstMisMatchIndex != -1)
                 {
-                    var sublist = stateGotos.Skip(firstMisMatchIndex).Take(lastMisMatchIndex - firstMisMatchIndex + 1).ToList();
-                    var offsetIndex = offsets.IndexOf(sublist);
+                    List<short> sublist = stateGotos.Skip(firstMisMatchIndex).Take(lastMisMatchIndex - firstMisMatchIndex + 1).ToList();
+                    int offsetIndex = offsets.IndexOf(sublist);
+
                     if (offsetIndex == -1)
                     {
                         // Not found. Add entire sublist to the end
@@ -84,33 +84,52 @@ namespace Piglet.Parser.Construction
 
                     // Set the offset index. This is offsetted by the first mismatch since those tokens will never be called, so they
                     // can be whatever. We're not using the entire list to look for the submatch.
-                    stateDictionary[state] = (short)(offsetIndex - firstMisMatchIndex);
+                    _stateDictionary[state] = (short)(offsetIndex - firstMisMatchIndex);
                 }
             }
 
             // Remove the list and condense into array for fast use once parsing starts
-            gotoValues = offsets.ToArray();
+            _gotoValues = offsets.ToArray();
         }
 
         private static short[] GetMostCommonGotos(IEnumerable<GotoTableValue> gotos, int maxToken)
         {
-            var defaultGotos = new short[maxToken];
-            var gotoCounts = new Dictionary<Tuple<int, int>, int>();
-            foreach (var g in gotos)
+            Dictionary<(int token, int state), int> gotoCounts = new Dictionary<(int token, int state), int>();
+            short[] defaultGotos = new short[maxToken];
+
+            foreach (GotoTableValue g in gotos)
             {
-                var t = new Tuple<int, int>(g.Token, g.NewState);
+                (int, int) t = (g.Token, g.NewState);
 
                 if (!gotoCounts.ContainsKey(t))
                     gotoCounts.Add(t, 0);
-                gotoCounts[t] = gotoCounts[t] + 1;
+
+                ++gotoCounts[t];
             }
+
+            List<int> unassigned = new List<int>();
 
             // For every token in the grammar, store the most stored count as the default goto
             for (int t = 0; t < maxToken; ++t)
             {
-                var mostCommonNewState = gotoCounts.Where(f => f.Key.Item1 == t).OrderBy(f => -f.Value).Select(f => f.Key.Item2);
-                defaultGotos[t] = (short) mostCommonNewState.First();
+                int[] def = (from f in gotoCounts
+                             where f.Key.token == t
+                             orderby -f.Value
+                             select f.Key.state).ToArray();
+
+                if (def.Length == 0)
+                    unassigned.Add(t);
+                else
+                    defaultGotos[t] = (short)def[0];
             }
+
+            foreach (int t in unassigned)
+                defaultGotos[t] = (from f in gotoCounts
+                                   let i2 = (short)f.Key.state
+                                   where !defaultGotos.Contains(i2)
+                                   orderby -f.Value
+                                   select i2).FirstOrDefault();
+
             return defaultGotos;
         }
 
@@ -120,16 +139,17 @@ namespace Piglet.Parser.Construction
             {
                 // This check is really unneccessary since the parser will never access outside of the legal state list
                 // but for now the debug printer will. So that is why we check for the state bounds
-                if (state >= stateDictionary.Length)
+                if (state >= _stateDictionary.Length)
                     return short.MinValue; // Nothing to see here.
-                
+
                 // Index into goto values.
-                var offsetIndex = stateDictionary[state] + input;
+                int offsetIndex = _stateDictionary[state] + input;
 
                 // Also an unnecessary check if it wasn't for the debugging feature
-                if (offsetIndex >= gotoValues.Length)
+                if (offsetIndex >= _gotoValues.Length)
                     return short.MinValue;
-                return gotoValues[offsetIndex];
+
+                return _gotoValues[offsetIndex];
             }
         }
     }

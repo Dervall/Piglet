@@ -14,7 +14,7 @@ namespace Piglet.Parser.Construction
 
             // Iterate through all the symbols we've got in the grammar
             // and add stuff to the first set
-            foreach (var symbol in grammar.AllSymbols.OfType<NonTerminal<T>>())
+            foreach (NonTerminal<T> symbol in grammar.AllSymbols.OfType<NonTerminal<T>>())
             {
                 // Initialize the list
                 dict[symbol] = new List<Terminal<T>>();
@@ -23,7 +23,7 @@ namespace Piglet.Parser.Construction
 
         public bool Add(NonTerminal<T> symbol, Terminal<T> terminal)
         {
-            var terminals = dict[symbol];
+            List<Terminal<T>> terminals = dict[symbol];
             if (terminals.Contains(terminal))
             {
                 return false;

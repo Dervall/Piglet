@@ -46,4 +46,7 @@
             <DependentUpon>ParsingUitilities.tt</DependentUpon>
         </Compile>
     </ItemGroup>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+      <Exec Command="cd &quot;$(SolutionDir)Piglet.GenericGenerator&quot;&#xD;&#xA;dotnet run -- $(ProjectDir) Parser/Configuration/Generic/ParsingUitilities2.cs" />
+    </Target>
 </Project>

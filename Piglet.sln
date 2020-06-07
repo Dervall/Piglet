@@ -7,7 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piglet", "Piglet\Piglet.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piglet.Tests", "Piglet.Tests\Piglet.Tests.csproj", "{4B926BCC-9F15-48FE-A37A-A9AF9F235360}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piglet.Demo", "Demo\Piglet.Demo.csproj", "{B23B66AD-EA0F-4254-BDE6-C4EF883BD5B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piglet.Demo", "Demo\Piglet.Demo.csproj", "{B23B66AD-EA0F-4254-BDE6-C4EF883BD5B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{41C436F4-E3FA-486E-8C4C-1B2828D00D50}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

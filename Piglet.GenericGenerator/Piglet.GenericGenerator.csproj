@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <OutputPath>$(SolutionDir)util</OutputPath>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AssemblyName>generator</AssemblyName>
+        <StartupObject>Piglet.GenericGenerator.Program</StartupObject>
     </PropertyGroup>
 </Project>

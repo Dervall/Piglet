@@ -31,6 +31,9 @@
         <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-      <Exec Command="cd &quot;$(SolutionDir)Piglet.GenericGenerator&quot;&#xD;&#xA;dotnet run -- $(ProjectDir) Parser/Configuration/Generic/ParsingUitilities.cs" />
+        <Exec Command="dotnet &quot;$(SolutionDir)util\generator.dll&quot; &quot;Parser/Configuration/Generic/ParsingUitilities.cs&quot;" />
+        <ItemGroup>
+            <Compile Include="**/*$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**;@(Compile)" />
+        </ItemGroup>
     </Target>
 </Project>

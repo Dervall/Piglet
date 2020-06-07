@@ -12,15 +12,13 @@ namespace Piglet.GenericGenerator
 
         public static void Main(string[] args)
         {
-            Directory.SetCurrentDirectory(args[0]);
-
-            FileInfo target_file = new FileInfo(args[1]);
+            FileInfo target_file = new FileInfo(args[0]);
             DirectoryInfo parent = target_file.Directory;
 
             if (!parent.Exists)
                 parent.Create();
 
-            if (args.Length > 2 && int.TryParse(args[2], out int size))
+            if (args.Length > 1 && int.TryParse(args[1], out int size))
                 MAX_SIZE = size;
 
             using FileStream stream = new FileStream(target_file.FullName, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);

@@ -1,30 +1,24 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/7k5vohj4lhmdhac1?svg=true)](https://ci.appveyor.com/project/Unknown6656/piglet)
-=================================================
 
+
+# Piglet, the little friendly parser and lexer tool
 Piglet is a library for lexing and parsing text, in the spirit of those big parser and lexer genererators such as bison, antlr and flex. While not as feature packed as those, it is also a whole lot leaner and much easier to understand.
 
-Mission statement
------------------
-
+### Mission statement
 * To broaden the use of real parsing and lexer to extend to more than compiler construction
 * To be a dependency free library that is embeddable in your code without requiring a compile-time step
 * To be easy to use
 * To be a source of understanding of the underlying algorithms by using understandable code
 
-Why use piglet
-==============
+## Why use piglet
 
 Piglets mission in life is to fill the void where regular expressions aren't enough and a full-blown parser generator is way too much work to integrate into your project.
 A typical example is when you have hierarchical data, something which regular expressions cannot parse. Don't revert to hand writing parsers when Piglet can help you out!
 
-How to use
-==========
-
+## How to use
 Piglet is composed of two parts, a lexer and a parser. 
 
-Parser
-------
-
+### Parser
 Parsing is inheritly a complex subject, and Piglet tries it's best to make it as accessible as possible by using a fluent format that actually tells you what is going to happen. 
 You declare rules, that themselves may contain other rules. The first rule that you define is what the entire thing must be reduced to using the other rules.
 
@@ -91,9 +85,7 @@ int result = parser.Parse(new StringReader("7+8*2-2+2"));
 Assert.AreEqual(23, result);
 ```
 
-Lexer
------
-
+### Lexer
 Sometimes you don't need a full parser, but only a tool to identify tokens. This the sort of work that you typically do using a series of regular expressions or perhaps a lot of tryParse. A lexer is a tool for identifying tokens in a much more flexible way than doing it yourself. It is also more efficient. An example:
 
 ```csharp
@@ -162,14 +154,13 @@ foreach (var token in lexer.Tokenize("up down left right right north west left n
 }
 ```
 
-More samples and documentation
-------------------------------
+## Generic Parser
+[TODO !!]
 
+## More samples and documentation
 Piglet is quite extensively covered by integration type tests, that provides many sample uses of both the parser and the lexer. There is also the wiki here on github which I hope will get filled out as this library matures. There is also a Demo project that comes with the Solution, which has a few interesting sample uses of both the lexer and parser components.
 
-Releases
---------
-
+# Releases
 Releases are numbered in major, minor and revision number. 
 
 * Major number are updated on major changes which are not backwards compatible. 
@@ -180,7 +171,7 @@ All releases are available from both NuGet, and are always represented as tags o
 
 Apart from compiling the source yourself, the easiest way to get your hands on the library is to use NuGet. Just search for Piglet, and you shall be rewarded.
 
-# 1.4.0
+### 1.4.0
 * Added thread safety to lexing and parsing.
 * Improved lexer usage. Tokenize is now new preferred method of listing tokens, which is also thread safe.
 * Made \w and \d more consistent with MS use of the term.
@@ -188,17 +179,17 @@ Apart from compiling the source yourself, the easiest way to get your hands on t
 * Added convenience reduction functions for common cases of reducing to a single member in tech configuration
 * Fixed some left over console output in error recovery
 
-# 1.3.0
+### 1.3.0
 * Piglet now supports Unicode! Piglet will now lex the full unicode character set.
 * You can now specify the lexer runtime, giving you more options on the speed tradeoffs of lexer construction and lexer runtime
 
-# 1.2.2
+### 1.2.2
 * Added support for ignoring expressions in fluent configuration parsing.
 
-# 1.2.1
+### 1.2.1
 * Added support for escaped characters inside character classes.
 
-# 1.2.0 
+### 1.2.0 
 * Added error recovery and reporting to fluent parser configuration
 * Added token precedence to fluent configuration
 * Completed XML documentation to include every method
@@ -207,37 +198,35 @@ Apart from compiling the source yourself, the easiest way to get your hands on t
 * Fixed bug with possible wrong order of defined expressions for fluent configuration
 * Automated the NuGet package management
 
-# 1.1.0 
+### 1.1.0 
 * Added DFA minimization to the lexer generation algorithm. 
 * Added public dotnotation functionality for getting debug graphs for lexers.
 * Unit test framework changed to NUnit.
 
-# 1.0.1 
+### 1.0.1 
 * Added missing Piglet.XML file to the NuGet package. Documentation should now be available in intellisense.
 
-# 1.0.0 
+### 1.0.0 
 *First NuGet release
 
-Contributing
-------------
-
+## Contributing
 Contributors are welcome at any skill level! Forking the repo is probably the easiest way to get started. There is a nice list of issues, both bugs and features that is up for grabs. Or devise a feature of your own.
 
-Bug tracker
------------
-
+## Bug tracker
 Please create an issue here on GitHub!
 
 https://github.com/Dervall/Piglet/issues
 
-Authors
--------
-
-**Per Dervall**
+## Authors
+#### Per Dervall
 + http://twitter.com/perdervall
 + http://binarysculpting.com
 
-Copyright and license
----------------------
+#### Unknown6656
++ https://github.com/unknown6656
++ https://twitter.com/unknown6656
++ https://youtube.com/unknown6656
++ https://unknown6656.com
 
+## Copyright and license
 Piglet is licenced under the MIT license. Refer to LICENSE.txt for more information.

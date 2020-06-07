@@ -224,6 +224,7 @@ namespace Piglet.Parser.Configuration
             public bool CreateLexer { get; set; }
             public bool EscapeLiterals { get; set; }
             public string[]? Ignore { get; set; }
+            public bool IgnoreCase { get; set; }
             public LexerRuntime Runtime { get; set; } = LexerRuntime.Tabular;
         }
     }

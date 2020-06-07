@@ -23,6 +23,11 @@ namespace Piglet.Parser.Configuration
         string[] Ignore { get; set; }
 
         /// <summary>
+        /// Specifies whether the lexer is case-insensitive (<see langword="true"/>), or case-sensitive (<see langword="false"/>).
+        /// </summary>
+        bool IgnoreCase { get; set; }
+
+        /// <summary>
         /// Gets and sets the runtime of the constructed lexer. See the enumeration LexerRuntime for an
         /// explanation of the valid values.
         /// </summary>

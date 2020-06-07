@@ -11,20 +11,15 @@ namespace Piglet.Lexer.Configuration
     internal sealed class LexerConfigurator<T>
         : ILexerConfigurator<T>
     {
-        private readonly List<(string regex, Func<string, T> action)> _tokens;
-        private readonly List<string> _ignore;
+        private readonly List<(string regex, Func<string, T> action)> _tokens = new List<(string, Func<string, T>)>();
+        private readonly List<string> _ignore = new List<string>();
 
 
         public int EndOfInputTokenNumber { get; set; } = -1;
         public bool MinimizeDfa { get; set; } = true;
+        public bool IgnoreCase { get; set; } = false;
         public LexerRuntime Runtime { get; set; } = LexerRuntime.Tabular;
 
-
-        public LexerConfigurator()
-        {
-            _tokens = new List<(string regex, Func<string, T> action)>();
-            _ignore = new List<string>();
-        }
 
         public ILexer<T> CreateLexer()
         {
@@ -33,7 +28,7 @@ namespace Piglet.Lexer.Configuration
             {
                 try
                 {
-                    return NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(token.regex))));
+                    return NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(token.regex)), IgnoreCase));
                 }
                 catch (Exception ex)
                 {
@@ -42,7 +37,7 @@ namespace Piglet.Lexer.Configuration
             }).ToList();
 
             foreach (string ignoreExpr in _ignore)
-                nfas.Add(NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(ignoreExpr)))));
+                nfas.Add(NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(ignoreExpr)), IgnoreCase)));
 
             // Create a merged NFA
             NFA mergedNfa = NFA.Merge(nfas);

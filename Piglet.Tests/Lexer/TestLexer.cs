@@ -220,20 +220,20 @@ namespace Piglet.Tests.Lexer
         [Test]
         public void TestCreateDFA()
         {
-            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a|b*cd"))));
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a|b*cd")), false));
             DFA dfa = DFA.Create(nfa);
         }
 
         [Test]
         public void TestCreateDFA2()
         {
-            DFA dfa = DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a|b|c")))));
+            DFA dfa = DFA.Create(NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a|b|c")), false)));
         }
 
         [Test]
         public void TestOneOrMoreDFA()
         {
-            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a+"))));
+            NFA nfa = NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader("a+")), false));
             DFA dfa = DFA.Create(nfa);
         }
     }

@@ -66,6 +66,11 @@
             The default is true, and it should normally be kept that way
             </summary>
         </member>
+        <member name="P:Piglet.Lexer.Configuration.ILexerConfigurator`1.IgnoreCase">
+            <summary>
+            Specifies whether the lexer is case-insensitive (<see langword="true"/>), or case-sensitive (<see langword="false"/>).
+            </summary>
+        </member>
         <member name="P:Piglet.Lexer.Configuration.ILexerConfigurator`1.Runtime">
             <summary>
             Gets and sets the lexer runtime, which is the method that the resulting lexer will be constructed with.
@@ -102,16 +107,17 @@
             This is a debug class for obtaining dot notation graphviz graphs for lexer components.
             </summary>
         </member>
-        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.GetDfaAndNfaGraphs(System.String,System.Boolean,System.String@,System.String@)">
+        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.GetDfaAndNfaGraphs(System.String,System.Boolean,System.Boolean,System.String@,System.String@)">
             <summary>
             Get the DFA and NFA graphs for a given regular expression
             </summary>
             <param name="regex">Regular expression</param>
             <param name="minimize">Minimize the resulting DFA</param>
+            <param name="ignoreCase">Determines whether the regular expression is case-insensitive</param>
             <param name="nfaString">Dot notation NFA graph</param>
             <param name="dfaString">Dot notation DFA graph</param>
         </member>
-        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.GetDfaAndNfaGraphs(System.String,System.String,System.Boolean,System.String@,System.String@)">
+        <member name="M:Piglet.Lexer.Construction.DotNotation.DotNotation.GetDfaAndNfaGraphs(System.String,System.String,System.Boolean,System.Boolean,System.String@,System.String@)">
             <summary>
             Get the DFA and NFA graphs for a given regular expression and highlight active
             states for a given input string
@@ -119,6 +125,7 @@
             <param name="regex">Regular expression</param>
             <param name="input">Input string</param>
             <param name="minimize">Minimize the resulting DFA</param>
+            <param name="ignoreCase">Determines whether the regular expression is case-insensitive</param>
             <param name="nfaString">Dot notation NFA graph</param>
             <param name="dfaString">Dot notation DFA graph</param>
         </member>
@@ -544,6 +551,11 @@
         <member name="P:Piglet.Parser.Configuration.ILexerSettings.Ignore">
             <summary>
             Set the list of regular expressions to ignore. The default is to ignore all kinds of whitespace.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.ILexerSettings.IgnoreCase">
+            <summary>
+            Specifies whether the lexer is case-insensitive (<see langword="true"/>), or case-sensitive (<see langword="false"/>).
             </summary>
         </member>
         <member name="P:Piglet.Parser.Configuration.ILexerSettings.Runtime">

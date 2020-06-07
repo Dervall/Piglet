@@ -38,6 +38,11 @@ namespace Piglet.Lexer.Configuration
         bool MinimizeDfa { get; set; }
 
         /// <summary>
+        /// Specifies whether the lexer is case-insensitive (<see langword="true"/>), or case-sensitive (<see langword="false"/>).
+        /// </summary>
+        bool IgnoreCase { get; set; }
+
+        /// <summary>
         /// Gets and sets the lexer runtime, which is the method that the resulting lexer will be constructed with.
         /// </summary>
         LexerRuntime Runtime { get; set; }

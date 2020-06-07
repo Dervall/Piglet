@@ -208,11 +208,11 @@ namespace Piglet.Lexer.Construction
                 case 'W':
                     return new CharSet(false, escW);
                 case 'n':
-                    return SingleChar('\n');
+                    return SingleChar('\n', false);
                 case 'r':
-                    return SingleChar('\r');
+                    return SingleChar('\r', false);
                 case 't':
-                    return SingleChar('\t');
+                    return SingleChar('\t', false);
                 case '.':
                 case '*':
                 case '|':
@@ -226,17 +226,28 @@ namespace Piglet.Lexer.Construction
                 case '}':
                 case ' ':
                 case '?':
-                    return SingleChar(c);
+                    return SingleChar(c, false);
                 default:
                     return new CharSet();   // Empty charset, might be added to
             }
         }
 
-        private CharSet SingleChar(char c)
+        private CharSet SingleChar(char c, bool ignoreCase)
         {
             CharSet cs = new CharSet();
 
-            cs.Add(c);
+            if (ignoreCase)
+            {
+                char lower = char.ToLowerInvariant(c);
+                char upper = char.ToUpperInvariant(c);
+
+                cs.Add(lower);
+
+                if (lower != upper)
+                    cs.Add(upper);
+            }
+            else
+                cs.Add(c);
 
             return cs;
         }
@@ -248,13 +259,13 @@ namespace Piglet.Lexer.Construction
             {
                 case '-':
                 case '^':
-                    return SingleChar(c);
+                    return SingleChar(c, false);
             }
 
             return EscapedCharToAcceptCharRange(c);
         }
 
-        public RegexToken? NextToken()
+        public RegexToken? NextToken(bool ignoreCase)
         {
             // These keeps track of classes
             CharacterClassState classState = new CharacterClassState();
@@ -290,7 +301,7 @@ namespace Piglet.Lexer.Construction
                             case '*': return new RegexToken { Type = RegexTokenType.OperatorMul };
                             case '?': return new RegexToken { Type = RegexTokenType.OperatorQuestion };
                             case '.': return new RegexToken { Type = RegexTokenType.Accept, Characters = AllCharactersExceptNull };
-                            default: return new RegexToken { Type = RegexTokenType.Accept, Characters = SingleChar(c) };
+                            default: return new RegexToken { Type = RegexTokenType.Accept, Characters = SingleChar(c, ignoreCase) };
                         }
 
                         break;
@@ -298,10 +309,8 @@ namespace Piglet.Lexer.Construction
                         {
                             CharSet characters = EscapedCharToAcceptCharRange(c);
 
-                            if (characters.Any())
-                                return new RegexToken { Characters = characters, Type = RegexTokenType.Accept };
-                            else
-                                throw new LexerConstructionException($"Unknown escaped character '{c}'.");
+                            return characters.Any() ? new RegexToken { Characters = characters, Type = RegexTokenType.Accept }
+                                                    : throw new LexerConstructionException($"Unknown escaped character '{c}'.");
                         }
                     case State.BeginCharacterClass:
                         switch (c)

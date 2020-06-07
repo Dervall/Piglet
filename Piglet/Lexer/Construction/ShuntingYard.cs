@@ -6,15 +6,20 @@ namespace Piglet.Lexer.Construction
     internal sealed class ShuntingYard
     {
         private readonly RegexLexer _lexer;
+        private readonly bool _ignorecase;
 
 
-        public ShuntingYard(RegexLexer lexer) => _lexer = lexer;
+        public ShuntingYard(RegexLexer lexer, bool ignorecase)
+        {
+            _lexer = lexer;
+            _ignorecase = ignorecase;
+        }
 
         private IEnumerable<RegexToken> TokensWithImplicitConcat()
         {
-            RegexToken lastToken = null;
+            RegexToken? lastToken = null;
 
-            for (RegexToken token = _lexer.NextToken(); token != null;)
+            for (RegexToken? token = _lexer.NextToken(_ignorecase); token is { };)
             {
                 // If the last token was accept and this new token is also accept we need to insert a concat operator  between the two.
                 if (lastToken != null && PreceedingTypeRequiresConcat(lastToken.Type) && NextTypeRequiresConcat(token.Type))
@@ -23,7 +28,7 @@ namespace Piglet.Lexer.Construction
                 yield return token;
 
                 lastToken = token;
-                token = _lexer.NextToken();
+                token = _lexer.NextToken(_ignorecase);
             }
         }
 

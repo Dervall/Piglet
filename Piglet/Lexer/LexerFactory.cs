@@ -45,6 +45,7 @@ namespace Piglet.Lexer
             // own lexer for Piglet.
 
             c.Runtime = lexerSettings.Runtime;
+            c.IgnoreCase = lexerSettings.IgnoreCase;
 
             List<ITerminal<T>> terminals = grammar.AllSymbols.OfType<ITerminal<T>>().ToList();
 

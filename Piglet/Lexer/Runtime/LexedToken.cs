@@ -32,6 +32,8 @@ namespace Piglet.Lexer.Runtime
         /// </summary>
         public bool IsTerminal { get; }
 
+        public virtual string? DebugName => LexedString;
+
 
         private protected LexedTokenBase(int abs_index, int line, int char_index, int length, bool terminal)
             : this(null, abs_index, line, char_index, terminal) => Length = length;
@@ -77,6 +79,7 @@ namespace Piglet.Lexer.Runtime
         public LexedToken<T>[] ChildNodes { get; }
         public LexedToken<T> FirstChild => ChildNodes[0];
         public LexedToken<T> LastChild => ChildNodes[^1];
+        public override string? DebugName => NonTerminal.DebugName;
 
 
         private LexedNonTerminal(T value, LexedToken<T>[] children, bool dummy)

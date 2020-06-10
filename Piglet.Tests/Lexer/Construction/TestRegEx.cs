@@ -120,8 +120,7 @@ namespace Piglet.Tests.Lexer.Construction
                 f.Token(@";[^\n]*\n", a => a);
                 f.Token("nextLine", a => a + "%" );
             });
-            var lexerInstance = lexer.Begin(@"; this is a comment
-nextLine");
+            var lexerInstance = lexer.Begin("; this is a comment\r\nnextLine");
 
             Assert.AreEqual("; this is a comment\r\n", lexerInstance.Next().token.SymbolValue);
             Assert.AreEqual("nextLine%", lexerInstance.Next().token.SymbolValue);

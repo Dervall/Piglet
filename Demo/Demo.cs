@@ -4,6 +4,8 @@ using Piglet.Parser.Configuration;
 using Piglet.Parser.Construction;
 using Piglet.Demo.Parser;
 using Piglet.Demo.Lexer;
+using System.Linq;
+using Piglet.Parser;
 
 namespace Piglet.Demo
 {
@@ -13,6 +15,50 @@ namespace Piglet.Demo
     {
         public static void Main(string[] args)
         {
+            static int Exp(int a, int x) => Enumerable.Range(0, x).Aggregate(1, (acc, i) => acc * a);
+            var configurator = ParserFactory.Configure<int>();
+
+            INonTerminal<int> expr = configurator.CreateNonTerminal();
+            INonTerminal<int> term = configurator.CreateNonTerminal();
+            INonTerminal<int> factor = configurator.CreateNonTerminal();
+            INonTerminal<int> expexpr = configurator.CreateNonTerminal();
+            ITerminal<int> number = configurator.CreateTerminal("\\d+", t => int.Parse(t, System.Globalization.CultureInfo.InvariantCulture));
+            ITerminal<int> add = configurator.CreateTerminal("\\+");
+            ITerminal<int> sub = configurator.CreateTerminal("-");
+            ITerminal<int> mul = configurator.CreateTerminal("\\*");
+            ITerminal<int> div = configurator.CreateTerminal("/");
+            ITerminal<int> pow = configurator.CreateTerminal("[\\^]");
+
+            expr.AddProduction(expr, add, term).SetReduceFunction(s => s[0] + s[2]);
+            expr.AddProduction(expr, sub, term).SetReduceFunction(s => s[0] - s[2]);
+            expr.AddProduction(term).SetReduceFunction(s => s[0]);
+
+            term.AddProduction(term, mul, expexpr).SetReduceFunction(s => s[0] * s[2]);
+            term.AddProduction(term, div, expexpr).SetReduceFunction(s => s[0] / s[2]);
+            term.AddProduction(expexpr).SetReduceFunction(s => s[0]);
+
+            expexpr.AddProduction(expexpr, pow, factor).SetReduceFunction(s => Exp(s[0], s[2]));
+            expexpr.AddProduction(factor).SetReduceFunction(s => s[0]);
+
+            factor.AddProduction(number).SetReduceFunction(s => s[0]);
+            factor.AddProduction("(", expr, ")").SetReduceFunction(s => s[1]);
+
+            var parser = configurator.CreateParser();
+            var value = parser.Parse("3^4 + 1");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             var s = @"x + -5 - 3 * -x * x";
             var par = new test_lexer().CreateParser();
             var f = par.Parse(s);

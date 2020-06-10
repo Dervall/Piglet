@@ -44,7 +44,7 @@ namespace Piglet.Lexer.Runtime
             private readonly StringBuilder _lexeme = new StringBuilder();
             private readonly TextReader _source;
             [MaybeNull]
-            private TState?? _state;
+            private TState _state;
 
 
             public int CurrentLineNumber { get; private set; } = 1;

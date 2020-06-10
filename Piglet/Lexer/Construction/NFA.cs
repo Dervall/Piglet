@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    internal class NFA
+    internal sealed class NFA
         : FiniteAutomata<NFA.State>
     {
         internal sealed class State
@@ -38,12 +39,18 @@ namespace Piglet.Lexer.Construction
             }
 
             foreach (Transition<State> transition in Transitions)
-            {
-                // Hard copy the valid input
-                Transition<State> newTransition = new Transition<State>(stateMap[transition.From], stateMap[transition.To], transition.ValidInput);
+                if (transition.To is { } to && transition.From is { } from)
+                {
+                    // Hard copy the valid input
+                    Transition<State> newTransition = new Transition<State>(stateMap[from], stateMap[to], transition.ValidInput);
 
-                newNFA.Transitions.Add(newTransition);
-            }
+                    newNFA.Transitions.Add(newTransition);
+                }
+                else
+                    throw new InvalidOperationException("At least one transition contains a null value in its source or target state.");
+
+            if (StartState is null)
+                throw new InvalidOperationException("The start state must not be null.");
 
             newNFA.StartState = stateMap[StartState];
 
@@ -59,10 +66,12 @@ namespace Piglet.Lexer.Construction
 
             // Find all states reachable by following only epsilon edges.
             State[] closureStates = (from e in Transitions
+                                     let dest = e.To
+                                     where dest is { }
                                      where states.Contains(e.From)
                                      where !e.ValidInput.Any()
-                                     where !visitedStates.Contains(e.To)
-                                     select e.To).ToArray();
+                                     where !visitedStates.Contains(dest)
+                                     select dest).ToArray();
 
             if (closureStates.Length > 0)
                 foreach (State state in Closure(closureStates, visitedStates))
@@ -72,7 +81,7 @@ namespace Piglet.Lexer.Construction
                 yield return state;
         }
 
-        public static NFA Merge(IList<NFA> nfas)
+        public static NFA Merge(IEnumerable<NFA> nfas)
         {
             // Create a new NFA, add everything to it.
             NFA merged = new NFA();
@@ -88,7 +97,10 @@ namespace Piglet.Lexer.Construction
 
             // Add epsilon transiontions from the start state to all the previous start states
             foreach (NFA nfa in nfas)
-                merged.Transitions.Add(new Transition<State>(state, nfa.StartState));
+                if (nfa.StartState is null)
+                    throw new ArgumentException("At least one of the given NFAs contains a start state which is null.", nameof(nfas));
+                else
+                    merged.Transitions.Add(new Transition<State>(state, nfa.StartState));
 
             return merged;
         }

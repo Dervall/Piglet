@@ -41,8 +41,11 @@ namespace Piglet.Lexer.Construction
             // Get the closure set of S0
             DFA dfa = new DFA();
 
-            dfa.States.Add(new State(closures[nfa.StartState]));
-            
+            if (nfa.StartState is null)
+                throw new ArgumentException("The NFA's start state must not be null", nameof(nfa));
+            else
+                dfa.States.Add(new State(closures[nfa.StartState]));
+
             while (true)
             {
                 // Get an unmarked state in dfaStates

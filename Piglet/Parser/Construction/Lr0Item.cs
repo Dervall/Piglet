@@ -8,14 +8,8 @@ namespace Piglet.Parser.Construction
         public IProductionRule<T> ProductionRule { get; private set; } 
         public int DotLocation { get; private set; }
 
-        public ISymbol<T> SymbolRightOfDot
-        {
-            get { 
-                if (DotLocation < ProductionRule.Symbols.Length) 
-                    return ProductionRule.Symbols[DotLocation];
-                return null;
-            }
-        }
+        public ISymbol<T>? SymbolRightOfDot => DotLocation < (ProductionRule.Symbols?.Length ?? 0) ? ProductionRule.Symbols?[DotLocation] : null;
+
 
         public Lr0Item(IProductionRule<T> productionRule, int dotLocation)
         {
@@ -23,27 +17,30 @@ namespace Piglet.Parser.Construction
             ProductionRule = productionRule;
         }
 
-        
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
+
             sb.Append(ProductionRule.ResultSymbol.DebugName);
             sb.Append(" -> ");
+
             bool dotAdded = false;
-            for (int i = 0; i < ProductionRule.Symbols.Length; ++i )
+
+            for (int i = 0; i < (ProductionRule.Symbols?.Length ?? 0); ++i )
             {
                 if (i == DotLocation)
                 {
                     sb.Append("• ");
                     dotAdded = true;
                 }
-                sb.Append(ProductionRule.Symbols[i].DebugName);
+
+                sb.Append(ProductionRule.Symbols?[i]?.DebugName);
                 sb.Append(" ");
             }
+
             if (!dotAdded)
-            {
-                sb.Append("•");                
-            }
+                sb.Append("•");
+
             return sb.ToString();
         }
     }

@@ -200,7 +200,7 @@ namespace Piglet.Parser.Construction
                                     (INonTerminal<T>)lr1Item.ProductionRule.ResultSymbol,
                                     lr1Item.ProductionRule.Symbols.Count(),
                                     ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber - firstNonTerminalTokenNumber,
-                                    lr1Item.ProductionRule.ReduceAction ?? throw new ArgumentNullException(nameof(lr1Item.ProductionRule.ReduceAction))
+                                    lr1Item.ProductionRule.ReduceAction!
                                 )));
 
                             foreach (Terminal<T> lookahead in lr1Item.Lookaheads)

@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Piglet.Lexer.Construction
 {
-    internal class NfaBuilder
+    internal static class NfaBuilder
     {
         public static NFA Create(ShuntingYard yard)
         {
@@ -129,8 +130,8 @@ namespace Piglet.Lexer.Construction
             nfa.StartState = new NFA.State();
             nfa.States.Add(nfa.StartState);
 
-            nfa.Transitions.Add(new Transition<NFA.State>(nfa.StartState, a.StartState));
-            nfa.Transitions.Add(new Transition<NFA.State>(nfa.StartState, b.StartState));
+            nfa.Transitions.Add(new Transition<NFA.State>(nfa.StartState, a.StartState ?? throw new ArgumentException("The NFA must not have a null start state.", nameof(a))));
+            nfa.Transitions.Add(new Transition<NFA.State>(nfa.StartState, b.StartState ?? throw new ArgumentException("The NFA must not have a null start state.", nameof(b))));
 
             // Add a new accept state, link all old accept states to the new accept state with an epsilon link and remove the accept flag
             NFA.State newAcceptState = new NFA.State { AcceptState = true };

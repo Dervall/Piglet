@@ -574,8 +574,102 @@
             Specify that the preceeding element may be missing
             </summary>
         </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ParserConstructor`1">
+            <summary>
+            Represents an abstract generic parser constructor.
+            <para/>
+            The parser based on this constructor will return a parsed value of the type <typeparamref name="TOut"/>.
+            </summary>
+            <typeparam name="TOut">The generic value return type of the parser.</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Generic.ParserConstructor`1.Configurator">
+            <summary>
+            The parser configuration.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.#ctor">
+            <summary>
+            Creates a new generic parser constructor with the default parser configuration.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.#ctor(Piglet.Parser.Configuration.IParserConfigurator{System.Object})">
+            <summary>
+            Creates a new generic parser constructor with the given parser configuration.
+            </summary>
+            <param name="configurator">Parser configuration.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateNonTerminal``1(System.String)">
+            <summary>
+            Creates a new non-terminal symbol with the given generic semantic value and name.
+            </summary>
+            <typeparam name="T">Generic semantic value stored inside the new non-terminal symbol.</typeparam>
+            <param name="name">The name of the new non-terminal symbol.</param>
+            <returns>The newly created non-terminal symbol.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateNonTerminal``1">
+            <summary>
+            Creates a new non-terminal symbol with the given generic semantic value and the default name for non-terminals ("NT...").
+            </summary>
+            <typeparam name="T">Generic semantic value stored inside the new non-terminal symbol.</typeparam>
+            <returns>The newly created non-terminal symbol.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateTerminal``1(System.String,``0)">
+            <summary>
+            Creates a new terminal symbol associated with the given regex string and generic value.
+            </summary>
+            <typeparam name="T">Generic semantic value stored inside the new terminal symbol.</typeparam>
+            <param name="regex">The regex string associated with the terminal symbol.</param>
+            <param name="value">The value stored inside the new terminal value.</param>
+            <returns>The newly created terminal symbol.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateTerminal``1(System.String,System.Func{System.String,``0})">
+            <summary>
+            Creates a new terminal symbol associated with the given regex string and the function providing the generic value.
+            </summary>
+            <typeparam name="T">Generic semantic value stored inside the new terminal symbol.</typeparam>
+            <param name="regex">The regex string associated with the terminal symbol.</param>
+            <param name="func">The function providing the generic value represented by the terminal symbol.</param>
+            <returns>The newly created terminal symbol.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateTerminal(System.String)">
+            <summary>
+            Creates a new terminal symbol associated with the given regex string and the identity function (of the type <see langword="string"/>).
+            </summary>
+            <param name="regex">The regex string associated with the terminal symbol.</param>
+            <returns>The newly created terminal symbol.</returns>
+        </member>
         <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.SetPrecedenceList(System.ValueTuple{Piglet.Parser.Construction.AssociativityDirection,Piglet.Parser.Configuration.Generic.ITerminalWrapper[]}[])">
-            <summary>ascending precedence!</summary>
+            <summary>
+            Sets the precedence for all given symbols in ascending order. The first symbol group is therefore considered to have the lowest precedence and the last symbol group the highest precedence.
+            </summary>
+            <param name="groups">Ordered collection of groups containing a set of symbols with their corresponding associativity.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.SetAssociativity(Piglet.Parser.Construction.AssociativityDirection,Piglet.Parser.Configuration.Generic.ITerminalWrapper[])">
+            <summary>
+            Sets the given associativity to all symbols in the given symbol collection. All sybols will be considered to have the same precedence group.
+            </summary>
+            <param name="dir">Associativity direction.</param>
+            <param name="symbols">Target symbols.</param>
+            <returns>The precedence group associated with the given symbols.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateParser">
+            <summary>
+            Creates a new parser based on the current configurator and returns it.
+            <para/>
+            <b>Note:</b> Only the first call of <see cref="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateParser"/> creates a new parser. If you wish to reset the generated parser and re-create it, call the method <see cref="!:ReesetParser"/> beforehand.
+            </summary>
+            <returns>The constructed parser.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.ResetParser">
+            <summary>
+            Resets the constructed parser to <see langword="null"/>, thereby forcing the parser to be re-constructed based on the current conficuration the next time <see cref="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateParser"/> is called.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.Construct(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{`0})">
+            <summary>
+            Constructs the parser. This method must be implemented by every constructor based on <see cref="T:Piglet.Parser.Configuration.Generic.ParserConstructor`1"/>
+            </summary>
+            <param name="start_symbol">The non-terminal production start symbol. The value of this symbol will be returned when the constructed parser is executed.</param>
         </member>
         <member name="T:Piglet.Parser.Configuration.ILexerSettings">
             <summary>

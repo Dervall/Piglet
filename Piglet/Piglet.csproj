@@ -19,6 +19,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Prefer32Bit>false</Prefer32Bit>
         <Nullable>enable</Nullable>
+        <Deterministic>false</Deterministic>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <DebugType>full</DebugType>
@@ -31,7 +32,7 @@
         <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="dotnet &quot;$(SolutionDir)util\generator.dll&quot; &quot;Parser/Configuration/Generic/ParsingUitilities.cs&quot;" />
+        <Exec Command="dotnet &quot;$(SolutionDir)Piglet.GenericGenerator/bin/generator.dll&quot; &quot;Parser/Configuration/Generic/ParsingUitilities.cs&quot; cs" />
         <ItemGroup>
             <Compile Include="**/*$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**;@(Compile)" />
         </ItemGroup>

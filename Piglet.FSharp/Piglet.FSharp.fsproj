@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netstandard2.1</TargetFrameworks>
+        <Company>Unknown6656</Company>
+        <Product>Piglet.FSharp</Product>
+        <Authors>Unknown6656</Authors>
+        <Description>[TODO]</Description>
+        <RepositoryUrl>https://github.com/unknown6656/Piglet</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/unknown6656/Piglet</PackageProjectUrl>
+        <PackageId>Piglet.FSharp</PackageId>
+        <OutputPath>..\bin</OutputPath>
+        <Deterministic>false</Deterministic>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Piglet\Piglet.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="FShaParsingUitilities.fs" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Update="FSharp.Core" Version="4.7.2" />
+    </ItemGroup>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="dotnet &quot;$(SolutionDir)Piglet.GenericGenerator/bin/generator.dll&quot; &quot;FShaParsingUitilities.fs&quot; fs" />
+        <ItemGroup>
+            <Compile Include="**/*$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**;@(Compile)" />
+        </ItemGroup>
+    </Target>
+</Project>

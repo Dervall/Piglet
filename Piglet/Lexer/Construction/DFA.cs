@@ -95,13 +95,11 @@ namespace Piglet.Lexer.Construction
                         if (oldState is null)
                             dfa.States.Add(newState);
                         else
-                            // New state wasn't that new. We already have one exacly like it in the DFA. Set 
-                            // netstate to oldstate so that the created transition will be correct (still need to
-                            // create a transition)
+                            // New state wasn't that new. We already have one exacly like it in the DFA. Set netstate to
+                            // oldstate so that the created transition will be correct (still need to create a transition)
                             newState = oldState;
 
-                        // See if there already is a transition. In that case, add our character to the list
-                        // of valid values
+                        // See if there already is a transition. In that case, add our character to the list of valid values
                         Transition<State> transition = dfa.Transitions.SingleOrDefault(f => f.From == t && f.To == newState);
 
                         if (transition is null) 
@@ -140,7 +138,7 @@ namespace Piglet.Lexer.Construction
 
                         action(p, q);
                     }
-                }        
+                }
             };
 
             // Get a set of all valid input ranges that we have in the DFA
@@ -158,8 +156,7 @@ namespace Piglet.Lexer.Construction
                 if (bIsAcceptState && pIsAcceptState)
                 {
                     // If both are accepting states, then we might have an issue merging them.
-                    // this is because we use multiple regular expressions with different endings when
-                    // constructing lexers.
+                    // This is because we use multiple regular expressions with different endings when constructing lexers.
                     List<NFA.State> pAcceptStates = p.NfaStates.Where(f => f.AcceptState).ToList();
                     List<NFA.State> qAcceptStates = q.NfaStates.Where(f => f.AcceptState).ToList();
 

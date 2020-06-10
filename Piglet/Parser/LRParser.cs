@@ -98,7 +98,7 @@ namespace Piglet.Parser
 
                     parseStack.Push(_errorTokenNumber);
                     parseStack.Push(ParseTable.Action?[state, _errorTokenNumber] ?? short.MinValue);
-                    valueStack.Push(new LexedToken<T>(default!, lexerInstance.CurrentAbsoluteIndex, lexerInstance.CurrentLineNumber, lexerInstance.CurrentCharacterIndex, 0, true));
+                    valueStack.Push(new LexedToken<T>(default!, lexerInstance.CurrentAbsoluteIndex, lexerInstance.CurrentLineNumber, lexerInstance.CurrentCharacterIndex, 0));
 
                     state = parseStack.Peek();
 

@@ -77,7 +77,7 @@ namespace Piglet.Lexer.Runtime
                         // If reading the end of file and the lexeme is empty, return end of stream token
                         // If the lexeme isn't empty, it must try to find out whatever it is in the lexeme.
                         if (_lexeme.Length == 0)
-                            return (_lexer._endOfInputTokenNumber, new LexedToken<T>(default, "", CurrentAbsoluteIndex, CurrentLineNumber, CurrentCharacterIndex, true));
+                            return (_lexer._endOfInputTokenNumber, new LexedToken<T>(default, "", CurrentAbsoluteIndex, CurrentLineNumber, CurrentCharacterIndex));
 
                         peek = 0;
                     }
@@ -105,7 +105,7 @@ namespace Piglet.Lexer.Runtime
                             {
                                 string str = _lexeme.ToString();
                                 T value = t.action is null ? default : t.action(str);
-                                LexedToken<T> lx = new LexedToken<T>(value, str, CurrentAbsoluteIndex - str.Length, CurrentLineNumber, CurrentCharacterIndex - str.Length, true);
+                                LexedToken<T> lx = new LexedToken<T>(value, str, CurrentAbsoluteIndex - str.Length, CurrentLineNumber, CurrentCharacterIndex - str.Length);
 
                                 return (t.number, lx); // Token completed. Return it
                             }
@@ -115,14 +115,14 @@ namespace Piglet.Lexer.Runtime
                             string input = c == '\0' ? "NULL" : c.ToString();
 
                             // We get here if there is no action at the state where the lexer cannot continue given the input. This fails.
-                            throw new LexerException($"Unexpected character '{input}' in '{_currentLine.ToString().TrimStart()}{c} ...' at ({CurrentLineNumber}:{CurrentCharacterIndex})")
-                            {
-                                Input = input,
-                                LineContents = CurrentLine,
-                                CharacterIndex = CurrentCharacterIndex,
-                                CurrentAbsoluteIndex = CurrentAbsoluteIndex,
-                                LineNumber = CurrentLineNumber
-                            };
+                            throw new LexerException(
+                                $"Unexpected character '{input}' in '{_currentLine.ToString().TrimStart()}{c} ...' at ({CurrentLineNumber}:{CurrentCharacterIndex})",
+                                lineNumber: CurrentLineNumber,
+                                lineContents: CurrentLine,
+                                characterIndex: CurrentCharacterIndex,
+                                currentAbsoluteIndex: CurrentAbsoluteIndex,
+                                input: input
+                            );
                         }
                     }
                     else

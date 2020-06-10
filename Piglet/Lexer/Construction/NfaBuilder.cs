@@ -68,10 +68,12 @@ namespace Piglet.Lexer.Construction
         {
             // Add an epsilon transition from the accept state back to the start state
             NFA.State oldAcceptState = nfa.States.First(f => f.AcceptState);
-            nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, nfa.StartState));
+
+            nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, nfa.StartState!));
 
             // Add a new accept state, since we cannot have edges exiting the accept state
             NFA.State newAcceptState = new NFA.State { AcceptState = true };
+
             nfa.Transitions.Add(new Transition<NFA.State>(oldAcceptState, newAcceptState));
             nfa.States.Add(newAcceptState);
 

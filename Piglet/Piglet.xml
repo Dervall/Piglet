@@ -261,11 +261,21 @@
             The current character index in the input text (zero-based).
             </summary>
         </member>
-        <member name="M:Piglet.Lexer.LexerException.#ctor(System.String)">
+        <member name="P:Piglet.Lexer.LexerException.Input">
+            <summary>
+            The lexed input string.
+            </summary>
+        </member>
+        <member name="M:Piglet.Lexer.LexerException.#ctor(System.String,System.Int32,System.String,System.Int32,System.Int32,System.String)">
             <summary>
             Construct a new LexerException
             </summary>
             <param name="message">Message to display</param>
+            <param name="lineNumber">The current line number of the document the lexer is scanning.</param>
+            <param name="lineContents">The contents of the current line so far of the current document.</param>
+            <param name="characterIndex">The current character index inside the current line (zero-based).</param>
+            <param name="currentAbsoluteIndex">The current character index in the input text (zero-based).</param>
+            <param name="input">The lexed input string.</param>
         </member>
         <member name="T:Piglet.Lexer.LexerFactory`1">
             <summary>
@@ -288,6 +298,11 @@
             <param name="grammar">Grammar to generate lexers from</param>
             <param name="lexerSettings">Additional lexing settings</param>
             <returns>A lexer compatibe with the given grammars tokenizing rules</returns>
+        </member>
+        <member name="T:Piglet.Lexer.Runtime.LexedTokenBase">
+            <summary>
+            Represents an abstract lexed (accepted) token.
+            </summary>
         </member>
         <member name="P:Piglet.Lexer.Runtime.LexedTokenBase.LexedString">
             <summary>
@@ -316,18 +331,47 @@
         </member>
         <member name="P:Piglet.Lexer.Runtime.LexedTokenBase.IsTerminal">
             <summary>
-            Determines whether the token is a terminal token
+            Determines whether the token is a terminal token.
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedTokenBase.DebugName">
+            <summary>
+            The debug name of the current token.
             </summary>
         </member>
         <member name="T:Piglet.Lexer.Runtime.LexedToken`1">
             <summary>
             Represents a lexed (accepted) token.
             </summary>
+            <typeparam name="T">The semantic value stored inside the lexed symbol.</typeparam>
         </member>
         <member name="P:Piglet.Lexer.Runtime.LexedToken`1.SymbolValue">
             <summary>
             Returns the lexed symbol.
             </summary>
+        </member>
+        <member name="M:Piglet.Lexer.Runtime.LexedToken`1.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Piglet.Lexer.Runtime.LexedNonTerminal`1">
+            <summary>
+            Represents a lexed non-terminal token.
+            </summary>
+            <typeparam name="T">The semantic value stored inside the lexed symbol.</typeparam>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedNonTerminal`1.ChildNodes">
+            <summary>
+            The 
+            </summary>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedNonTerminal`1.IsTerminal">
+            <inheritdoc/>
+        </member>
+        <member name="P:Piglet.Lexer.Runtime.LexedNonTerminal`1.DebugName">
+            <inheritdoc/>
+        </member>
+        <member name="M:Piglet.Lexer.Runtime.LexedNonTerminal`1.ToString">
+            <inheritdoc/>
         </member>
         <member name="T:Piglet.Parser.Configuration.Fluent.IFluentParserConfigurator">
             <summary>
@@ -572,7 +616,7 @@
         </member>
         <member name="M:Piglet.Parser.Configuration.INonTerminal`1.AddProduction(System.Object[])">
             <summary>
-            Creates a production on a given nonterminal. The parts parameter may contains either
+            Creates a production on a given non-terminal. The parts parameter may contains either
             previously declared symbols of the grammar or strings, which are interpreted as terminals
             which may be given unescaped as per the lexer settings of the main configurator object.
             If an empty rule is desired you may pass no parameters to the Production. Null must not be passed.
@@ -597,14 +641,14 @@
             <param name="regExp">Regular expression to match</param>
             <param name="onParse">Action to take on parsing. If null is passed the default action is f => default(T)</param>
             <param name="topPrecedence">If true, this terminal takes precedence over previously created terminals</param>
-            <returns>A terminal symbol</returns>
+            <returns>The newly created terminal symbol.</returns>
         </member>
         <member name="M:Piglet.Parser.Configuration.IParserConfigurator`1.CreateNonTerminal">
             <summary>
-            Create a new NonTerminal. Production actions may be specified directly, or deferred until later. The
+            Creates a new non-terminal. Production actions may be specified directly, or deferred until later. The
             latter is more typical since rules are often recursive in their nature.
             </summary>
-            <returns></returns>
+            <returns>The newly created non-terminal symbol.</returns>
         </member>
         <member name="P:Piglet.Parser.Configuration.IParserConfigurator`1.LexerSettings">
             <summary>
@@ -651,6 +695,41 @@
             Creates a parser based on the inputted configuration. If a lexer has been desired as well, this method will also create the lexer.
             </summary>
             <returns>The created parser</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Extensions">
+            <summary>
+            A static class containing generic extension methods for <see cref="T:Piglet.Parser.Configuration.IParserConfigurator`1"/>.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Extensions.CreateTerminal``1(Piglet.Parser.Configuration.IParserConfigurator{``0},System.String,``0,System.Boolean)">
+            <inheritdoc cref="M:Piglet.Parser.Configuration.IParserConfigurator`1.CreateTerminal(System.String,System.Func{System.String,`0},System.Boolean)"/>
+            <typeparam name="T">Semantic value of tokens.</typeparam>
+            <param name="conf">The parser configurator.</param>
+            <param name="regex">Regular expression to match.</param>
+            <param name="val">The value stored inside the terminal symbol.</param>
+            <param name="topPrecedence">If true, this terminal takes precedence over previously created terminals.</param>
+            <returns>The newly created terminal symbol.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Extensions.CreateNonTerminal``1(Piglet.Parser.Configuration.IParserConfigurator{``0},System.String)">
+            <inheritdoc cref="M:Piglet.Parser.Configuration.IParserConfigurator`1.CreateNonTerminal"/>
+            <typeparam name="T">Semantic value of tokens.</typeparam>
+            <param name="conf">The parser configurator.</param>
+            <param name="name">The non-terminal symbol's name.</param>
+            <returns>The newly created non-terminal symbol.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Extensions.AddReduceProduction``1(Piglet.Parser.Configuration.INonTerminal{``0},System.Object[])">
+            <summary>
+            Creates a new reduce production on the given non-terminal symbol.
+            <para/>
+            The <paramref name="args"/> parameter may contains either
+            previously declared symbols of the grammar or strings, which are interpreted as terminals
+            which may be given unescaped as per the lexer settings of the main configurator object.
+            If an empty rule is desired you may pass no parameters to the Production.
+            </summary>
+            <typeparam name="T">Semantic value of tokens.</typeparam>
+            <param name="symb">The non-terminal symbol.</param>
+            <param name="args">Parts of rule to configure the production</param>
+            <returns>A production configurator for the created production, for addition configuration.</returns>
         </member>
         <member name="T:Piglet.Parser.Configuration.IProduction`1">
             <summary>

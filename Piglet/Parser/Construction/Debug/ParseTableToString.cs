@@ -51,9 +51,8 @@ namespace Piglet.Parser.Construction.Debug
                                                                                           : table.Goto[i, f.TokenNumber - numTerminals].ToString()))).ToArray<object>();
 
                 // If formatparams is all empty, we have run out of table to process.
-                // This is perhaps not the best way to determine if the table has ended but the grammar
-                // has no idea of the number of states, and I'd rather not mess up the interface
-                // with methods to get the number of states.
+                // This is perhaps not the best way to determine if the table has ended but the grammar has no idea of the
+                // number of states, and I'd rather not mess up the interface with methods to get the number of states.
                 if (formatParams.Distinct().Count() == 2)
                     break; // All empty strings and one state.
 

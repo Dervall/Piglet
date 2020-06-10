@@ -118,7 +118,7 @@ namespace Piglet.Lexer.Construction
 
         public StimulateResult<TState> Stimulate(string input)
         {
-            List<TState> activeStates = Closure(new[] { StartState }).ToList();
+            List<TState> activeStates = Closure(new[] { StartState! }).ToList();
             StringBuilder matchedString = new StringBuilder();
 
             foreach (char c in input)

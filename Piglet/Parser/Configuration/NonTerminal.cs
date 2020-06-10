@@ -46,10 +46,10 @@ namespace Piglet.Parser.Configuration
         {
             private readonly INonTerminal<T> _resultSymbol;
 
-            public ISymbol<T>[] Symbols { get; }
+            public ISymbol<T>?[] Symbols { get; }
             public ISymbol<T> ResultSymbol => _resultSymbol;
-            public Func<ParseException, LexedToken<T>[], T> ReduceAction { get; private set; }
-            public IPrecedenceGroup ContextPrecedence { get; private set; }
+            public Func<ParseException, LexedToken<T>[], T>? ReduceAction { get; private set; }
+            public IPrecedenceGroup? ContextPrecedence { get; private set; }
 
 
             public NonTerminalProduction(IParserConfigurator<T> configurator, INonTerminal<T> resultSymbol, object?[] symbols)
@@ -69,10 +69,12 @@ namespace Piglet.Parser.Configuration
                             regex = Regex.Escape(regex);
 
                         Symbols[i] = configurator.CreateTerminal(regex, null, true);
-                        Symbols[i].DebugName = (string)part;   // Set debug name to unescaped string, so it's easy on the eyes.
+
+                        if (Symbols[i] is { } sym)
+                            sym.DebugName = (string)part;   // Set debug name to unescaped string, so it's easy on the eyes.
                     }
                     else
-                        Symbols[i] = (ISymbol<T>)symbols[i];
+                        Symbols[i] = (ISymbol<T>?)symbols[i];
 
                     ++i;
                 }
@@ -92,9 +94,9 @@ namespace Piglet.Parser.Configuration
 
             public override string ToString()
             {
-                string tstr<U>(ISymbol<U> s) => s is ITerminal<U> ? $"'{s.DebugName}'" : s.DebugName;
+                string? to_string<U>(ISymbol<U>? s) => s is ITerminal<U> ? $"'{s.DebugName}'" : s?.DebugName;
                 
-                return $"{string.Join(" ", Symbols.Select(tstr))} --> {tstr(ResultSymbol)}";
+                return $"{string.Join(" ", Symbols.Select(to_string))} --> {to_string(ResultSymbol)}";
             }
         }
     }

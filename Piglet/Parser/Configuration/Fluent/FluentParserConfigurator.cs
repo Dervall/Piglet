@@ -9,7 +9,7 @@ namespace Piglet.Parser.Configuration.Fluent
     internal sealed class FluentParserConfigurator
         : IFluentParserConfigurator
     {
-        private readonly Dictionary<(IRule rule, string separator), NonTerminal<object>> _listRules;
+        private readonly Dictionary<(IRule? rule, string? separator), NonTerminal<object>> _listRules;
         private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> _optionalRules;
         private readonly ParserConfigurator<object> _configurator;
         private readonly List<FluentRule> _rules;
@@ -92,18 +92,18 @@ namespace Piglet.Parser.Configuration.Fluent
 
         public void Ignore(string ignoreExpression) => _ignored.Add(ignoreExpression);
 
-        public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)
+        public NonTerminal<object> MakeListRule<TListType>(IRule? rule, string? separator)
         {
-            (IRule rule, string separator) t = (rule, separator);
+            (IRule? rule, string? separator) tuple = (rule, separator);
 
-            if (_listRules.ContainsKey(t))
-                return _listRules[t];
+            if (_listRules.ContainsKey(tuple))
+                return _listRules[tuple];
 
             // Create a new nonterminal
             NonTerminal<object> listRule = (NonTerminal<object>)_configurator.CreateNonTerminal();
 
             if (separator != null)
-                listRule.AddProduction(listRule, separator, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
+                listRule.AddProduction(listRule, separator, ((FluentRule?)rule)?.NonTerminal).SetReduceFunction(f =>
                 {
                     List<TListType> list = (List<TListType>)f[0];
 
@@ -112,7 +112,7 @@ namespace Piglet.Parser.Configuration.Fluent
                     return list;
                 });
             else
-                listRule.AddProduction(listRule, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
+                listRule.AddProduction(listRule, ((FluentRule?)rule)?.NonTerminal).SetReduceFunction(f =>
                 {
                     List<TListType> list = (List<TListType>)f[0];
 
@@ -121,8 +121,8 @@ namespace Piglet.Parser.Configuration.Fluent
                     return list;
                 });
 
-            listRule.AddProduction(((FluentRule)rule).NonTerminal).SetReduceFunction(f => new List<TListType> { (TListType)f[0] });
-            _listRules.Add(t, listRule);
+            listRule.AddProduction(((FluentRule?)rule)?.NonTerminal).SetReduceFunction(f => new List<TListType> { (TListType)f[0] });
+            _listRules.Add(tuple, listRule);
 
             return listRule;
         }

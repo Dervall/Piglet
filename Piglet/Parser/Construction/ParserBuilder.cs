@@ -133,7 +133,7 @@ namespace Piglet.Parser.Construction
                         // Iterate over symbols. If we find a terminal it is never nullable
                         // if we find a nonterminal continue iterating only if this terminal itself is not nullable.
                         // By this rule, empty production rules will always return nullable true
-                        bool symbolIsNullable = production.Symbols.All(symbol => !(symbol is Terminal<T>) && nullable.Contains((NonTerminal<T>)symbol));
+                        bool symbolIsNullable = production.Symbols.All(symbol => symbol is NonTerminal<T> term && nullable.Contains(term));
 
                         if (symbolIsNullable)
                             nullableSetChanged |= nullable.Add(nonTerminal);
@@ -200,7 +200,7 @@ namespace Piglet.Parser.Construction
                                     (INonTerminal<T>)lr1Item.ProductionRule.ResultSymbol,
                                     lr1Item.ProductionRule.Symbols.Count(),
                                     ((Symbol<T>)lr1Item.ProductionRule.ResultSymbol).TokenNumber - firstNonTerminalTokenNumber,
-                                    lr1Item.ProductionRule.ReduceAction
+                                    lr1Item.ProductionRule.ReduceAction ?? throw new ArgumentNullException(nameof(lr1Item.ProductionRule.ReduceAction))
                                 )));
 
                             foreach (Terminal<T> lookahead in lr1Item.Lookaheads)
@@ -345,21 +345,17 @@ namespace Piglet.Parser.Construction
 
                 foreach (NonTerminal<T> symbol in _grammar.AllSymbols.OfType<NonTerminal<T>>())
                     foreach (IProductionRule<T> productionRule in symbol.ProductionRules)
-                        foreach (ISymbol<T> productionSymbol in productionRule.Symbols)
-                        {
-                            // Terminals are trivial, just add them
-                            if (productionSymbol is Terminal<T>)
+                        foreach (ISymbol<T>? productionSymbol in productionRule.Symbols)
+                            if (productionSymbol is Terminal<T> terminal)
                             {
-                                addedThings |= first.Add(symbol, (Terminal<T>)productionSymbol);
+                                // Terminals are trivial, just add them
+                                addedThings |= first.Add(symbol, terminal);
 
                                 // This production rule is done now
                                 break;
                             }
-
-                            if (productionSymbol is NonTerminal<T>)
+                            else if (productionSymbol is NonTerminal<T> nonTerminal)
                             {
-                                NonTerminal<T> nonTerminal = (NonTerminal<T>)productionSymbol;
-
                                 // Add everything in FIRST for the given terminal.
                                 foreach (Terminal<T> f in first[nonTerminal])
                                     addedThings |= first.Add(symbol, f);
@@ -368,7 +364,6 @@ namespace Piglet.Parser.Construction
                                 if (!nullable.Contains(nonTerminal))
                                     break; // Jump out since we've found a non nullable symbol
                             }
-                        }
             }
             while (addedThings);
 
@@ -406,12 +401,12 @@ namespace Piglet.Parser.Construction
 
                     for (int i = item.DotLocation + 1; i < item.ProductionRule.Symbols.Length; ++i)
                     {
-                        ISymbol<T> symbol = item.ProductionRule.Symbols[i];
+                        ISymbol<T>? symbol = item.ProductionRule.Symbols[i];
 
                         // If symbol is terminal, just add it
-                        if (symbol is Terminal<T>)
+                        if (symbol is Terminal<T> term)
                         {
-                            lookaheads.Add((Terminal<T>)symbol);
+                            lookaheads.Add(term);
 
                             // Terminals are not nullable, break out of loop
                             nonNullableFound = true;
@@ -419,7 +414,7 @@ namespace Piglet.Parser.Construction
                             break;
                         }
 
-                        foreach (Terminal<T> terminal in first[(NonTerminal<T>)symbol])
+                        foreach (Terminal<T> terminal in first[(NonTerminal<T>?)symbol])
                             lookaheads.Add(terminal);
 
                         if (!nullable.Contains(symbol))

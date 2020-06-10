@@ -87,7 +87,7 @@ namespace Piglet.Lexer.Construction.DotNotation
             }
 
             foreach (Transition<TState> transition in automata.Transitions)
-                sb.Append($"\t{transition.From.StateNumber} -> {transition.To.StateNumber} [label=\"{transition.TransitionLabel().Replace("\\", "\\\\").Replace("\"", "\\\"")}\"]\n");
+                sb.Append($"\t{transition.From?.StateNumber} -> {transition.To?.StateNumber} [label=\"{transition.TransitionLabel().Replace("\\", "\\\\").Replace("\"", "\\\"")}\"]\n");
 
             foreach (TState state in automata.States.Where(f => f.AcceptState || (currentStates?.Contains(f) ?? false)))
                 sb.AppendFormat("\t{0} [{1}{2}]\n",

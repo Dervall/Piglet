@@ -9,12 +9,15 @@ namespace Piglet.Lexer.Construction
         public char To { get; set; }
 
 
-        public int CompareTo(CharRange other)
-    	{
-    		int cmp = From - other.From;
+        public int CompareTo(CharRange? other)
+        {
+            if (other is null)
+                return 1;
 
-    		return cmp == 0 ? To - other.To : cmp;
-    	}
+            int cmp = From - other.From;
+
+            return cmp == 0 ? To - other.To : cmp;
+        }
 
         public override string ToString() => From == To ? ToGraphSafeString(From) : $"{ToGraphSafeString(From)}-{ToGraphSafeString(To)}";
 

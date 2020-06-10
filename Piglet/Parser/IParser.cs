@@ -13,7 +13,7 @@ namespace Piglet.Parser
         /// <summary>
         /// Gets or sets the lexer associated with the parser.
         /// </summary>
-        ILexer<T> Lexer { get; set; }
+        ILexer<T>? Lexer { get; set; }
 
         /// <summary>
         /// Get the internal parse table for this parser.

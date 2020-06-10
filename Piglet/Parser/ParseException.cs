@@ -24,7 +24,7 @@ namespace Piglet.Parser
         /// <summary>
         /// The debug name of the token that was found instead.
         /// </summary>
-        public string FoundToken { get; set; }
+        public string? FoundToken { get; set; }
 
         /// <summary>
         /// The state number of the parser when it failed

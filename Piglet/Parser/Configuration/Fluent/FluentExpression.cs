@@ -7,9 +7,9 @@ namespace Piglet.Parser.Configuration.Fluent
         : IExpressionConfigurator
         , IExpressionReturnConfigurator
     {
-        private readonly ParserConfigurator<object> _configurator;
-        private Terminal<object> _terminal;
-        private string _regex;
+        private readonly ParserConfigurator<object>? _configurator;
+        private Terminal<object>? _terminal;
+        private string? _regex;
 
 
         public FluentExpression(ParserConfigurator<object> configurator) => _configurator = configurator;
@@ -42,6 +42,6 @@ namespace Piglet.Parser.Configuration.Fluent
         }
 
         // Create the terminal now to ensure that the tokens will be created in the right order
-        public void AndReturns(Func<string, object> func) => _terminal = (Terminal<object>)_configurator.CreateTerminal(_regex, func);
+        public void AndReturns(Func<string, object> func) => _terminal = (Terminal<object>?)_configurator?.CreateTerminal(_regex, func);
     }
 }

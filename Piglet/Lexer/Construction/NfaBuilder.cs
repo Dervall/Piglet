@@ -103,7 +103,7 @@ namespace Piglet.Lexer.Construction
             NFA nfa = new NFA { StartState = first.StartState };
 
             // Change all links in to first acceptstate to go to seconds start state
-            foreach (Transition<NFA.State> edge in first.Transitions.Where(f => f.To.AcceptState))
+            foreach (Transition<NFA.State> edge in first.Transitions.Where(f => f.To?.AcceptState ?? false))
                 edge.To = second.StartState;
 
             // Remove acceptstate from first

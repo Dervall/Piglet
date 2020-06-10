@@ -28,10 +28,10 @@ namespace Piglet.Lexer.Runtime
 
             // Get the first applicable action. This returns null if there is no action defined but there are accepting states.
             // This is fine, this means an ignored token.
-            (NFA.State state, (int index, Func<string, T> action)? action)? action = _actions.FirstOrDefault(f => state.Contains(f.Value.state));
+            (NFA.State state, (int index, Func<string, T> function)? action)? tuple = _actions?.FirstOrDefault(f => state.Contains(f.Value.state));
 
-            if (action?.action?.action is { })
-                return action.Value.action;
+            if (tuple?.action is { function: { } })
+                return tuple.Value.action;
 
             return (int.MinValue, null);
         }

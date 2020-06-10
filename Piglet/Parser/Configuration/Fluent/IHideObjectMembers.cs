@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
@@ -15,6 +16,7 @@ namespace Piglet.Parser.Configuration.Fluent
 
         
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [return: MaybeNull]
         string ToString();
 
         [EditorBrowsable(EditorBrowsableState.Never)]

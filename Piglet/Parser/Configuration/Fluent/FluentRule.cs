@@ -222,7 +222,7 @@ namespace Piglet.Parser.Configuration.Fluent
         private sealed class ListOfTypedObjectRule<TListType>
             : ListOfRule
         {
-            public override NonTerminal<object> MakeListRule(FluentParserConfigurator fluentParserConfigurator) => fluentParserConfigurator.MakeListRule<TListType>((IRule)Symbol, Separator);
+            public override NonTerminal<object> MakeListRule(FluentParserConfigurator fluentParserConfigurator) => fluentParserConfigurator.MakeListRule<TListType>(Symbol as IRule, Separator);
         }
     }
 }

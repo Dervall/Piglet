@@ -13,14 +13,14 @@ namespace Piglet.Parser
     {
         private readonly int _errorTokenNumber;
         private readonly int _endOfInputTokenNumber;
-        private readonly string[] _terminalDebugNames;
+        private readonly string?[] _terminalDebugNames;
 
 
         public IParseTable<T> ParseTable { get; }
         public ILexer<T>? Lexer { get; set; }
 
 
-        internal LRParser(IParseTable<T> parseTable, int errorTokenNumber, int endOfInputTokenNumber, string[] terminalDebugNames)
+        internal LRParser(IParseTable<T> parseTable, int errorTokenNumber, int endOfInputTokenNumber, string?[] terminalDebugNames)
         {
             ParseTable = parseTable;
             _errorTokenNumber = errorTokenNumber;
@@ -28,8 +28,11 @@ namespace Piglet.Parser
             _terminalDebugNames = terminalDebugNames;
         }
 
-        private LexedToken<T> Parse(ILexerInstance<T> lexerInstance)
+        private LexedToken<T> Parse(ILexerInstance<T>? lexerInstance)
         {
+            if (lexerInstance is null)
+                throw new ArgumentNullException(nameof(lexerInstance));
+
             Stack<LexedToken<T>> valueStack = new Stack<LexedToken<T>>();
             Stack<int> parseStack = new Stack<int>();
 
@@ -45,7 +48,7 @@ namespace Piglet.Parser
             while (true)
             {
                 int state = parseStack.Peek();
-                int action = ParseTable.Action[state, input.number];
+                int action = ParseTable.Action?[state, input.number] ?? short.MinValue;
 
                 if (action >= 0)
                 {
@@ -78,7 +81,7 @@ namespace Piglet.Parser
                     };
 
                     // Go for error recovery!
-                    while (ParseTable.Action[parseStack.Peek(), _errorTokenNumber] == short.MinValue)
+                    while ((ParseTable.Action?[parseStack.Peek(), _errorTokenNumber] ?? short.MinValue) == short.MinValue)
                     {
                         // If we run out of stack while searching for the error handler, throw the exception
                         // This is what happens when there is no error handler defined at all.
@@ -94,8 +97,8 @@ namespace Piglet.Parser
                     state = parseStack.Peek();
 
                     parseStack.Push(_errorTokenNumber);
-                    parseStack.Push(ParseTable.Action[state, _errorTokenNumber]);
-                    valueStack.Push(new LexedToken<T>(default, lexerInstance.CurrentAbsoluteIndex, lexerInstance.CurrentLineNumber, lexerInstance.CurrentCharacterIndex, 0, true));
+                    parseStack.Push(ParseTable.Action?[state, _errorTokenNumber] ?? short.MinValue);
+                    valueStack.Push(new LexedToken<T>(default!, lexerInstance.CurrentAbsoluteIndex, lexerInstance.CurrentLineNumber, lexerInstance.CurrentCharacterIndex, 0, true));
 
                     state = parseStack.Peek();
 
@@ -112,11 +115,8 @@ namespace Piglet.Parser
                     // If we get here we are pretty cool, continue running the parser. The actual error recovery routine will be
                     // called as soon as the error rule itself is reduced.
                 }
-                else
+                else if (ParseTable.ReductionRules?[-(action + 1)] is IReductionRule<T> rule) // Get the right reduction rule to apply
                 {
-                    // Get the right reduction rule to apply
-                    IReductionRule<T> rule = ParseTable.ReductionRules[-(action + 1)];
-
                     for (int i = 0; i < rule.NumTokensToPop * 2; ++i)
                         parseStack.Pop();
 
@@ -124,7 +124,7 @@ namespace Piglet.Parser
                     int stateOnTopOfStack = parseStack.Peek();
 
                     parseStack.Push(rule.TokenToPush);
-                    parseStack.Push(ParseTable.Goto[stateOnTopOfStack, rule.TokenToPush]);
+                    parseStack.Push(ParseTable.Goto?[stateOnTopOfStack, rule.TokenToPush] ?? short.MinValue);
 
                     // Get tokens off the value stack for the OnReduce function to run on
                     LexedToken<T>[] tokens = new LexedToken<T>[rule.NumTokensToPop];
@@ -136,17 +136,17 @@ namespace Piglet.Parser
                     // This calls the reduction function with the possible exception set. The exception could be cleared here, but
                     // there is no real reason to do so, since all the normal rules will ignore it, and all the error rules are guaranteed
                     // to have the exception set prior to entering the reduction function.
-                    Func<ParseException, LexedToken<T>[], T> reduceFunc = rule.OnReduce;
+                    Func<ParseException?, LexedToken<T>[], T> reduceFunc = rule.OnReduce!;
                     T result = reduceFunc == null ? default : reduceFunc(exception, tokens);
 
-                    valueStack.Push(new LexedNonTerminal<T>(result, rule.ReductionSymbol, tokens));
+                    valueStack.Push(new LexedNonTerminal<T>(result!, rule.ReductionSymbol, tokens));
                 }
             }
         }
 
-        private IEnumerable<string> GetExpectedTokenNames(int state) => _terminalDebugNames.Where((t, i) => ParseTable.Action[state, i] != short.MinValue);
+        private IEnumerable<string> GetExpectedTokenNames(int state) => _terminalDebugNames.Where((t, i) => t is { } && ParseTable.Action?[state, i] != short.MinValue).Cast<string>();
 
-        public LexedToken<T> ParseTokens(string input) => Parse(Lexer.Begin(input));
+        public LexedToken<T> ParseTokens(string input) => Parse(Lexer?.Begin(input));
 
         public T Parse(string input) => ParseTokens(input).SymbolValue;
     }

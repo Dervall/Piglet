@@ -36,7 +36,7 @@ namespace Piglet.Lexer.Runtime
             }
         }
 
-        protected override (int number, Func<string, T>? action)? GetAction(DFA.State state) => _actions.ContainsKey(state) ? _actions[state] : ((int, Func<string, T>)?)null;
+        protected override (int number, Func<string, T>? action)? GetAction(DFA.State state) => _actions.ContainsKey(state) ? _actions?[state] : null;
 
         protected override bool ReachedTermination(DFA.State nextState) => nextState is null;
 

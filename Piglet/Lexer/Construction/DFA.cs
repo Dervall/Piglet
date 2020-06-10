@@ -61,7 +61,7 @@ namespace Piglet.Lexer.Construction
                 foreach (Transition<NFA.State> fromTransition in fromTransitions)
                     foreach (CharRange range in fromTransition.ValidInput.Ranges)
                     {
-                        if (!moveDestinations.TryGetValue(range, out List<NFA.State> destList))
+                        if (!moveDestinations.TryGetValue(range, out List<NFA.State>? destList))
                         {
                             destList = new List<NFA.State>();
                             moveDestinations.Add(range, destList);
@@ -175,14 +175,18 @@ namespace Piglet.Lexer.Construction
             });
 
             // Make a dictionary of from transitions. This is well worth the time, since this gets accessed lots of times.
-            Dictionary<State, Dictionary<CharRange, State>> targetDict = new Dictionary<State, Dictionary<CharRange, State>>();
+            Dictionary<State, Dictionary<CharRange, State?>> targetDict = new Dictionary<State, Dictionary<CharRange, State?>>();
+
             foreach (Transition<State> transition in Transitions)
             {
-                targetDict.TryGetValue(transition.From, out Dictionary<CharRange, State>? toDict);
+                if (transition.From is null)
+                    throw new InvalidOperationException("The outgoing state of a transition must not be null.");
+
+                targetDict.TryGetValue(transition.From, out Dictionary<CharRange, State?>? toDict);
 
                 if (toDict is null)
                 {
-                    toDict = new Dictionary<CharRange, State>();
+                    toDict = new Dictionary<CharRange, State?>();
 
                     targetDict.Add(transition.From, toDict);
                 }
@@ -202,7 +206,7 @@ namespace Piglet.Lexer.Construction
                 {
                     if (distinct[p, q] == -1) 
                     {
-                        State? targetState(State state, CharRange c) => targetDict.TryGetValue(state, out Dictionary<CharRange, State>? charDict) &&
+                        State? targetState(State state, CharRange c) => targetDict.TryGetValue(state, out Dictionary<CharRange, State?>? charDict) &&
                                                                         charDict.TryGetValue(c, out State? toState) ? toState : null;
 
                         foreach (CharRange a in allValidInputs)

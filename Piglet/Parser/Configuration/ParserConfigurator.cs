@@ -12,7 +12,7 @@ namespace Piglet.Parser.Configuration
         : IParserConfigurator<T>
         , IGrammar<T>
     {
-        private NonTerminal<T> _startSymbol;
+        private NonTerminal<T>? _startSymbol;
         private readonly List<NonTerminal<T>> _nonTerminals;
         private readonly LinkedList<Terminal<T>> _terminals;
         private readonly ILexerSettings lexerSettings;
@@ -20,7 +20,7 @@ namespace Piglet.Parser.Configuration
         private int _currentPrecedence;
 
 
-        public IProductionRule<T> Start { get; private set; }
+        public IProductionRule<T>? Start { get; private set; }
 
         public ILexerSettings LexerSettings => lexerSettings;
 
@@ -40,9 +40,9 @@ namespace Piglet.Parser.Configuration
             }
         }
 
-        public NonTerminal<T> AcceptSymbol => (NonTerminal<T>)Start.ResultSymbol;
+        public NonTerminal<T>? AcceptSymbol => Start?.ResultSymbol as NonTerminal<T>;
 
-        public Terminal<T> EndOfInputTerminal { get; set; }
+        public Terminal<T>? EndOfInputTerminal { get; set; }
 
 
         public ParserConfigurator()
@@ -55,7 +55,7 @@ namespace Piglet.Parser.Configuration
 
             // Create the Error token. This will create it as terminal 0, but in the end it will be the LAST terminal
             // second last is EndOfInput. This is sort of hackish and mainly due to the way the lexer is configured.
-            ErrorToken = CreateTerminal(null, s => default);
+            ErrorToken = CreateTerminal(null, s => default!);
             ErrorToken.DebugName = "%ERROR%";
 
             // Set some default settings
@@ -223,7 +223,7 @@ namespace Piglet.Parser.Configuration
         {
             public bool CreateLexer { get; set; }
             public bool EscapeLiterals { get; set; }
-            public string[]? Ignore { get; set; }
+            public string[] Ignore { get; set; } = Array.Empty<string>();
             public bool IgnoreCase { get; set; }
             public LexerRuntime Runtime { get; set; } = LexerRuntime.Tabular;
         }

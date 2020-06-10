@@ -2,6 +2,7 @@
 using System.Text;
 using System.IO;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Piglet.Lexer.Runtime
 {
@@ -31,6 +32,7 @@ namespace Piglet.Lexer.Runtime
 
         protected abstract TState GetNextState(TState state, char input);
 
+        [return: MaybeNull]
         protected abstract TState GetInitialState();
 
 
@@ -41,7 +43,8 @@ namespace Piglet.Lexer.Runtime
             private readonly StringBuilder _currentLine = new StringBuilder();
             private readonly StringBuilder _lexeme = new StringBuilder();
             private readonly TextReader _source;
-            private TState _state;
+            [MaybeNull]
+            private TState?? _state;
 
 
             public int CurrentLineNumber { get; private set; } = 1;

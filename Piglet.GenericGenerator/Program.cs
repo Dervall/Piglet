@@ -549,6 +549,10 @@ open Piglet.Parser.Configuration.Generic
 open System
 
 
+type ParserConstructor<'TOut> with
+    // TODO : ?
+    end
+
 /// A module containing F# code extensions for the namespace 'Piglet.Parser.Configuration.Generic'.
 [<AutoOpen>]
 module FSharpExtensions =

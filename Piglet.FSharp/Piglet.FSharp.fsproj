@@ -17,13 +17,13 @@
         <ProjectReference Include="..\Piglet\Piglet.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="FShaParsingUitilities.fs" />
+        <Compile Include="FSharpParsingUitilities.fs" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="4.7.2" />
     </ItemGroup>
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="dotnet &quot;$(SolutionDir)Piglet.GenericGenerator/bin/generator.dll&quot; &quot;FShaParsingUitilities.fs&quot; fs" />
+        <Exec Command="dotnet &quot;$(SolutionDir)Piglet.GenericGenerator/bin/generator.dll&quot; &quot;FSharpParsingUitilities.fs&quot; fs" />
         <ItemGroup>
             <Compile Include="**/*$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**;@(Compile)" />
         </ItemGroup>

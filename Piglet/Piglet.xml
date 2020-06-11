@@ -652,6 +652,476 @@
             <param name="symbols">Target symbols.</param>
             <returns>The precedence group associated with the given symbols.</returns>
         </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``2(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the given symbol.
+            </summary>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <param name="symbol0">The symbol, to which <paramref name="non_terminal"/> gets reduced.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``1(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},System.Func{``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 0 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``2(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},System.Func{``1,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 1 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``3(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},System.Func{``1,``2,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 2 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``4(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},System.Func{``1,``2,``3,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 3 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``5(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},System.Func{``1,``2,``3,``4,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 4 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``6(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},System.Func{``1,``2,``3,``4,``5,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 5 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``7(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},System.Func{``1,``2,``3,``4,``5,``6,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 6 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``8(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},System.Func{``1,``2,``3,``4,``5,``6,``7,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 7 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``9(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 8 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``10(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 9 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``11(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``10,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 10 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <typeparam name="S9">The generic type of <paramref name="symbol9"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``12(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``10,``11,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 11 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <typeparam name="S9">The generic type of <paramref name="symbol9"/>.</typeparam>
+            <typeparam name="S10">The generic type of <paramref name="symbol10"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``13(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``10,``11,``12,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 12 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <typeparam name="S9">The generic type of <paramref name="symbol9"/>.</typeparam>
+            <typeparam name="S10">The generic type of <paramref name="symbol10"/>.</typeparam>
+            <typeparam name="S11">The generic type of <paramref name="symbol11"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``14(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},Piglet.Parser.Configuration.Generic.SymbolWrapper{``13},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``10,``11,``12,``13,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 13 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <typeparam name="S9">The generic type of <paramref name="symbol9"/>.</typeparam>
+            <typeparam name="S10">The generic type of <paramref name="symbol10"/>.</typeparam>
+            <typeparam name="S11">The generic type of <paramref name="symbol11"/>.</typeparam>
+            <typeparam name="S12">The generic type of <paramref name="symbol12"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``15(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},Piglet.Parser.Configuration.Generic.SymbolWrapper{``13},Piglet.Parser.Configuration.Generic.SymbolWrapper{``14},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``10,``11,``12,``13,``14,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 14 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <typeparam name="S9">The generic type of <paramref name="symbol9"/>.</typeparam>
+            <typeparam name="S10">The generic type of <paramref name="symbol10"/>.</typeparam>
+            <typeparam name="S11">The generic type of <paramref name="symbol11"/>.</typeparam>
+            <typeparam name="S12">The generic type of <paramref name="symbol12"/>.</typeparam>
+            <typeparam name="S13">The generic type of <paramref name="symbol13"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol13">The symbol no. 13, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``16(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},Piglet.Parser.Configuration.Generic.SymbolWrapper{``13},Piglet.Parser.Configuration.Generic.SymbolWrapper{``14},Piglet.Parser.Configuration.Generic.SymbolWrapper{``15},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``10,``11,``12,``13,``14,``15,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 15 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <typeparam name="S9">The generic type of <paramref name="symbol9"/>.</typeparam>
+            <typeparam name="S10">The generic type of <paramref name="symbol10"/>.</typeparam>
+            <typeparam name="S11">The generic type of <paramref name="symbol11"/>.</typeparam>
+            <typeparam name="S12">The generic type of <paramref name="symbol12"/>.</typeparam>
+            <typeparam name="S13">The generic type of <paramref name="symbol13"/>.</typeparam>
+            <typeparam name="S14">The generic type of <paramref name="symbol14"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol13">The symbol no. 13, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol14">The symbol no. 14, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateProduction``17(Piglet.Parser.Configuration.Generic.NonTerminalWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},Piglet.Parser.Configuration.Generic.SymbolWrapper{``13},Piglet.Parser.Configuration.Generic.SymbolWrapper{``14},Piglet.Parser.Configuration.Generic.SymbolWrapper{``15},Piglet.Parser.Configuration.Generic.SymbolWrapper{``16},System.Func{``1,``2,``3,``4,``5,``6,``7,``8,``9,``10,``11,``12,``13,``14,``15,``16,``0})">
+            <summary>
+            Creates a new production rule on the given non-terminal symbol using the given production function.
+            <br/>
+            This production represents the reducing of the given non-terminal to the 16 given symbols.
+            </summary>
+            <param name="non_terminal">The non-terminal symbol which gets reduced.</param>
+            <typeparam name="T">The generic type of <paramref name="non_terminal"/>.</typeparam>
+            <typeparam name="S0">The generic type of <paramref name="symbol0"/>.</typeparam>
+            <typeparam name="S1">The generic type of <paramref name="symbol1"/>.</typeparam>
+            <typeparam name="S2">The generic type of <paramref name="symbol2"/>.</typeparam>
+            <typeparam name="S3">The generic type of <paramref name="symbol3"/>.</typeparam>
+            <typeparam name="S4">The generic type of <paramref name="symbol4"/>.</typeparam>
+            <typeparam name="S5">The generic type of <paramref name="symbol5"/>.</typeparam>
+            <typeparam name="S6">The generic type of <paramref name="symbol6"/>.</typeparam>
+            <typeparam name="S7">The generic type of <paramref name="symbol7"/>.</typeparam>
+            <typeparam name="S8">The generic type of <paramref name="symbol8"/>.</typeparam>
+            <typeparam name="S9">The generic type of <paramref name="symbol9"/>.</typeparam>
+            <typeparam name="S10">The generic type of <paramref name="symbol10"/>.</typeparam>
+            <typeparam name="S11">The generic type of <paramref name="symbol11"/>.</typeparam>
+            <typeparam name="S12">The generic type of <paramref name="symbol12"/>.</typeparam>
+            <typeparam name="S13">The generic type of <paramref name="symbol13"/>.</typeparam>
+            <typeparam name="S14">The generic type of <paramref name="symbol14"/>.</typeparam>
+            <typeparam name="S15">The generic type of <paramref name="symbol15"/>.</typeparam>
+            <param name="symbol0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol13">The symbol no. 13, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol14">The symbol no. 14, to which the current non-terminal symbol gets reduced.</param>
+            <param name="symbol15">The symbol no. 15, to which the current non-terminal symbol gets reduced.</param>
+            <param name="func">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol "<paramref name="non_terminal"/>".</param>
+            <returns>The newly created production rule.</returns>
+        </member>
         <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.CreateParser">
             <summary>
             Creates a new parser based on the current configurator and returns it.
@@ -670,6 +1140,904 @@
             Constructs the parser. This method must be implemented by every constructor based on <see cref="T:Piglet.Parser.Configuration.Generic.ParserConstructor`1"/>
             </summary>
             <param name="start_symbol">The non-terminal production start symbol. The value of this symbol will be returned when the constructed parser is executed.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ParserConstructor`1.ParserWrapper">
+            <summary>
+            Represents a wrapper for the generic parser.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Generic.ParserConstructor`1.ParserWrapper.Parser">
+            <summary>
+            The internal parser instance.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.ParserWrapper.TryParse(System.String,Piglet.Parser.Configuration.Generic.ParserResult{`0}@)">
+            <summary>
+            Tries to parse the given string and returns whether the parsing was successful.
+            </summary>
+            <param name="input">The input string.</param>
+            <param name="result">The parsed value.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ParserConstructor`1.ParserWrapper.Parse(System.String)">
+            <summary>
+            Parses the given string and returns the parsed value of the type <typeparamref name="TOut"/>.
+            </summary>
+            <param name="input">The input string.</param>
+            <returns>The parsed value.</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ITerminalWrapper">
+            <summary>
+            An interface for generic terminal wrappers.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Generic.ITerminalWrapper.Symbol">
+            <summary>
+            The underlying terminal symbol.
+            </summary>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.SymbolWrapper`1">
+            <summary>
+            Represents a generic symbol wrapper.
+            </summary>
+            <typeparam name="T">The generic type stored inside the symbol.</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Generic.SymbolWrapper`1.Symbol">
+            <summary>
+            The underlying (boxed) symbol.
+            </summary>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Generic.SymbolWrapper`1.SymbolType">
+            <summary>
+            The type of the generic value stored inside the symbol.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.SymbolWrapper`1.#ctor(Piglet.Parser.Configuration.ISymbol{System.Object})">
+            <summary>
+            Creates a new generic symbol wrapper for the given (boxed) symbol.
+            </summary>
+            <param name="symbol">Boxed symbol.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.SymbolWrapper`1.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.TerminalWrapper`1">
+            <summary>
+            Represents a generic terminal symbol wrapper.
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T">The generic type stored inside the symbol.</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Generic.TerminalWrapper`1.Piglet#Parser#Configuration#Generic#ITerminalWrapper#Symbol">
+            <inheritdoc/>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.TerminalWrapper`1.#ctor(Piglet.Parser.Configuration.ISymbol{System.Object})">
+            <summary>
+            Creates a new generic symbol wrapper for the given (boxed) terminal symbol.
+            </summary>
+            <param name="symbol">Boxed terminal symbol.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1">
+            <summary>
+            Represents a generic non-terminal symbol wrapper.
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T">The generic type stored inside the symbol.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.#ctor(Piglet.Parser.Configuration.ISymbol{System.Object})">
+            <summary>
+            Creates a new generic symbol wrapper for the given (boxed) non-terminal symbol.
+            </summary>
+            <param name="symbol">Boxed non-terminal symbol.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction">
+            <summary>
+            Creates a new (empty) production rule on the current non-terminal symbol and returns it.
+            </summary>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``1(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 1 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``2(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 2 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``3(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 3 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``4(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 4 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``5(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 5 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``6(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 6 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``7(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 7 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``8(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 8 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``9(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 9 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``10(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 10 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <typeparam name="T9">The generic type of <paramref name="sym9"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``11(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 11 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <typeparam name="T9">The generic type of <paramref name="sym9"/>.</typeparam>
+            <typeparam name="T10">The generic type of <paramref name="sym10"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``12(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 12 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <typeparam name="T9">The generic type of <paramref name="sym9"/>.</typeparam>
+            <typeparam name="T10">The generic type of <paramref name="sym10"/>.</typeparam>
+            <typeparam name="T11">The generic type of <paramref name="sym11"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``13(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 13 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <typeparam name="T9">The generic type of <paramref name="sym9"/>.</typeparam>
+            <typeparam name="T10">The generic type of <paramref name="sym10"/>.</typeparam>
+            <typeparam name="T11">The generic type of <paramref name="sym11"/>.</typeparam>
+            <typeparam name="T12">The generic type of <paramref name="sym12"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``14(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},Piglet.Parser.Configuration.Generic.SymbolWrapper{``13})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 14 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <typeparam name="T9">The generic type of <paramref name="sym9"/>.</typeparam>
+            <typeparam name="T10">The generic type of <paramref name="sym10"/>.</typeparam>
+            <typeparam name="T11">The generic type of <paramref name="sym11"/>.</typeparam>
+            <typeparam name="T12">The generic type of <paramref name="sym12"/>.</typeparam>
+            <typeparam name="T13">The generic type of <paramref name="sym13"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym13">The symbol no. 13, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``15(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},Piglet.Parser.Configuration.Generic.SymbolWrapper{``13},Piglet.Parser.Configuration.Generic.SymbolWrapper{``14})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 15 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <typeparam name="T9">The generic type of <paramref name="sym9"/>.</typeparam>
+            <typeparam name="T10">The generic type of <paramref name="sym10"/>.</typeparam>
+            <typeparam name="T11">The generic type of <paramref name="sym11"/>.</typeparam>
+            <typeparam name="T12">The generic type of <paramref name="sym12"/>.</typeparam>
+            <typeparam name="T13">The generic type of <paramref name="sym13"/>.</typeparam>
+            <typeparam name="T14">The generic type of <paramref name="sym14"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym13">The symbol no. 13, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym14">The symbol no. 14, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.NonTerminalWrapper`1.AddProduction``16(Piglet.Parser.Configuration.Generic.SymbolWrapper{``0},Piglet.Parser.Configuration.Generic.SymbolWrapper{``1},Piglet.Parser.Configuration.Generic.SymbolWrapper{``2},Piglet.Parser.Configuration.Generic.SymbolWrapper{``3},Piglet.Parser.Configuration.Generic.SymbolWrapper{``4},Piglet.Parser.Configuration.Generic.SymbolWrapper{``5},Piglet.Parser.Configuration.Generic.SymbolWrapper{``6},Piglet.Parser.Configuration.Generic.SymbolWrapper{``7},Piglet.Parser.Configuration.Generic.SymbolWrapper{``8},Piglet.Parser.Configuration.Generic.SymbolWrapper{``9},Piglet.Parser.Configuration.Generic.SymbolWrapper{``10},Piglet.Parser.Configuration.Generic.SymbolWrapper{``11},Piglet.Parser.Configuration.Generic.SymbolWrapper{``12},Piglet.Parser.Configuration.Generic.SymbolWrapper{``13},Piglet.Parser.Configuration.Generic.SymbolWrapper{``14},Piglet.Parser.Configuration.Generic.SymbolWrapper{``15})">
+            <summary>
+            Creates a new production rule on the current non-terminal symbol.
+            <br/>
+            This production represents the reducing of the current non-terminal to the 16 given symbols.
+            </summary>
+            <typeparam name="T0">The generic type of <paramref name="sym0"/>.</typeparam>
+            <typeparam name="T1">The generic type of <paramref name="sym1"/>.</typeparam>
+            <typeparam name="T2">The generic type of <paramref name="sym2"/>.</typeparam>
+            <typeparam name="T3">The generic type of <paramref name="sym3"/>.</typeparam>
+            <typeparam name="T4">The generic type of <paramref name="sym4"/>.</typeparam>
+            <typeparam name="T5">The generic type of <paramref name="sym5"/>.</typeparam>
+            <typeparam name="T6">The generic type of <paramref name="sym6"/>.</typeparam>
+            <typeparam name="T7">The generic type of <paramref name="sym7"/>.</typeparam>
+            <typeparam name="T8">The generic type of <paramref name="sym8"/>.</typeparam>
+            <typeparam name="T9">The generic type of <paramref name="sym9"/>.</typeparam>
+            <typeparam name="T10">The generic type of <paramref name="sym10"/>.</typeparam>
+            <typeparam name="T11">The generic type of <paramref name="sym11"/>.</typeparam>
+            <typeparam name="T12">The generic type of <paramref name="sym12"/>.</typeparam>
+            <typeparam name="T13">The generic type of <paramref name="sym13"/>.</typeparam>
+            <typeparam name="T14">The generic type of <paramref name="sym14"/>.</typeparam>
+            <typeparam name="T15">The generic type of <paramref name="sym15"/>.</typeparam>
+            <param name="sym0">The symbol no. 0, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym1">The symbol no. 1, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym2">The symbol no. 2, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym3">The symbol no. 3, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym4">The symbol no. 4, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym5">The symbol no. 5, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym6">The symbol no. 6, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym7">The symbol no. 7, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym8">The symbol no. 8, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym9">The symbol no. 9, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym10">The symbol no. 10, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym11">The symbol no. 11, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym12">The symbol no. 12, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym13">The symbol no. 13, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym14">The symbol no. 14, to which the current non-terminal symbol gets reduced.</param>
+            <param name="sym15">The symbol no. 15, to which the current non-terminal symbol gets reduced.</param>
+            <returns>The newly created production rule.</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapperBase`1">
+            <summary>
+            Represents an abstract generic production wrapper.
+            </summary>
+            <typeparam name="T">The generic return type of the production. This is the type stored inside the non-terminal which gets reduced by the production represented by this wrapper.</typeparam>
+        </member>
+        <member name="P:Piglet.Parser.Configuration.Generic.ProductionWrapperBase`1.Production">
+            <summary>
+            The underlying (boxed) production of this wrapper.
+            </summary>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapperBase`1.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new abstract generic production wrapper based on the given (boxed) production.
+            </summary>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapperBase`1.SetReduceToFirst">
+            <summary>
+            Configures the production to reduce the non-terminal to the first symbol. This is equivalent to <see cref="M:Piglet.Parser.Configuration.IProduction`1.SetReduceToIndex(System.Int32)"/> with the index 0.
+            </summary>
+            <returns>The current instance.</returns>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapperBase`1.SetPrecedence(Piglet.Parser.Construction.IPrecedenceGroup)">
+            <summary>
+            Sets given precedence group to the current production.
+            </summary>
+            <param name="precedence">Precedence group to the assigned to the current production.</param>
+            <returns>The current instance.</returns>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`1">
+            <summary>
+            Represents a generic reduce function of the type "<c>(R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`1.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`2">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`2.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`3">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`3.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`4">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`4.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`5">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`5.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`6">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`6.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`7">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`7.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`8">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`8.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`9">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`9.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`10">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`10.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`11">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="T9">The generic input type of the symbol no. 9.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`11.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`12">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="T9">The generic input type of the symbol no. 9.</typeparam>
+            <typeparam name="T10">The generic input type of the symbol no. 10.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`12.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`13">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="T9">The generic input type of the symbol no. 9.</typeparam>
+            <typeparam name="T10">The generic input type of the symbol no. 10.</typeparam>
+            <typeparam name="T11">The generic input type of the symbol no. 11.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`13.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`14">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="T9">The generic input type of the symbol no. 9.</typeparam>
+            <typeparam name="T10">The generic input type of the symbol no. 10.</typeparam>
+            <typeparam name="T11">The generic input type of the symbol no. 11.</typeparam>
+            <typeparam name="T12">The generic input type of the symbol no. 12.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`14.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`15">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="T9">The generic input type of the symbol no. 9.</typeparam>
+            <typeparam name="T10">The generic input type of the symbol no. 10.</typeparam>
+            <typeparam name="T11">The generic input type of the symbol no. 11.</typeparam>
+            <typeparam name="T12">The generic input type of the symbol no. 12.</typeparam>
+            <typeparam name="T13">The generic input type of the symbol no. 13.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`15.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`16">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="T9">The generic input type of the symbol no. 9.</typeparam>
+            <typeparam name="T10">The generic input type of the symbol no. 10.</typeparam>
+            <typeparam name="T11">The generic input type of the symbol no. 11.</typeparam>
+            <typeparam name="T12">The generic input type of the symbol no. 12.</typeparam>
+            <typeparam name="T13">The generic input type of the symbol no. 13.</typeparam>
+            <typeparam name="T14">The generic input type of the symbol no. 14.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`16.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
+        </member>
+        <member name="T:Piglet.Parser.Configuration.Generic.ProductionWrapper`17">
+            <summary>
+            Represents a generic reduce function of the type "<c>(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, R) -&gt; <typeparamref name="R"/></c>".
+            </summary>
+            <inheritdoc/>
+            <typeparam name="T0">The generic input type of the symbol no. 0.</typeparam>
+            <typeparam name="T1">The generic input type of the symbol no. 1.</typeparam>
+            <typeparam name="T2">The generic input type of the symbol no. 2.</typeparam>
+            <typeparam name="T3">The generic input type of the symbol no. 3.</typeparam>
+            <typeparam name="T4">The generic input type of the symbol no. 4.</typeparam>
+            <typeparam name="T5">The generic input type of the symbol no. 5.</typeparam>
+            <typeparam name="T6">The generic input type of the symbol no. 6.</typeparam>
+            <typeparam name="T7">The generic input type of the symbol no. 7.</typeparam>
+            <typeparam name="T8">The generic input type of the symbol no. 8.</typeparam>
+            <typeparam name="T9">The generic input type of the symbol no. 9.</typeparam>
+            <typeparam name="T10">The generic input type of the symbol no. 10.</typeparam>
+            <typeparam name="T11">The generic input type of the symbol no. 11.</typeparam>
+            <typeparam name="T12">The generic input type of the symbol no. 12.</typeparam>
+            <typeparam name="T13">The generic input type of the symbol no. 13.</typeparam>
+            <typeparam name="T14">The generic input type of the symbol no. 14.</typeparam>
+            <typeparam name="T15">The generic input type of the symbol no. 15.</typeparam>
+            <typeparam name="R">The generic return type of the production.</typeparam>
+        </member>
+        <member name="M:Piglet.Parser.Configuration.Generic.ProductionWrapper`17.#ctor(Piglet.Parser.Configuration.IProduction{System.Object})">
+            <summary>
+            Creates a new generic production wrapper based on the given (boxed) production.
+            </summary>
+            <inheritdoc/>
+            <param name="production">Boxed production instance.</param>
         </member>
         <member name="T:Piglet.Parser.Configuration.ILexerSettings">
             <summary>

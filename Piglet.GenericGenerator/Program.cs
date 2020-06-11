@@ -71,12 +71,14 @@ Arguments:
 //   All your changes to this file will be lost upon re-generation.  //
 ///////////////////////////////////////////////////////////////////////
 
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
 using System;
 
 using Piglet.Parser.Construction;
 using Piglet.Lexer.Runtime;
+using Piglet.Lexer;
 
 
 namespace Piglet.Parser.Configuration.Generic
@@ -183,18 +185,46 @@ namespace Piglet.Parser.Configuration.Generic
             }}
         }}
 
-        protected void CreateProduction<T, S0>(NonTerminalWrapper<T> to, SymbolWrapper<S0> s) => to.AddProduction(s).SetReduceToFirst();
+        /// <summary>
+        /// Creates a new production rule on the given non-terminal symbol using the given production function.
+        /// <br/>
+        /// This production represents the reducing of the given non-terminal to the given symbol.
+        /// </summary>
+        /// <typeparam name=""T"">The generic type of <paramref name=""non_terminal""/>.</typeparam>
+        /// <typeparam name=""S0"">The generic type of <paramref name=""non_terminal""/>.</typeparam>
+        /// <param name=""non_terminal"">The non-terminal symbol which gets reduced.</param>
+        /// <param name=""symbol0"">The symbol, to which <paramref name=""non_terminal""/> gets reduced.</param>
+        protected void CreateProduction<T, S0>(NonTerminalWrapper<T> non_terminal, SymbolWrapper<S0> symbol0) => non_terminal.AddProduction(symbol0).SetReduceToFirst();
 ");
 
             for (int i = 0; i <= MAX_SIZE; ++i)
             {
                 string types = string.Concat(range(0, i).Select(x => $", S{x}"));
                 string ftypes = string.Concat(range(0, i).Select(x => $"S{x}, "));
-                string names = string.Join(", ", range(0, i).Select(x => $"s{x}"));
-                string args = string.Concat(range(0, i).Select(x => $", SymbolWrapper<S{x}> s{x}"));
+                string names = string.Join(", ", range(0, i).Select(x => $"symbol{x}"));
+                string args = string.Concat(range(0, i).Select(x => $", SymbolWrapper<S{x}> symbol{x}"));
 
                 writer.Write($@"
-        protected ProductionWrapper<{ftypes}T> CreateProduction<T{types}>(NonTerminalWrapper<T> to{args}, Func<{ftypes}T> func) => to.AddProduction({names}).SetReduceFunction(func);
+        /// <summary>
+        /// Creates a new production rule on the given non-terminal symbol using the given production function.
+        /// <br/>
+        /// This production represents the reducing of the given non-terminal to the {i} given symbols.
+        /// </summary>
+        /// <param name=""non_terminal"">The non-terminal symbol which gets reduced.</param>
+        /// <typeparam name=""T"">The generic type of <paramref name=""non_terminal""/>.</typeparam>");
+
+                for (int j = 0; j < i; ++j)
+                    writer.Write($@"
+        /// <typeparam name=""S{j}"">The generic type of <paramref name=""symbol{j}""/>.</typeparam>");
+
+                for (int j = 0; j < i; ++j)
+                    writer.Write($@"
+        /// <param name=""symbol{j}"">The symbol no. {j}, to which the current non-terminal symbol gets reduced.</param>");
+
+                writer.Write($@"
+        /// <param name=""func"">The generic production function which gets called upon reduction. The function accepts the value stored inside the produced symbols, and returns the value to be stored inside the non-terminal symbol ""<paramref name=""non_terminal""/>"".</param>
+        /// <returns>The newly created production rule.</returns>
+        protected ProductionWrapper<{ftypes}T> CreateProduction<T{types}>(NonTerminalWrapper<T> non_terminal{args}, Func<{ftypes}T> func) => non_terminal.AddProduction({names}).SetReduceFunction(func);
 ");
             }
 
@@ -232,14 +262,44 @@ namespace Piglet.Parser.Configuration.Generic
         protected abstract void Construct(NonTerminalWrapper<TOut> start_symbol);
 
 
+        /// <summary>
+        /// Represents a wrapper for the generic parser.
+        /// </summary>
         public sealed class ParserWrapper
         {
+            /// <summary>
+            /// The internal parser instance.
+            /// </summary>
             public IParser<object> Parser { get; }
 
 
             internal ParserWrapper(IParser<object> parser) => Parser = parser;
 
-            public ParserResult<TOut> Parse(string s)
+            /// <summary>
+            /// Tries to parse the given string and returns whether the parsing was successful.
+            /// </summary>
+            /// <param name=""input"">The input string.</param>
+            /// <param name=""result"">The parsed value.</param>
+            public bool TryParse(string input, [MaybeNullWhen(false)] out ParserResult<TOut>? result)
+            {
+                try
+                {
+                    result = Parse(input);
+                }
+                catch (LexerException)
+                {
+                    result = null;
+                }
+
+                return result is { };
+            }
+
+            /// <summary>
+            /// Parses the given string and returns the parsed value of the type <typeparamref name=""TOut""/>.
+            /// </summary>
+            /// <param name=""input"">The input string.</param>
+            /// <returns>The parsed value.</returns>
+            public ParserResult<TOut> Parse(string input)
             {
                 List<LexedToken<object>> tokens = new List<LexedToken<object>>();
                 void aggregate(LexedToken<object> token)
@@ -251,9 +311,9 @@ namespace Piglet.Parser.Configuration.Generic
                             aggregate(child);
                 }
 
-                aggregate(Parser.ParseTokens(s));
+                aggregate(Parser.ParseTokens(input));
 
-                return new ParserResult<TOut>((TOut)tokens[0].SymbolValue, s.Split('\n'), tokens.ToArray());
+                return new ParserResult<TOut>((TOut)tokens[0].SymbolValue, input.Split('\n'), tokens.ToArray());
             }
         }
     }
@@ -275,42 +335,86 @@ namespace Piglet.Parser.Configuration.Generic
         public static implicit operator TOut(ParserResult<TOut> res) => res.ParsedValue;
     }
 
+    /// <summary>
+    /// An interface for generic terminal wrappers.
+    /// </summary>
     public interface ITerminalWrapper
     {
+        /// <summary>
+        /// The underlying terminal symbol.
+        /// </summary>
         ITerminal<object> Symbol { get; }
     }
 
+    /// <summary>
+    /// Represents a generic symbol wrapper.
+    /// </summary>
+    /// <typeparam name=""T"">The generic type stored inside the symbol.</typeparam>
     public class SymbolWrapper<T>
     {
+        /// <summary>
+        /// The underlying (boxed) symbol.
+        /// </summary>
         public ISymbol<object> Symbol { get; }
+        /// <summary>
+        /// The type of the generic value stored inside the symbol.
+        /// </summary>
         public Type SymbolType => typeof(T);
 
 
+        /// <summary>
+        /// Creates a new generic symbol wrapper for the given (boxed) symbol.
+        /// </summary>
+        /// <param name=""symbol"">Boxed symbol.</param>
         public SymbolWrapper(ISymbol<object> symbol) => Symbol = symbol;
 
-        public override string ToString() => Symbol.ToString();
+        /// <inheritdoc/>
+        public override string? ToString() => Symbol.ToString();
     }
 
+    /// <summary>
+    /// Represents a generic terminal symbol wrapper.
+    /// </summary>
+    /// <inheritdoc/>
+    /// <typeparam name=""T"">The generic type stored inside the symbol.</typeparam>
     public sealed class TerminalWrapper<T>
         : SymbolWrapper<T>
         , ITerminalWrapper
     {
+        /// <inheritdoc/>
         ITerminal<object> ITerminalWrapper.Symbol => (ITerminal<object>)Symbol;
 
+        /// <summary>
+        /// Creates a new generic symbol wrapper for the given (boxed) terminal symbol.
+        /// </summary>
+        /// <param name=""symbol"">Boxed terminal symbol.</param>
         public TerminalWrapper(ISymbol<object> symbol)
             : base(symbol)
         {
         }
     }
 
+    /// <summary>
+    /// Represents a generic non-terminal symbol wrapper.
+    /// </summary>
+    /// <inheritdoc/>
+    /// <typeparam name=""T"">The generic type stored inside the symbol.</typeparam>
     public sealed class NonTerminalWrapper<T>
         : SymbolWrapper<T>
     {
+        /// <summary>
+        /// Creates a new generic symbol wrapper for the given (boxed) non-terminal symbol.
+        /// </summary>
+        /// <param name=""symbol"">Boxed non-terminal symbol.</param>
         public NonTerminalWrapper(ISymbol<object> symbol)
             : base(symbol)
         {
         }
 
+        /// <summary>
+        /// Creates a new (empty) production rule on the current non-terminal symbol and returns it.
+        /// </summary>
+        /// <returns>The newly created production rule.</returns>
         public ProductionWrapper<T> AddProduction() => new ProductionWrapper<T>(((INonTerminal<object>)Symbol).AddProduction());
 ");
 
@@ -321,26 +425,72 @@ namespace Piglet.Parser.Configuration.Generic
                 string args = string.Join(", ", range(0, i).Select(x => $"SymbolWrapper<T{x}> sym{x}"));
 
                 writer.Write($@"
+        /// <summary>
+        /// Creates a new production rule on the current non-terminal symbol.
+        /// <br/>
+        /// This production represents the reducing of the current non-terminal to the {i} given symbols.
+        /// </summary>");
+
+                for (int j = 0; j < i; ++j)
+                    writer.Write($@"
+        /// <typeparam name=""T{j}"">The generic type of <paramref name=""sym{j}""/>.</typeparam>");
+
+                for (int j = 0; j < i; ++j)
+                    writer.Write($@"
+        /// <param name=""sym{j}"">The symbol no. {j}, to which the current non-terminal symbol gets reduced.</param>");
+
+                writer.Write($@"
+        /// <returns>The newly created production rule.</returns>
         public ProductionWrapper<{types}, T> AddProduction<{types}>({args}) =>
             new ProductionWrapper<{types}, T>(((INonTerminal<object>)Symbol).AddProduction({names}));
 ");
             }
 
-            writer.Write($@"
-    }}
+            writer.Write(@"
+    }
 
+    /// <summary>
+    /// Represents an abstract generic production wrapper.
+    /// </summary>
+    /// <typeparam name=""T"">The generic return type of the production. This is the type stored inside the non-terminal which gets reduced by the production represented by this wrapper.</typeparam>
     public abstract class ProductionWrapperBase<T>
         where T : ProductionWrapperBase<T>
-    {{
-        public IProduction<object> Production {{ get; }}
+    {
+        /// <summary>
+        /// The underlying (boxed) production of this wrapper.
+        /// </summary>
+        public IProduction<object> Production { get; }
 
 
+        /// <summary>
+        /// Creates a new abstract generic production wrapper based on the given (boxed) production.
+        /// </summary>
+        /// <param name=""production"">Boxed production instance.</param>
         public ProductionWrapperBase(IProduction<object> production) => Production = production;
 
-        public void SetReduceToFirst() => Production.SetReduceToFirst();
+        /// <summary>
+        /// Configures the production to reduce the non-terminal to the first symbol. This is equivalent to <see cref=""IProduction{T}.SetReduceToIndex(int)""/> with the index 0.
+        /// </summary>
+        /// <returns>The current instance.</returns>
+        public T SetReduceToFirst()
+        {
+            Production.SetReduceToFirst();
 
-        public void SetPrecedence(IPrecedenceGroup precedence) => Production.SetPrecedence(precedence);
-    }}
+            return (T)this;
+        }
+
+        /// <summary>
+        /// Sets given precedence group to the current production.
+        /// </summary>
+        /// <param name=""precedence"">Precedence group to the assigned to the current production.</param>
+        /// <returns>The current instance.</returns>
+        public T SetPrecedence(IPrecedenceGroup precedence)
+        {
+            Production.SetPrecedence(precedence);
+
+            return (T)this;
+        }
+    }
 ");
             for (int i = 1; i <= MAX_SIZE + 1; ++i)
             {
@@ -348,10 +498,25 @@ namespace Piglet.Parser.Configuration.Generic
                 string typestr = string.Join(", ", types);
 
                 writer.Write($@"
+    /// <summary>
+    /// Represents a generic reduce function of the type ""<c>({typestr}) -&gt; <typeparamref name=""R""/></c>"".
+    /// </summary>
+    /// <inheritdoc/>");
 
+                for (int j = 0; j < i - 1; ++j)
+                    writer.Write($@"
+    /// <typeparam name=""T{j}"">The generic input type of the symbol no. {j}.</typeparam>");
+
+                writer.Write($@"
+    /// <typeparam name=""R"">The generic return type of the production.</typeparam>
     public sealed class ProductionWrapper<{typestr}>
         : ProductionWrapperBase<ProductionWrapper<{typestr}>>
     {{
+        /// <summary>
+        /// Creates a new generic production wrapper based on the given (boxed) production.
+        /// </summary>
+        /// <inheritdoc/>
+        /// <param name=""production"">Boxed production instance.</param>
         public ProductionWrapper(IProduction<object> production)
             : base(production)
         {{

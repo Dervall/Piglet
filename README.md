@@ -1,7 +1,11 @@
+# Piglet, the little friendly parser and lexer tool
+
 [![Build status](https://ci.appveyor.com/api/projects/status/7k5vohj4lhmdhac1?svg=true)
 ![Test status](http://teststatusbadge.azurewebsites.net/api/status/unknown6656/piglet)](https://ci.appveyor.com/project/Unknown6656/piglet)
 
-# Piglet, the little friendly parser and lexer tool
+[![Build history](https://buildstats.info/appveyor/chart/unknown6656/piglet?buildCount=20&includeBuildsFromPullRequest=true&showStats=true)](https://ci.appveyor.com/project/unknown6656/piglet/history)
+
+
 Piglet is a library for lexing and parsing text, in the spirit of those big parser and lexer genererators such as bison, antlr and flex. While not as feature packed as those, it is also a whole lot leaner and much easier to understand.
 
 ### Mission statement

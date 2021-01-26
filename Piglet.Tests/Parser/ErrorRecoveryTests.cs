@@ -23,7 +23,7 @@ namespace Piglet.Tests.Parser
             var terminatedA = configurator.CreateNonTerminal();
 
             a.AddProduction(a, "a").SetReduceFunction(f => f[0] + 1);
-            a.AddProduction("a").SetReduceFunction(f => 1);
+            a.AddProduction("a").SetReduceFunction((int[] _) => 1);
 
             terminatedA.AddProduction(a, ";").SetReduceFunction( f => f[0]);
             terminatedA.AddProduction(configurator.ErrorToken, ";").SetErrorFunction((e, f) =>

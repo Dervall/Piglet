@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Piglet.Common
 {
@@ -19,19 +16,18 @@ namespace Piglet.Common
         /// <returns>Index of start of sublist, or -1 if not found</returns>
         public static int IndexOf<T>(this IList<T> haystack, IList<T> needle)
         {
-            // Stupid implementation. This could probably benefit from 
-            // using a string search algorithm.
+            // Stupid implementation. This could probably benefit from using a string search algorithm.
             for (int i = 0; i < haystack.Count - needle.Count; ++i)
             {
                 bool found = true;
+
                 for (int j = 0; j < needle.Count; ++j)
-                {
-                    if (!haystack[i + j].Equals(needle[j]))
+                    if (!Equals(haystack[i + j], needle[j]))
                     {
                         found = false;
+
                         break;
                     }
-                }
 
                 if (found)
                     return i;

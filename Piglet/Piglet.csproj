@@ -1,36 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.6;net40;net45</TargetFrameworks>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Version>1.5.0</Version>
-    <Company>Per Dervall</Company>
-    <Product>Piglet</Product>
-    <Authors>Per Dervall;harrison314</Authors>
-    <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.
-    </Description>
-    <RepositoryUrl>https://github.com/harrison314/Piglet</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/Dervall/Piglet</PackageProjectUrl>
-    <PackageId>Piglet</PackageId>
-    <DocumentationFile>Piglet.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup>
-      <PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
-    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>8.0</LangVersion>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <Version>1.6.0</Version>
+        <Company>Per Dervall; Unknown6656</Company>
+        <Product>Piglet</Product>
+        <Authors>Per Dervall; Unknown6656; harrison314</Authors>
+        <Description>Parser and lexer generator that does not require a pre-build step and configurable using fluent configuration.</Description>
+        <RepositoryUrl>https://github.com/unknown6656/Piglet</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/unknown6656/Piglet</PackageProjectUrl>
+        <PackageId>Piglet</PackageId>
+        <DocumentationFile>Piglet.xml</DocumentationFile>
+        <WarningLevel>4</WarningLevel>
+        <OutputPath>..\bin</OutputPath>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Prefer32Bit>false</Prefer32Bit>
+        <Nullable>enable</Nullable>
+        <Deterministic>false</Deterministic>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="dotnet &quot;$(SolutionDir)Piglet.GenericGenerator/bin/generator.dll&quot; &quot;Parser/Configuration/Generic/ParsingUitilities.cs&quot; cs" />
+        <ItemGroup>
+            <Compile Include="**/*$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(BaseIntermediateOutputPath)**;$(BaseOutputPath)**;@(Compile)" />
+        </ItemGroup>
+    </Target>
 </Project>

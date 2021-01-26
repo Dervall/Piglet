@@ -17,10 +17,7 @@ namespace Piglet.Tests.Lexer.Construction
             Assert.AreEqual(3, nfa.Transitions.Count());
         }
 
-        private NFA NFACreate(string s)
-        {
-            return NfaBuilder.Create(new ShuntingYard(new RegExLexer(new StringReader(s))));
-        }
+        private NFA NFACreate(string s) => NfaBuilder.Create(new ShuntingYard(new RegexLexer(new StringReader(s)), false));
 
         [Test]
         public void TestRepeat()

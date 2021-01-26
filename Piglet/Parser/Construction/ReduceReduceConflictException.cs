@@ -7,16 +7,10 @@ namespace Piglet.Parser.Construction
     /// at the same points. This is usually indicative of a serious grammar error.
     /// </summary>
     /// <typeparam name="T">Semantic value of symbols used in the grammar</typeparam>
-    public class ReduceReduceConflictException<T> : AmbiguousGrammarException
+    public sealed class ReduceReduceConflictException<T>
+        : AmbiguousGrammarException
     {
-        /// <summary>
-        /// Create a new reduce reduce conflict exception
-        /// </summary>
-        /// <param name="message">Exception message</param>
-        public ReduceReduceConflictException(string message)
-            : base (message)
-        {
-        }
+        internal string? _message;
 
         /// <summary>
         /// The reduce symbol that existed in the parse table before the new reduce symbol was applied.
@@ -27,5 +21,17 @@ namespace Piglet.Parser.Construction
         /// The reduce symbol that the parser generator tried to apply.
         /// </summary>
         public ISymbol<T> NewReduceSymbol { get; internal set; }
+
+        public override string Message => _message ?? base.Message;
+
+
+        /// <summary>
+        /// Create a new reduce reduce conflict exception
+        /// </summary>
+        /// <param name="message">Exception message</param>
+        public ReduceReduceConflictException(string message)
+            : base(message)
+        {
+        }
     }
 }

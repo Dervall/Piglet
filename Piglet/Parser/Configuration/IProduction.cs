@@ -1,4 +1,5 @@
 using System;
+using Piglet.Lexer.Runtime;
 using Piglet.Parser.Construction;
 
 namespace Piglet.Parser.Configuration
@@ -9,6 +10,13 @@ namespace Piglet.Parser.Configuration
     /// <typeparam name="T">Semantic type of tokens</typeparam>
     public interface IProduction<T>
     {
+        /// <summary>
+        /// Specifies a reduction function to be performed when parsing applies the production rule
+        /// </summary>
+        /// <param name="action">Function that takes each of the elements in the given rule and returns a new element. Elements in
+        /// input array are ordered the same way as in the production.</param>
+        void SetReduceFunction(Func<LexedToken<T>[], T> action);
+
         /// <summary>
         /// Specifies a reduction function to be performed when parsing applies the production rule
         /// </summary>
@@ -38,6 +46,6 @@ namespace Piglet.Parser.Configuration
         /// the Error token as predefined by the configurator.
         /// </summary>
         /// <param name="errorHandler">Error handler function</param>
-        void SetErrorFunction(Func<ParseException, T[], T> errorHandler);
+        void SetErrorFunction(Func<ParseException, LexedToken<T>[], T> errorHandler);
     }
 }

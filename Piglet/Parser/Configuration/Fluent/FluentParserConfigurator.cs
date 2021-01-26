@@ -1,158 +1,143 @@
-using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+
 using Piglet.Lexer.Configuration;
 
 namespace Piglet.Parser.Configuration.Fluent
 {
-    internal class FluentParserConfigurator : IFluentParserConfigurator
+    internal sealed class FluentParserConfigurator
+        : IFluentParserConfigurator
     {
-        private readonly ParserConfigurator<object> configurator;
-        private readonly List<FluentRule> rules;
-        private readonly Dictionary<Tuple<IRule, string>, NonTerminal<object>> listRules;
-        private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> optionalRules;
-        private readonly List<string> ignored;
+        private readonly Dictionary<(IRule? rule, string? separator), NonTerminal<object>> _listRules;
+        private readonly Dictionary<NonTerminal<object>, NonTerminal<object>> _optionalRules;
+        private readonly ParserConfigurator<object> _configurator;
+        private readonly List<FluentRule> _rules;
+        private readonly List<string> _ignored;
         
-        private IExpressionConfigurator quotedString;
-        private IExpressionConfigurator errorToken;
+        private IExpressionConfigurator? _quotedString;
+        private IExpressionConfigurator? _errorToken;
 
-        public FluentParserConfigurator(ParserConfigurator<object> configurator)
+
+        public LexerRuntime Runtime
         {
-            this.configurator = configurator;
-
-            rules = new List<FluentRule>();
-            listRules = new Dictionary<Tuple<IRule, string>, NonTerminal<object>>();
-            optionalRules = new Dictionary<NonTerminal<object>, NonTerminal<object>>();
-            ignored = new List<string>();
+            get => _configurator.LexerSettings.Runtime;
+            set => _configurator.LexerSettings.Runtime = value;
         }
 
-        public IRule Rule()
-        {
-            var rule = new FluentRule(this, configurator.CreateNonTerminal());
-            rules.Add(rule);
-            return rule;
-        }
-
-        public IExpressionConfigurator Expression()
-        {
-            return new FluentExpression(configurator);
-        }
+        public IExpressionConfigurator Error => _errorToken ?? (_errorToken = new FluentExpression(_configurator.ErrorToken));
 
         public IExpressionConfigurator QuotedString
         {
             get
             {
-                if (quotedString == null)
+                if (_quotedString is null)
                 {
-                    quotedString = Expression();
-                    quotedString.ThatMatches("\"(\\\\.|[^\"])*\"").AndReturns(f => f.Substring(1, f.Length - 2));
+                    _quotedString = Expression();
+                    _quotedString.ThatMatches("\"(\\\\.|[^\"])*\"").AndReturns(f => f.Substring(1, f.Length - 2));
                 }
-                return quotedString;
+
+                return _quotedString;
             }
         }
 
-        public IExpressionConfigurator Error
+
+        public FluentParserConfigurator(ParserConfigurator<object> configurator)
         {
-            get { return errorToken ?? (errorToken = new FluentExpression(configurator.ErrorToken)); }
+            _configurator = configurator;
+            _rules = new List<FluentRule>();
+            _listRules = new Dictionary<(IRule, string), NonTerminal<object>>();
+            _optionalRules = new Dictionary<NonTerminal<object>, NonTerminal<object>>();
+            _ignored = new List<string>();
         }
+
+        public IRule Rule()
+        {
+            FluentRule rule = new FluentRule(this, _configurator.CreateNonTerminal());
+
+            _rules.Add(rule);
+
+            return rule;
+        }
+
+        public IExpressionConfigurator Expression() => new FluentExpression(_configurator);
 
         public IParser<object> CreateParser()
         {
             // At this point the underlying parser configurator contains a bunch of nonterminals
             // It won't contain all of the nonterminals. We are going to replace everything in every rule with the proper
             // [non]terminals. Then we are going to generate the parser.
-            foreach (var rule in rules)
-            {
+            foreach (FluentRule rule in _rules)
                 rule.ConfigureProductions();
-            }
 
-            configurator.LexerSettings.CreateLexer = true;
-            configurator.LexerSettings.EscapeLiterals = true;
-            configurator.LexerSettings.Ignore = new[] { @"\s+" }.Concat(ignored).ToArray();
+            _configurator.LexerSettings.CreateLexer = true;
+            _configurator.LexerSettings.EscapeLiterals = true;
+            _configurator.LexerSettings.Ignore = new[] { @"\s+" }.Concat(_ignored).ToArray();
 
-            var parser = configurator.CreateParser();
-            parser.Lexer = configurator.CreateLexer();
+            IParser<object> parser = _configurator.CreateParser();
+
+            parser.Lexer = _configurator.CreateLexer();
 
             return parser;
         }
 
-        private ITerminal<object>[] ParamsToTerminalArray(object[] p)
-        {
-            return p.OfType<string>().Select(f => configurator.CreateTerminal(Regex.Escape(f)))
+        private ITerminal<object>[] ParamsToTerminalArray(object[] p) => p.OfType<string>().Select(f => _configurator.CreateTerminal(Regex.Escape(f)))
                 .Concat(p.OfType<FluentExpression>().Select(f => f.Terminal)).ToArray();
-        }
 
-        public void LeftAssociative(params object[] p)
+        public void LeftAssociative(params object[] p) => _configurator.LeftAssociative(ParamsToTerminalArray(p));
+
+        public void RightAssociative(params object[] p) => _configurator.RightAssociative(ParamsToTerminalArray(p));
+
+        public void NonAssociative(params object[] p) => _configurator.NonAssociative(ParamsToTerminalArray(p));
+
+        public void Ignore(string ignoreExpression) => _ignored.Add(ignoreExpression);
+
+        public NonTerminal<object> MakeListRule<TListType>(IRule? rule, string? separator)
         {
-            configurator.LeftAssociative(ParamsToTerminalArray(p));
-        }
+            (IRule? rule, string? separator) tuple = (rule, separator);
 
-        public void RightAssociative(params object[] p)
-        {
-            configurator.RightAssociative(ParamsToTerminalArray(p));
-        }
-
-        public void NonAssociative(params object[] p)
-        {
-            configurator.NonAssociative(ParamsToTerminalArray(p));
-        }
-
-        public void Ignore(string ignoreExpression)
-        {
-            ignored.Add(ignoreExpression);
-        }
-
-        public LexerRuntime Runtime {
-            get { return configurator.LexerSettings.Runtime; }
-            set { configurator.LexerSettings.Runtime = value; }
-        }
-
-        public NonTerminal<object> MakeListRule<TListType>(IRule rule, string separator)
-        {
-            var t = new Tuple<IRule, string>(rule, separator);
-            if (listRules.ContainsKey(t))
-                return listRules[t];
+            if (_listRules.ContainsKey(tuple))
+                return _listRules[tuple];
 
             // Create a new nonterminal
-            var listRule = (NonTerminal<object>)configurator.CreateNonTerminal();
+            NonTerminal<object> listRule = (NonTerminal<object>)_configurator.CreateNonTerminal();
 
             if (separator != null)
-            {
-                listRule.AddProduction(listRule, separator, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
+                listRule.AddProduction(listRule, separator, ((FluentRule?)rule)?.NonTerminal).SetReduceFunction(f =>
                 {
-                    var list = (List<TListType>)f[0];
-                    list.Add((TListType)f[2]);
-                    return list;
-                });
-            }
-            else
-            {
-                listRule.AddProduction(listRule, ((FluentRule)rule).NonTerminal).SetReduceFunction(f =>
-                {
-                    var list = (List<TListType>)f[0];
-                    list.Add((TListType)f[1]);
-                    return list;
-                });
-            }
-            listRule.AddProduction(((FluentRule)rule).NonTerminal).SetReduceFunction(f => new List<TListType> { (TListType)f[0] });
+                    List<TListType> list = (List<TListType>)f[0];
 
-            listRules.Add(t, listRule);
+                    list.Add((TListType)f[2]);
+
+                    return list;
+                });
+            else
+                listRule.AddProduction(listRule, ((FluentRule?)rule)?.NonTerminal).SetReduceFunction(f =>
+                {
+                    List<TListType> list = (List<TListType>)f[0];
+
+                    list.Add((TListType)f[1]);
+
+                    return list;
+                });
+
+            listRule.AddProduction(((FluentRule?)rule)?.NonTerminal).SetReduceFunction(f => new List<TListType> { (TListType)f[0] });
+            _listRules.Add(tuple, listRule);
+
             return listRule;
         }
 
         public NonTerminal<object> MakeOptionalRule(NonTerminal<object> nonTerminal)
         {
-            if (optionalRules.ContainsKey(nonTerminal))
-                return optionalRules[nonTerminal];
+            if (_optionalRules.ContainsKey(nonTerminal))
+                return _optionalRules[nonTerminal];
 
             // Makes a new rule
-            var optionalRule = (NonTerminal<object>)configurator.CreateNonTerminal();
+            NonTerminal<object> optionalRule = (NonTerminal<object>)_configurator.CreateNonTerminal();
 
             optionalRule.AddProduction(nonTerminal).SetReduceFunction(f => f[0]);
             optionalRule.AddProduction();
-
-            optionalRules.Add(nonTerminal, optionalRule);
+            _optionalRules.Add(nonTerminal, optionalRule);
 
             return optionalRule;
         }

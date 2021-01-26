@@ -1,4 +1,5 @@
 using System;
+
 using Piglet.Lexer.Configuration;
 
 namespace Piglet.Parser.Configuration.Fluent
@@ -6,7 +7,8 @@ namespace Piglet.Parser.Configuration.Fluent
     /// <summary>
     /// A configuration object for creating fluently configured parsers.
     /// </summary>
-    public interface IFluentParserConfigurator : IHideObjectMembers
+    public interface IFluentParserConfigurator
+        : IHideObjectMembers
     {
         /// <summary>
         /// Create a new rule
@@ -71,7 +73,8 @@ namespace Piglet.Parser.Configuration.Fluent
     /// <summary>
     /// A rule is a configurable rule entity.
     /// </summary>
-    public interface IRule : IHideObjectMembers
+    public interface IRule
+        : IHideObjectMembers
     {
         /// <summary>
         /// Specify what this rule is made up by
@@ -82,7 +85,8 @@ namespace Piglet.Parser.Configuration.Fluent
     /// <summary>
     /// An expression is a terminal token, and this is the configurator object for setting what the expression should match
     /// </summary>
-    public interface IExpressionConfigurator : IHideObjectMembers
+    public interface IExpressionConfigurator
+        : IHideObjectMembers
     {
         /// <summary>
         /// Match a type
@@ -101,7 +105,8 @@ namespace Piglet.Parser.Configuration.Fluent
     /// <summary>
     /// Allows you to specify the return of the expression
     /// </summary>
-    public interface IExpressionReturnConfigurator : IHideObjectMembers
+    public interface IExpressionReturnConfigurator
+        : IHideObjectMembers
     {
         /// <summary>
         /// Specify what the expression, when matched should return.
@@ -112,7 +117,8 @@ namespace Piglet.Parser.Configuration.Fluent
     }
 
 #pragma warning disable 1591
-    public interface IRuleByConfigurator : IHideObjectMembers
+    public interface IRuleByConfigurator
+        : IHideObjectMembers
 #pragma warning restore 1591
     {
         /// <summary>
@@ -164,7 +170,8 @@ namespace Piglet.Parser.Configuration.Fluent
 
 
 #pragma warning disable 1591
-    public interface IOptionalAsConfigurator : IRuleSequenceConfigurator
+    public interface IOptionalAsConfigurator
+        : IRuleSequenceConfigurator
 #pragma warning restore 1591
     {
         /// <summary>
@@ -176,7 +183,8 @@ namespace Piglet.Parser.Configuration.Fluent
     }
 
 #pragma warning disable 1591
-    public interface IMaybeNewRuleConfigurator : IHideObjectMembers
+    public interface IMaybeNewRuleConfigurator
+        : IHideObjectMembers
 #pragma warning restore 1591
     {
         /// <summary>
@@ -186,7 +194,8 @@ namespace Piglet.Parser.Configuration.Fluent
     }
 
 #pragma warning disable 1591
-    public interface IRuleSequenceConfigurator : IMaybeNewRuleConfigurator
+    public interface IRuleSequenceConfigurator
+        : IMaybeNewRuleConfigurator
 #pragma warning restore 1591
     {
         /// <summary>
@@ -205,7 +214,8 @@ namespace Piglet.Parser.Configuration.Fluent
     }
 
 #pragma warning disable 1591
-    public interface IMaybeListNamed : IListRuleSequenceConfigurator
+    public interface IMaybeListNamed
+        : IListRuleSequenceConfigurator
 #pragma warning restore 1591
     {
         /// <summary>
@@ -218,7 +228,8 @@ namespace Piglet.Parser.Configuration.Fluent
     }
 
 #pragma warning disable 1591
-    public interface IListRuleSequenceConfigurator : IRuleSequenceConfigurator
+    public interface IListRuleSequenceConfigurator
+        : IRuleSequenceConfigurator
 #pragma warning restore 1591
     {
         /// <summary>
@@ -228,7 +239,8 @@ namespace Piglet.Parser.Configuration.Fluent
     }
 
 #pragma warning disable 1591
-    public interface IListItemConfigurator : IRuleSequenceConfigurator
+    public interface IListItemConfigurator
+        : IRuleSequenceConfigurator
 #pragma warning restore 1591
     {
         /// <summary>
